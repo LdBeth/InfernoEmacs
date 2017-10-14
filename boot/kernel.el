@@ -1,7 +1,7 @@
 ;; First we are introducing the macro `eval-when-compile', this macro
 ;; can avoid the compilation of certain codes.
 (eval-when-compile
-  (unless (featurep 'core-lib)
+  (unless (or (featurep 'inferno-kernel) (featurep 'core-lib))
     ;; `signal' is a good way to stop and fire an error
     ;; at this point.
     (signal 'quit '("kernel.el is not compiled and `core-lib' have not loaded.
