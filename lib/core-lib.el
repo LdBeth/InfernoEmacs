@@ -7,42 +7,47 @@
 (defmacro exclamation (&rest structure)
   "Expand the $ structure as inline macros at compiling time
  to optimze byte-code."
-  (cl-labels ((process (s)
-                       (if (listp s)
-                           (cl-loop
-                            for i in s
+  (cl-labels ((process
+               (s)
+               (if (listp s)
+                   (cl-loop for i in s
                             collect
-                            (if (and (listp i)
-                                     (eq (car i) exclamation-macro-mark))
+                            (if (and
+                                 (listp i)
+                                 (eq
+                                  (car i)
+                                  exclamation-macro-mark))
                                 (let* ((lst (cdr i))
                                        (war (check lst)))
-                                  (if war lst (eval lst)))
+                                  (if war lst
+                                    (eval lst)))
                               (process i)))
-                         s))
-              (check (sexp)
-                     ;; A example of using `catch' and `throw'.
-                     (catch 'unbound
-                       (cl-loop
-                        for x in sexp
-                        ;; do form in `loop' always returns nil.
-                        do (if (listp x)
-                               (let ((head (car x)))
-                                 (unless (fboundp head)
-                                   (throw 'unbound t)
-                                   (warn
-                                    "symbol's function definition void: `%S' "
-                                    (car x)))
-                                 (unless (or (macrop head)
-                                             (special-form-p head))
-                                   check x))
-                             (or (not (symbolp x))
-                                 (boundp x)
-                                 (fboundp x)
-                                 (progn
-                                   (throw 'unbound t)
-                                   (warn
-                                    "symbol's definition void: `%S'"
-                                    x))))))))
+                 s))
+              (check
+               (sexp)
+               ;; A example of using `catch' and `throw'.
+               (catch 'unbound
+                 (cl-loop for x in sexp do ; do form in `loop' always returns nil.
+                          (if (listp x)
+                              (let ((head (car x)))
+                                (unless (fboundp head)
+                                  (throw 'unbound t)
+                                  (warn
+                                   "symbol's function definition void: `%S' "
+                                   (car x)))
+                                (unless (or
+                                         (macrop head)
+                                         (special-form-p head))
+                                  check x))
+                            (or
+                             (not (symbolp x))
+                             (boundp x)
+                             (fboundp x)
+                             (progn
+                               (throw 'unbound t)
+                               (warn
+                                "symbol's definition void: `%S'"
+                                x))))))))
     (cons 'progn (process structure))))
 
 ;;;###autoload
@@ -65,25 +70,32 @@ If the car of the BODY is a vector though, that vector becomes
 the argument list of the new lambda."
   (let* ((head (car body))
          (argp (vectorp head))
-         (form (if argp (cdr body) body)))
-    `(lambda ,(if argp
-                  (seq-into head 'list)
-                (cl-labels ((collect-vars
-                             (&rest forms)
-                             (cl-loop
-                              for form in forms
-                              append (cl-loop
-                                      for atom in form
-                                      if (and (symbolp atom)
-                                              (string-match anomyous-arg-mark
-                                                            (symbol-name atom)))
-                                      collect atom
-                                      else if (consp form)
-                                      append (collect-vars atom)))))
-                  (cl-sort (collect-vars body)
-                           #'string<
-                           :key #'symbol-name)))
-       ,@(if (cdr form) (list form) form))))
+         (form (if argp
+                   (cdr body)
+                 body)))
+    `(lambda
+       ,(if argp
+            (seq-into head 'list)
+          (cl-labels ((collect-vars
+                       (&rest forms)
+                       (cl-loop
+                        for form in forms
+                        append
+                        (cl-loop
+                         for atom in form
+                         if (and (symbolp atom)
+                                 (string-match anomyous-arg-mark
+                                               (symbol-name atom)))
+                         collect atom
+                         else if (consp form)
+                         append (collect-vars atom)))))
+            (cl-sort
+             (collect-vars body)
+             #'string<
+             :key #'symbol-name)))
+       ,@(if (cdr form)
+             (list form)
+           form))))
 
 ;; (require 'dash)
 
@@ -123,22 +135,30 @@ the argument list of the new lambda."
 If FORM is a function, it is only applied to the secound element of ARGS"
   (declare (indent 2))
   (cons 'progn
-        (cl-loop for i in args
-                 collect `(,mark
-                           ,(if (and (listp i) (not (eq (car i) 'quote)))
-                                (car i)
-                              i)
-                           ,@(cond ((or (not (listp i)) (eq (car i) 'quote))
-                                    nil)
-                                   ((functionp form)
-                                    (list (funcall form (cadr i))
-                                          (cl-caddr i)))
-                                   ((not form)
-                                    (cdr i))
-                                   (t
-                                    (cl-loop for x in form
-                                             for y in (cdr i)
-                                             collect (funcall x y))))))))
+        (cl-loop for i in args collect
+                 `(,mark
+                   ,(if (and
+                         (listp i)
+                         (not (eq (car i) 'quote)))
+                        (car i)
+                      i)
+                   ,@(cond
+                      ((or
+                        (not (listp i))
+                        (eq (car i) 'quote))
+                       nil)
+                      ((functionp form)
+                       (list
+                        (funcall form
+                                 (cadr i))
+                        (cl-caddr i)))
+                      ((not form)
+                       (cdr i))
+                      (t
+                       (cl-loop for x in form
+                                for y in (cdr i)
+                                collect
+                                (funcall x y))))))))
 
 
 ;;;###autoload
@@ -175,7 +195,8 @@ DOCSTRING is an optional string for the overall purpose of the
 function. The argument docstrings will be appended onto this.
 BODY is a form for the function."
   (declare (doc-string 3) (indent defun))
-  (if (not (stringp docstring))
+  (if
+      (not (stringp docstring))
       (setq body docstring
             docstring "No documentation provided."))
   (let* (_ds
@@ -190,12 +211,15 @@ BODY is a form for the function."
                         collect
                         (cond
                          ((listp arg)
-                          (setq arg-options (if (stringp (nth 1 arg))
-                                                (cddr arg)
-                                              (cdr arg)))
+                          (setq arg-options
+                                (if (stringp (nth 1 arg))
+                                    (cddr arg)
+                                  (cdr arg)))
                           (format "%s : %s%s%s"
                                   (upcase (symbol-name (car arg)))
-                                  (if (stringp (nth 1 arg)) (nth 1 arg) "No documentation")
+                                  (if (stringp (nth 1 arg))
+                                      (nth 1 arg)
+                                    "No documentation")
                                   (if (plist-get arg-options :default)
                                       (format " (default = %s)"
                                               (plist-get arg-options :default))
@@ -225,31 +249,44 @@ BODY is a form for the function."
                             (t
                              (list arg)))))
          ;; This is the code to set default values
-         (defaults (delq nil
-                         (cl-loop for arg in args
-                                  collect
-                                  (when (and (listp arg) (plist-get (cddr arg) :default))
-                                    `(when (null ,(car arg))
-                                       (setq ,(car arg) ,(plist-get (cddr arg) :default)))))))
+         (defaults
+           (delq nil
+                 (cl-loop for arg in args
+                          collect
+                          (when
+                              (and
+                               (listp arg)
+                               (plist-get (cddr arg) :default))
+                            `(when (null ,(car arg))
+                               (setq ,(car arg)
+                                     ,(plist-get (cddr arg) :default)))))))
          ;; This is the code to validate arguments
-         (validate (delq nil
-                         (cl-loop for i from 0 for arg in args
-                                  collect
-                                  (when (and (listp arg) (plist-get
-                                                          (delq :rest (cddr arg)) :validate))
-                                    `(unless (funcall ',(plist-get
-                                                         (delq :rest (cddr arg))
-                                                         :validate)
-                                                      ,(car arg))
-                                       (error "In (%s %s) Expected %s to pass %S. Got %S"
-                                              ,(symbol-name fname) ,(format "%s" newargs)
-                                              ,(symbol-name (car arg))
-                                              ',(plist-get (delq :rest (cddr arg)) :validate)
-                                              ,(car arg)))))))
+         (validate
+          (delq nil
+                (cl-loop for i from 0 for arg in args
+                         collect
+                         (when
+                             (and
+                              (listp arg)
+                              (plist-get
+                               (delq :rest (cddr arg))
+                               :validate))
+                           `(unless (funcall
+                                     ',(plist-get
+                                        (delq :rest (cddr arg))
+                                        :validate)
+                                     ,(car arg))
+                              (error "In (%s %s) Expected %s to pass %S. Got %S"
+                                     ,(symbol-name fname) ,(format "%s" newargs)
+                                     ,(symbol-name (car arg))
+                                     ',(plist-get (delq :rest (cddr arg)) :validate)
+                                     ,(car arg)))))))
          (f `(defun ,fname (,@newargs)
                ,(or ds "No docstring defined ;(."))))
-    (when defaults (setq f (append f `((progn ,@defaults)))))
-    (when validate (setq f (append f `((progn ,@validate)))))
+    (when defaults
+      (setq f (append f `((progn ,@defaults)))))
+    (when validate
+      (setq f (append f `((progn ,@validate)))))
     (setq f (append f `,@body))))
 
 
@@ -258,7 +295,7 @@ BODY is a form for the function."
   "Auto byte compile current loading file. If AEG, force update compiled file."
   (cond ((featurep 'wizard 'install)
          `(eval-when 'eval
-            (byte-compile-file .load-file-name)))
+            (byte-compile-file ,load-file-name)))
         ((featurep 'inferno 'autocomp)
          `(eval-when 'eval
             (byte-recompile-file ,load-file-name ,arg 0)))))

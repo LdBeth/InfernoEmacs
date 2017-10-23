@@ -1,5 +1,6 @@
 (self-byte-compile)
 
+
 ;;; Insert Line Number
 (defvar insert-line-number-separator "|"
   "The fancy separator used for `insert-line-number'.")
@@ -17,29 +18,33 @@
   (if (called-interactively-p 'any)
       (if (and current-prefix-arg (= current-prefix-arg 0))
           (insert-line-number (point-min) (point-max))
-        (save-excursion
-          (insert-line-number (progn (goto-char beg) (backward-paragraph)
-                                     (unless (= (point) (point-min))
-                                         (beginning-of-line 2))
-                                     (point))
-                              (progn (goto-char end) (forward-paragraph)
-                                     (point))
-                              current-prefix-arg)))
-    (save-excursion
-      (let* ((max (count-lines beg end))
-             (line (or arg 1))
-             (string (concat insert-line-number-prefix
-                             "%" (unless insert-line-number-alias-right "-")
-                             (number-to-string
-                              (length (number-to-string (+ (1- line) max))))
-                             "d" insert-line-number-separator))
-             (counter 1))
-        (goto-char beg)
-        (while (<= counter max)
-          (insert (format string line))
-          (beginning-of-line 2)
-          (incf line)
-          (incf counter))))))
+        (save-excursion (insert-line-number (progn
+                                              (goto-char beg)
+                                              (backward-paragraph)
+                                              (unless (= (point) (point-min))
+                                                (beginning-of-line 2))
+                                              (point))
+                                            (progn
+                                              (goto-char end)
+                                              (forward-paragraph)
+                                              (point))
+                                            current-prefix-arg)))
+    (save-excursion (let* ((max (count-lines beg end))
+                           (line (or arg 1))
+                           (string (concat insert-line-number-prefix
+                                           "%"
+                                           (unless insert-line-number-alias-right "-")
+                                           (number-to-string
+                                            (length (number-to-string (+ (1- line) max))))
+                                           "d"
+                                           insert-line-number-separator))
+                           (counter 1))
+                      (goto-char beg)
+                      (while (<= counter max)
+                        (insert (format string line))
+                        (beginning-of-line 2)
+                        (incf line)
+                        (incf counter))))))
 
 ;;;###autoload
 (defun strip-regular-expression-string (regular-expression)
@@ -78,5 +83,13 @@ if not select any area, then strip all line number of buffer."
   (message "Have strip line number. ^_^"))
 
 
+;;; Pretty Print
+
+;;;###autoload
+(defun xprint (form &optional output-stream)
+  "Pretty print FORM to OUTPUT-STREAM use `cl-prettyprint'"
+  (princ (with-temp-buffer (cl-prettyprint form) (buffer-string))
+         output-stream))
+
 
 (provide 'edit-lib)
