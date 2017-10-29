@@ -1,9 +1,32 @@
-;;; -*- lexical-binding: t -*-
+;;; core-lib.el --- Inferno Emacs Core Library       -*- lexical-binding: t; -*-
+
+;; Copyright (C) 2017  LdBeth
+
+;; Author: Jair Wang <ldbeth@Costume-Party.local>
+;; Keywords: lisp
+
+;; This program is free software; you can redistribute it and/or modify
+;; it under the terms of the GNU General Public License as published by
+;; the Free Software Foundation, either version 3 of the License, or
+;; (at your option) any later version.
+
+;; This program is distributed in the hope that it will be useful,
+;; but WITHOUT ANY WARRANTY; without even the implied warranty of
+;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+;; GNU General Public License for more details.
+
+;; You should have received a copy of the GNU General Public License
+;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+;;; Commentary:
+
+;; 
+
+;;; Code:
 
 (defconst exclamation-macro-mark '\$
   "Symbol used to represent a macro in `exclamation.'")
 
-;;;###autoload
 (defmacro exclamation (&rest structure)
   "Expand the $ structure as inline macros at compiling time
  to optimze byte-code."
@@ -50,7 +73,6 @@
                                 x))))))))
     (cons 'progn (process structure))))
 
-;;;###autoload
 (defalias 'excl (symbol-function 'exclamation))
 
 
@@ -58,8 +80,7 @@
 (defconst anomyous-arg-mark (rx bos "%" num)
   "String used to represent an argument in `anomyous'.")
 
-;;;###autoload
-(defmacro anomyous (&rest body)
+(defmacro anomyous (body)
   "Shortcut for lambdas.
 
 Inside this form symbols in the form %N where N is a positive
@@ -125,11 +146,9 @@ the argument list of the new lambda."
 ;;            form))))
 
 
-;;;###autoload
 (defalias 'amys (symbol-function 'anoymous))
 
 
-;;;###autoload
 (defmacro repeat-declare-syntax (mark form &rest args)
   "Repeat MARK with coresponding FORM on each of ARGS as arguments.
 If FORM is a function, it is only applied to the secound element of ARGS"
@@ -161,7 +180,6 @@ If FORM is a function, it is only applied to the secound element of ARGS"
                                 (funcall x y))))))))
 
 
-;;;###autoload
 (defmacro progress (&optional msg &rest body)
   "Excute BODY with MSG for each success excution."
   (declare (indent 1))
@@ -175,7 +193,6 @@ If FORM is a function, it is only applied to the secound element of ARGS"
 
 
 
-;;;###autoload
 (defmacro defn (fname args &optional docstring &rest body)
   "Macro to define a function with improved argument documentation.
 FNAME is a symbol for the function name.
@@ -290,7 +307,6 @@ BODY is a form for the function."
     (setq f (append f `,@body))))
 
 
-;;;###autoload
 (defmacro self-byte-compile (&optional arg)
   "Auto byte compile current loading file. If AEG, force update compiled file."
   (cond ((featurep 'wizard 'install)
@@ -304,3 +320,4 @@ BODY is a form for the function."
 (self-byte-compile t)
 
 (provide 'core-lib)
+;;; core-lib.el ends here
