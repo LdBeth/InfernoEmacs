@@ -24,6 +24,15 @@
 
 ;;; Code:
 
+(defmacro label (name symbol)
+  "Set NAME to SYMBOL's function definetion."
+  `(fset (quote ,name) ,(if (functionp symbol)
+                            (symbol-function symbol)
+                          (let ((def (eval symbol)))
+                            (if (eq (car def) 'lambda)
+                                def)))))
+
+
 (defconst exclamation-macro-mark '\$
   "Symbol used to represent a macro in `exclamation.'")
 
@@ -71,7 +80,7 @@
                                (warn
                                 "symbol's definition void: `%S'"
                                 x))))))))
-    (cons 'progn (process structure))))
+	     (cons 'progn (process structure))))
 
 (defalias 'excl (symbol-function 'exclamation))
 
@@ -80,43 +89,46 @@
 (defconst anomyous-arg-mark (rx bos "%" num)
   "String used to represent an argument in `anomyous'.")
 
-(defmacro anomyous (body)
-  "Shortcut for lambdas.
+(defmacro anomyous (&optional docstring &rest body)
+  "Shortcut for `lambda'.
 
-Inside this form symbols in the form %N where N is a positive
+Inside BODY symbols in the form %N where N is a positive
 number are to stand for positional arguments to the generated
 lambda.
 
-If the car of the BODY is a vector though, that vector becomes
-the argument list of the new lambda."
-  (let* ((head (car body))
-         (argp (vectorp head))
-         (form (if argp
-                   (cdr body)
-                 body)))
+BODY can be either wrapped in a list or not.
+
+e.g.
+
+anomyous + %1 %2 is equivalent to  and."
+  (declare (doc-string 1))
+  (let* ((dstrp (stringp docstring))
+         (form (if dstrp body
+                 (if (and body docstring)
+                     (cons docstring body)
+                   (or
+                    body
+                    (list docstring))))))
     `(lambda
-       ,(if argp
-            (seq-into head 'list)
-          (cl-labels ((collect-vars
-                       (&rest forms)
-                       (cl-loop
-                        for form in forms
-                        append
-                        (cl-loop
-                         for atom in form
-                         if (and (symbolp atom)
-                                 (string-match anomyous-arg-mark
-                                               (symbol-name atom)))
-                         collect atom
-                         else if (consp form)
-                         append (collect-vars atom)))))
-            (cl-sort
-             (collect-vars body)
-             #'string<
-             :key #'symbol-name)))
-       ,@(if (cdr form)
-             (list form)
-           form))))
+       ,(cl-labels ((collect-vars
+                     (&rest forms)
+                     (cl-loop
+                      for form in forms
+                      append
+                      (cl-loop
+                       for atom in form
+                       if (and (symbolp atom)
+                               (string-match anomyous-arg-mark
+                                             (symbol-name atom)))
+                       collect atom
+                       else if (consp form)
+                       append (collect-vars atom)))))
+          (cl-sort
+           (collect-vars form)
+           #'string<
+           :key #'symbol-name))
+       ,@(when dstrp (list docstring))
+       ,@form)))
 
 ;; (require 'dash)
 
