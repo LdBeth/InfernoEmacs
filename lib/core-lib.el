@@ -2,7 +2,7 @@
 
 ;; Copyright (C) 2017  LdBeth
 
-;; Author: Jair Wang <ldbeth@Costume-Party.local>
+;; Author: Ldbeth <andpuke@foxmail.com>
 ;; Keywords: lisp
 
 ;; This program is free software; you can redistribute it and/or modify
@@ -24,13 +24,18 @@
 
 ;;; Code:
 
-(defmacro label (name symbol)
-  "Set NAME to SYMBOL's function definetion."
-  `(fset (quote ,name) ,(if (functionp symbol)
-                            (symbol-function symbol)
-                          (let ((def (eval symbol)))
-                            (if (eq (car def) 'lambda)
-                                def)))))
+(defmacro label (name func)
+  "Set NAME's function definition to FUNC. FUNC can be
+either a symbol or a lambda expression. If the symbol have a function
+definition, the function definition is used, otherwise the return
+value of the symbol is used.
+Return NAME."
+  `(fset (quote ,name) ,(if (eq (car-safe func) 'lambda)
+                            func
+                          (or (when (functionp func)
+                                (symbol-function func))
+                              (eval func)))))
+
 
 
 (defconst exclamation-macro-mark '\$
@@ -80,7 +85,7 @@
                                (warn
                                 "symbol's definition void: `%S'"
                                 x))))))))
-	     (cons 'progn (process structure))))
+    (cons 'progn (process structure))))
 
 (defalias 'excl (symbol-function 'exclamation))
 
@@ -94,13 +99,7 @@
 
 Inside BODY symbols in the form %N where N is a positive
 number are to stand for positional arguments to the generated
-lambda.
-
-BODY can be either wrapped in a list or not.
-
-e.g.
-
-anomyous + %1 %2 is equivalent to  and."
+lambda."
   (declare (doc-string 1))
   (let* ((dstrp (stringp docstring))
          (form (if dstrp body
