@@ -1,0 +1,57 @@
+#!/usr/bin/env newlisp
+
+(define size 12); MB
+(define mount-point (or (env "TMPFS")
+                        (append (env "HOME") "/tmp")))
+
+(define (cmd-args) (1 (main-args)))
+
+(define (help)
+  (println (append "usage: " ((cmd-args) 0)
+                   " mount | unmount | remount | check"))
+  (println "\(default: mount\)"))
+
+(define (main)
+  (case ((cmd-args) 1)
+    (nil (mount))
+    ("mount" (mount))
+    ("umount" (umount))
+    ("remount" (remount))
+    ("check" (check))
+    ("orphan" (orphan))
+    (true (help)))
+  (exit))
+
+(define (check)
+  (if (= (! (append "mount | grep " mount-point)) 0)
+      true
+      nil))
+
+(define (mount)
+  (when (check)
+    (println (append "Already mounted at " mount-point))
+    (exit 1))
+  (letn (sect (/ (* size 1024 1024) 512)
+              dev ((exec (format "hdiutil attach -nomount ram://%d" sect)) 0))
+    (! (append "newfs_hfs -v \"TMPFS\" " dev))
+    (! (format "mount -t hfs -o nobrowse %s \"%s\"" dev mount-point))
+    (println ("Mounted TMPFS \(%s MB\) at %s" size mount-point))))
+
+(define (umount)
+  (let (dev (string
+             ;; Used a special feature of rad expr
+             (read-expr ((exec (append "df " mount-point)) 1))))
+    (if (file? dev)
+        (exit 1)
+        (! (format "umount \"%s\" && hdiutil detach \"%s\""
+                   mount-point dev)))))
+
+(define (remount)
+  (when (check)
+    (umount))
+  (mount))
+
+(define (orphan)
+  (! "hdiutil info | egrep 'image-path\s+: ram://' -A14 | egrep '^/dev/disk\d+\s*$'"))
+
+(main)
