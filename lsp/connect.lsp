@@ -1,5 +1,7 @@
 #!/usr/bin/env newlisp
 
+(context 'con)
+
 ;; Servers
 (define freenode
   '((server "irc.freenode.net")
@@ -11,8 +13,6 @@
 
 ;; Timeout
 (define timeout 25)
-
-(context 'con)
 
 (define (main)
   (dolist (net networks)

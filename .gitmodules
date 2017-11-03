@@ -1,0 +1,6 @@
+[submodule "exec/iim"]
+	path = exec/iim
+	url = git@github.com:c00kiemon5ter/iim.git
+[submodule "exec/cii"]
+	path = exec/cii
+	url = git@github.com:arkamar/cii.git
