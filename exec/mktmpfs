@@ -1,6 +1,6 @@
 #!/usr/bin/env newlisp
 
-(define size 12); MB
+(define size 2); MB
 (define mount-point (or (env "TMPFS")
                         (append (env "HOME") "/tmp")))
 
@@ -8,7 +8,7 @@
 
 (define (help)
   (println (append "usage: " ((cmd-args) 0)
-                   " mount | unmount | remount | check"))
+                   " mount | umount | remount | check"))
   (println "\(default: mount\)"))
 
 (define (main)
@@ -41,10 +41,10 @@
   (let (dev (string
              ;; Used a special feature of rad expr
              (read-expr ((exec (append "df " mount-point)) 1))))
-    (if (file? dev)
-        (exit 1)
+    (unless (file? dev)
+        (exit 1))
         (! (format "umount \"%s\" && hdiutil detach \"%s\""
-                   mount-point dev)))))
+                   mount-point dev))))
 
 (define (remount)
   (when (check)

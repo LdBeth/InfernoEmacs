@@ -1,7 +1,7 @@
 #/usr/bin/env newlisp
 ;; A SDF.ORG `com` style IRC interface.
 
-(define nick (env "NICK"))
+(context 'com)
 
 (define (send-input str , input)
   (write-line (or input current-file) str))
@@ -9,7 +9,7 @@
 (define (msg-loop)
   (catch
       (while true
-        (print (format "%s@%s " nick chan))
+        (print (format "%s@%s " MAIN:nick MAIN:chan))
         (handle-input (read-line)))))
 
 (define (handle-input str)
@@ -33,5 +33,4 @@
       (true (msg-loop))
       )))
 
-(define (msg-loop)
-  ())
+

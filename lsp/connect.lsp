@@ -12,6 +12,7 @@
 ;; Timeout
 (define timeout 25)
 
+(context 'con)
 
 (define (main)
   (dolist (net networks)
@@ -33,7 +34,8 @@
                             (string net) serv))
 
                    (! (format "/usr/bin/env iim -i %s -n %s -k %s -p %d &"
-                              (env "IRC") (env "NICK") serv po))
+                               (env "IRC") (env "NICK") serv po))
+                   ;; (process)
                    (let (t 1)
                      (while (not (when (file? in) (throw 0)))
                        (if (= t timeout) (throw 1))
@@ -52,4 +54,3 @@
             (println "Connected.")))
   (exit 0))
 
-(main)
