@@ -20,9 +20,9 @@ Macro libraries, function libraries. Lexical binded.
 Per-package base configurations.
 
 ### lsp/
-Extra emacs-lisp scripts.
+Extra lisp scripts.
 
-### bin/
+### exec/
 Shell scripts and other tools.
 
 ### share/
