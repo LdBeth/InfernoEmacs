@@ -2,6 +2,9 @@
 
 A Brain F**cking Emacs Config
 
+You can even find a Common Lisp BrainFuck interpreter
+under `lsp/`!!
+
 ## Coding Style
 
 1. Don't be afraid to use tones of syntax sugers.

@@ -10,13 +10,24 @@
   (catch
       (while true
         (print (format "%s@%s " MAIN:nick MAIN:chan))
-        (handle-input (read-line)))))
+        (handle-input (read-line))))
+  (command-loop))
 
 (define (handle-input str)
-  (case str
-    ("" (println "Nothing was sent.")
-     (throw true))
-    (true (send-input str))))
+  (when (= str "")
+    (println "Nothing was sent.")
+    (throw true))
+  (send-input str)
+  (let (cmd (append (lower-case (regex "^/[A-Za-z0-9]+" str)) " "))
+    (cond
+     ((regex "^/quit |^/q" cmd)
+      (println "Quitting...Wait processes to quit.")
+      (exit)
+      ;; (until process-quit)
+      )
+     ;; ("/join" open-new-window)
+     ;;((regex "^/part |^/leave") leave)
+     )))
 
 (define (command-loop)
   (while true
