@@ -10,10 +10,17 @@
   (write-line (or input current-file) str))
 
 (define (msg-loop)
+  (abort tail-loop)
   (catch
       (while true
-        (print (format "%s@%s " MAIN:nick MAIN:chan))
+        (print (format "%s@%s " MAIN:nick MAIN:chan)); maybe escaped
         (handle-input (read-line)))))
+
+;; TODO: Sould be move to server side
+(define (tail-loop file)
+  (while true (read-line file)
+         (unless (= (current-line) "")
+           (println (current-line)))))
 
 (define (handle-input str)
   (when (= str "")
@@ -24,6 +31,8 @@
     (cond
      ((regex "^/quit |^/q" cmd)
       (println "Quitting...Wait processes to quit.")
+      (destroy named)
+      (destroy ircd)
       (exit)
       ;; (until process-quit)
       )
@@ -33,9 +42,9 @@
 
 (define (command-loop)
   (while true
-    (print "%s %s" chan serv)
+    (tail window)
     (case (read-key)
-      (113 (println "Detach to process.")
+      (113 (println "Detatch process.")
            (exit)); q - Quit
       (108 (glist)); l - Get list
       (103 (goto)); g -Goto

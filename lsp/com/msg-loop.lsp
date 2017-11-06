@@ -7,7 +7,7 @@
     (print ">> ")))
 
 (define (main)
-  (set 'input (open ".irc/irc.freenode.net/#linuxba/in" "write"))
+  (set 'input (open "/Users/ldbeth/.irc/irc.freenode.net/#linuxba/in" "write"))
   (println "Now you can start typing. Use /EXIT to leave.")
   (msg-loop)
   (close input)

@@ -20,14 +20,14 @@ for pid in ${pids:=$( /sbin/fuser $src | cut -d ':' -f 2 )};
 do
     echo "src=$src, dst=$dst"
     echo "$src has $pid using it"
-    (
+    lldb -b -o $(
         echo "attach $pid"
         echo 'call (int)open("'$dst'", 66, 0666)'
         for ufd in $(LANG=C lsof -p $pid | \
-        grep "$src"\$ | awk ' { print $9; } ');
- 	    do echo 'call (int)dup2($1,'"$ufd"')'; done
-        echo 'call close($1)'
+                         grep "$src"\$ | awk ' { print $4; } ' | \
+                         sed 's/.$//');
+ 	      do echo 'call (int)dup2($0,'"$ufd"')'; done
+        echo 'call (int)close($0)'
         echo 'detach'; echo 'quit'
-        sleep 5
-    ) | lldb -q -x -
+    )
 done
