@@ -12,14 +12,15 @@
   (println "\(default: mount\)"))
 
 (define (main)
+    (if (= 1 (length (cmd-args) 1))
+       (mount)
   (case ((cmd-args) 1)
-    (nil (mount))
     ("mount" (mount))
     ("umount" (umount))
     ("remount" (remount))
     ("check" (check))
     ("orphan" (orphan))
-    (true (help)))
+    (true (help))))
   (exit))
 
 (define (check)
