@@ -68,10 +68,10 @@ Return NAME."
                           (if (listp x)
                               (let ((head (car x)))
                                 (unless (fboundp head)
-                                  (throw 'unbound t)
                                   (warn
                                    "symbol's function definition void: `%S' "
-                                   (car x)))
+                                   (car x))
+                                  (throw 'unbound t))
                                 (unless (or
                                          (macrop head)
                                          (special-form-p head))
@@ -80,11 +80,11 @@ Return NAME."
                              (not (symbolp x))
                              (boundp x)
                              (fboundp x)
-                             (progn
-                               (throw 'unbound t)
+                             (progn 
                                (warn
                                 "symbol's definition void: `%S'"
-                                x))))))))
+                                x)
+                               (throw 'unbound t))))))))
     (cons 'progn (process structure))))
 
 (defalias 'excl (symbol-function 'exclamation))
