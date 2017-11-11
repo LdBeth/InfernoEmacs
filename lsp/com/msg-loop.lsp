@@ -4,9 +4,9 @@
 
 (context 'msg)
 
-(define (loop)
+(define (loop , line)
   (print ">> ")
-  (while (!= (set 'line (read-line)) "")
+  (while (and (!= (set 'line (read-line)) "") line)
     (write-line input line)
     (print ">> ")))
 
@@ -20,9 +20,9 @@
 
 (define (loop)
   (while true
-    (unless (= (peek MAIN:out) 0)
-      (read-line MAIN:out)
-      (println (current-line)))))
+    (while (read-line MAIN:out)
+      (println (current-line)))
+    (sleep 2000)))
 
 ;; (define (main)
 ;;   (process (append "/usr/bin/tail -f " MAIN:dir "out") 0 0))
