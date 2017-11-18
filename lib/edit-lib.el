@@ -91,5 +91,36 @@ if not select any area, then strip all line number of buffer."
   (princ (with-temp-buffer (cl-prettyprint form) (buffer-string))
          output-stream))
 
+
+;;; Sudo edit
+
+;;;###autoload
+(defun sudo-edit (&optional arg)
+  (interactive "P")
+  (require 'tramp)
+  (let ((fname (if (or arg (not buffer-file-name))
+                   (read-file-name "File: ")
+                 buffer-file-name)))
+    (find-file
+     (if (not (tramp-tramp-file-p fname))
+         (concat "/sudo:root@localhost:" fname)
+       (with-parsed-tramp-file-name fname parsed
+         (when (equal parsed-user "root")
+           (error "Already root!"))
+         (let* ((new-hop (tramp-make-tramp-file-name parsed-method
+                                                     parsed-user
+                                                     parsed-host
+                                                     nil
+                                                     parsed-hop))
+
+                (new-hop (substring new-hop 1 -1))
+                (new-hop (concat new-hop "|"))
+                (new-fname (tramp-make-tramp-file-name "sudo"
+                                                       "root"
+                                                       parsed-host
+                                                       parsed-localname
+                                                       new-hop)))
+           new-fname))))))
+
 
 (provide 'edit-lib)
