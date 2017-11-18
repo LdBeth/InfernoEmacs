@@ -4,3 +4,6 @@
 [submodule "exec/cii"]
 	path = exec/cii
 	url = git@github.com:arkamar/cii.git
+[submodule "exec/ff"]
+	path = exec/ff
+	url = git@github.com:silentbicycle/ff.git
