@@ -318,6 +318,27 @@ BODY is a form for the function."
     (setq f (append f `,@body))))
 
 
+(defun doctest (fun)
+  "Run examples in docstring of FUN."
+  (interactive "aFunction: ")
+  (let (pairs (failures 0))
+    ;; Collect examples
+    (with-temp-buffer
+      (insert (documentation fun t))
+      (goto-char (point-min))
+      (while (search-forward ">>>" nil t)
+        (push (cons (read (current-buffer)) (read (current-buffer))) pairs))
+      (setq pairs (nreverse pairs)))
+    ;; Run examples
+    (dolist (p pairs)
+      (pcase-let ((`(,expr . ,result) p))
+        (unless (equal (eval expr) result)
+          (message "Eval %s failed, expected %s" expr result)
+          (cl-incf failures))))
+    ;; Final report
+    (message "Test Results: failed=%d, attempted=%d" failures (length pairs))))
+
+
 (defmacro self-byte-compile (&optional arg)
   "Auto byte compile current loading file. If AEG, force update compiled file."
   (cond ((featurep 'wizard 'install)

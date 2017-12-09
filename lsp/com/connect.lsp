@@ -16,7 +16,7 @@
 
 (define (main)
   (dolist (net networks)
-    (letn (data (eval net)
+    (let (data (eval net)
                 ser (1 (assoc 'server data))
                 chan (1 (assoc 'channels data))
                 po (last (or (assoc 'port data) '(6667)))

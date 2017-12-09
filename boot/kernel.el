@@ -7,6 +7,7 @@
     (signal 'quit '("kernel.el is not compiled and `core-lib' have not loaded.
 You may run install script to bootstrap inferno firest."))))
 
+;; Then `eval-when'.
 (eval-when (compile)
   (unless (excl (string-equal (emacs-version) ($ emacs-version)))
     (signal 'quit '("Your Emacs version is not coresponding to the compiled config.
