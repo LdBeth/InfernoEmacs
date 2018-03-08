@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>org.ldbeth.notmuch</string>
+    <key>ProgramArguments</key>
+    <array>
+        <string>/opt/pkg/bin/notmuch</string>
+        <string>new</string>
+    </array>
+    <key>UserName</key>
+    <string>ldbeth</string>
+    <key>WatchPaths</key>
+    <array>
+        <string>/Users/ldbeth/Net/Maildir/new</string>
+    </array>
+    <key>StandardOutPath</key>
+    <string>/var/log/mail.log</string>
+    <key>StandardErrorPath</key>
+    <string>/var/log/mail.log</string>
+</dict>
+</plist>

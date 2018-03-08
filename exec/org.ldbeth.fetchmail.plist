@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>org.ldbeth.fetchmail</string>
+    <key>ProgramArguments</key>
+    <array>
+        <string>/opt/pkg/bin/fetchmail</string>
+        <string>-d</string>
+        <string>1800</string>
+        <string>-f</string>
+        <string>/Users/ldbeth/.fetchmailrc</string>
+        <string>--syslog</string>
+    </array>
+    <key>KeepAlive</key>
+    <true/>
+    <key>UserName</key>
+    <string>ldbeth</string>
+    <key>ProcessType</key>
+    <string>Background</string>
+    <key>EnvironmentVariables</key>
+    <dict>
+      <key>LC_ALL</key>
+      <string>C</string>
+    </dict>
+</dict>
+</plist>
