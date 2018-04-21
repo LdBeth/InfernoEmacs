@@ -55,7 +55,7 @@ press q to quit.
 
 
 (defun msg ()
-  (privmsg *current-connection* *current-channel* (prompt "ldb")))
+  (privmsg *current-connection* *current-channel* (prompt *current-channel*)))
 
 (defun exec (c)
   (ccl:process-suspend *message-process*)
