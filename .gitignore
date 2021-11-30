@@ -1,0 +1,4 @@
+*.elc
+*~
+elpa/
+.DS_Store
