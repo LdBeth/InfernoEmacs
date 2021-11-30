@@ -10,7 +10,7 @@
    'package-archives
    '("melpa" . "https://melpa.org/packages/") t)
 
-(require 'use-package)
+;(require 'use-package)
 (load (concat user-emacs-directory "pkgs"))
 (load (concat user-emacs-directory "core/spacemacs-buffer"))
 

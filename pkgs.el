@@ -1,3 +1,5 @@
+(require 'bind-key)
+
 (use-package diminish
   :config
   (diminish 'eldoc-mode))

@@ -696,7 +696,7 @@ can be adjusted with the variable:
       (message "Jump to startup list: %s" spacemacs-buffer--startup-list-number))
     (setq spacemacs-buffer--idle-numbers-timer
           (run-with-idle-timer
-           0,4 nil
+           0.4 nil
            'spacemacs-buffer/stop-waiting-for-additional-numbers))))
 
 (defun spacemacs-buffer//re-line-starts-with-nr-space (nr-string)
