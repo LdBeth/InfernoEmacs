@@ -17,6 +17,8 @@
 (spacemacs-buffer/goto-buffer)
 (spacemacs-buffer//startup-hook)
 
+(setq spacemacs-initialized t)
+
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.

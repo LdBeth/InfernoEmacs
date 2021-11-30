@@ -10,7 +10,6 @@
   (load-theme 'spacemacs-dark t))
 
 (use-package paren-face
-  :defer t
   :config
   (global-paren-face-mode 1))
 

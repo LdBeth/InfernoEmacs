@@ -766,7 +766,8 @@ If a prefix argument is given, switch to it in an other, possibly new window."
             (insert "\n"))
           (spacemacs-buffer/insert-banner-and-buttons)
           (when (bound-and-true-p spacemacs-initialized)
-            (spacemacs-buffer/insert-startup-lists)
+	    (when dotspacemacs-startup-lists
+              (spacemacs-buffer/insert-startup-lists))
             (force-mode-line-update)
             (spacemacs-buffer-mode)))
         (if save-line
