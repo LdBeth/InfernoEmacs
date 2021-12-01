@@ -18,6 +18,15 @@
       scroll-margin 0
       scroll-conservatively 97)
 
+(setq-default indent-tabs-mode nil)
+(setq ring-bell-function 'ignore)
+(defalias 'yes-or-no-p 'y-or-n-p)
+
+;; elpa
+(setq package-archives
+      '(("gnu" . "https://elpa.gnu.org/packages/")
+	("melpa" . "https://melpa.org/packages/")))
+
 ;; Splash
 (defvar dotspacemacs-banner
   (concat user-emacs-directory "banner.pbm"))

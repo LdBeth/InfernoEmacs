@@ -20,6 +20,8 @@
 
 (use-package ivy
   :diminish ivy-mode
+  :init
+  (setq ivy-use-virtual-buffers t)
   :config
   (ivy-mode))
 
@@ -35,7 +37,7 @@
 (use-package swiper
   :defer t
   :bind
-  ("C-s" . swiper))
+  ([remap isearch-forward] . swiper))
 
 (use-package which-key
   :diminish which-key-mode
@@ -49,6 +51,18 @@
   :diminish page-break-lines-mode
   :config
   (global-page-break-lines-mode 1))
+
+;; Better defaults
+(use-package mwim
+    :defer t
+    :bind (("C-a" . mwim-beginning-of-code-or-line)
+	   ("C-e" . mwim-end-of-code-or-line)))
+
+(use-package unfill
+    :defer t
+    :commands (unfill-region unfill-paragraph unfill-toggle)
+    :bind
+    ([remap fill-paragraph] . unfill-toggle))
 
 ;; Programming
 (use-package sly
