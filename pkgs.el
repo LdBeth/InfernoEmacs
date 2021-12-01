@@ -37,7 +37,7 @@
 (use-package swiper
   :defer t
   :bind
-  ([remap isearch-forward] . swiper))
+  ([remap isearch-forward] . swiper-isearch))
 
 (use-package which-key
   :diminish which-key-mode

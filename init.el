@@ -9,6 +9,7 @@
 ;(require 'use-package)
 (load (concat user-emacs-directory "pkgs"))
 (load (concat user-emacs-directory "core/spacemacs-buffer"))
+(load (concat user-emacs-directory "keys"))
 
 (spacemacs-buffer/goto-buffer)
 (spacemacs-buffer//startup-hook)
