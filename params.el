@@ -22,6 +22,8 @@
 (setq ring-bell-function 'ignore)
 (defalias 'yes-or-no-p 'y-or-n-p)
 
+(setq recentf-exclude '("mime-example$"))
+
 ;; elpa
 (setq package-archives
       '(("gnu" . "https://elpa.gnu.org/packages/")

@@ -1048,7 +1048,7 @@ to 'auto, tags may not be properly aligned. "
 (provide 'spacemacs-common)
 
 ;; Local Variables:
-;; no-byte-compile: t
+;; no-byte-compile: nil
 ;; End:
 
 ;;; spacemacs-common.el ends here

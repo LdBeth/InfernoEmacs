@@ -1280,7 +1280,7 @@ newlines."
 	      (concat (nreverse data))))
 	(if bool-vector
 	    (x-face-string-to-bool-vector (read (buffer-string)))
-	  (string-as-unibyte (read (current-buffer))))))))
+	  (string-to-unibyte (read (current-buffer))))))))
 
 ;;;###autoload
 (defun x-face-bitmap-to-pbm (bitmap &optional plain)
@@ -1684,8 +1684,8 @@ cQqAAAAEElEQVR4nGP4DwYMoxR1KABPVB7waCGvfwAAAABJRU5ErkJggg==")
     (plist-put params :scale-factor nil)
     (append image (x-face-cleanup-plist params))))
 
-(eval-when-compile
-  (defvar last))
+;;(eval-when-compile
+;;  (defvar last))
 
 ;;;###autoload
 (defun x-face-decode-message-header (&optional beg end buffer ignore)
@@ -1860,9 +1860,10 @@ This requires a support for images in your Emacs and the external
 		  (insert " X-Face\n"))
 		(put-text-property start (point) 'x-face-image t)))
 	    (set-buffer-modified-p mod)))))
-    (when (and (boundp 'gnus-article-buffer)
-	       (eq (current-buffer) (symbol-value 'gnus-article-buffer)))
-      (set 'last t))))
+    ;;(when (and (boundp 'gnus-article-buffer)
+    ;;           (eq (current-buffer) (symbol-value 'gnus-article-buffer)))
+    ;; (set 'last t))
+    ))
 
 ;;;###autoload
 (defun x-face-show (&optional arg)
