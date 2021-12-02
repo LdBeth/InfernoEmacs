@@ -26,7 +26,7 @@
  '(custom-safe-themes
    '("bffa9739ce0752a37d9b1eee78fc00ba159748f50dc328af4be661484848e476" default))
  '(package-selected-packages
-   '(mwim unfill hl-todo sly smex diminish which-key counsel ivy paren-face use-package)))
+   '(wanderlust flyspell-correct-ivy mwim unfill hl-todo sly smex diminish which-key counsel ivy paren-face use-package)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.

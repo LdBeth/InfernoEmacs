@@ -54,15 +54,41 @@
 
 ;; Better defaults
 (use-package mwim
-    :defer t
-    :bind (("C-a" . mwim-beginning-of-code-or-line)
-	   ("C-e" . mwim-end-of-code-or-line)))
+  :defer t
+  :bind (("C-a" . mwim-beginning-of-code-or-line)
+	 ("C-e" . mwim-end-of-code-or-line)))
 
 (use-package unfill
-    :defer t
-    :commands (unfill-region unfill-paragraph unfill-toggle)
-    :bind
-    ([remap fill-paragraph] . unfill-toggle))
+  :defer t
+  :commands (unfill-region unfill-paragraph unfill-toggle)
+  :bind
+  ([remap fill-paragraph] . unfill-toggle))
+
+;; Spell
+(use-package flyspell
+  :defer t
+  :diminish " s"
+  :bind (:map flyspell-mode-map
+              ("C-;" . flyspell-correct-wrapper)))
+
+;; Mail
+(use-package wl
+  :defer t
+  :init
+  (progn
+    (setq read-mail-command 'wl
+          mail-user-agent 'wl-user-agent
+          mime-header-accept-quoted-encoded-words t)
+    (define-mail-user-agent
+        'wl-user-agent
+        'wl-user-agent-compose
+        'wl-draft-send
+        'wl-draft-kill
+        'mail-send-hook)))
+
+(use-package x-face-e21
+  :defer t
+  :commands (x-face-decode-message-header))
 
 ;; Programming
 (use-package sly
