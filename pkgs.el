@@ -78,6 +78,7 @@
   (progn
     (setq read-mail-command 'wl
           mail-user-agent 'wl-user-agent
+          mail-specify-envelope-from t
           mime-header-accept-quoted-encoded-words t)
     (define-mail-user-agent
         'wl-user-agent

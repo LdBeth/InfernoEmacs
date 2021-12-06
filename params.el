@@ -22,7 +22,11 @@
 (setq ring-bell-function 'ignore)
 (defalias 'yes-or-no-p 'y-or-n-p)
 
-(setq recentf-exclude '("mime-example$"))
+(setq recentf-exclude '("mime-example$" ".emacs.d/url/*"))
+
+;; ERC
+(setq erc-server "irc.libera.chat"
+      erc-nick "ldb")
 
 ;; elpa
 (setq package-archives

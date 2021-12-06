@@ -16,6 +16,7 @@ if prefix argument ARG is given, switch to it in an other, possibly new window."
  :prefix-map launchpad-key-map
  ("h" . spacemacs/home)
  ("s" . switch-to-scratch-buffer)
- ("i" . ibuffer))
+ ("i" . ibuffer)
+ ("w" . wl))
 
 (add-to-list 'auto-mode-alist '("\\.spad" . prog-mode) t)
