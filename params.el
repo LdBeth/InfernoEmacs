@@ -10,7 +10,13 @@
 
 (set-frame-font (font-spec :name "SF Mono" :size 13
 			   :weight 'normal
-               :width 'normal) nil t)
+                           :width 'normal) nil t)
+
+(set-fontset-font "fontset-default"
+                  'unicode
+                  (font-spec :name "SImPL Medium" :size 13
+			     :weight 'normal
+                             :width 'normal) nil 'prepend)
 
 (blink-cursor-mode -1)
 

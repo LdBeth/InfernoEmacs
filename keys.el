@@ -17,6 +17,7 @@ if prefix argument ARG is given, switch to it in an other, possibly new window."
  ("h" . spacemacs/home)
  ("s" . switch-to-scratch-buffer)
  ("i" . ibuffer)
- ("w" . wl))
+ ("w" . wl)
+ ("f" . make-frame))
 
 (add-to-list 'auto-mode-alist '("\\.spad" . prog-mode) t)

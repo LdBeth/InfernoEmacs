@@ -87,6 +87,12 @@
         'wl-draft-kill
         'mail-send-hook)))
 
+(use-package mu-cite
+  :disabled
+  :defer t
+  :init
+  (add-hook 'mail-citation-hook 'mu-cite-original))
+
 (use-package x-face-e21
   :defer t
   :commands (x-face-decode-message-header))
