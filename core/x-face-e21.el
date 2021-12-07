@@ -27,11 +27,6 @@
 ;; Using x-face-e21 to display X-Faces in the Gnus article buffer is
 ;; not recommended.  There is still the way to do that, though.
 
-;; The Elisp based uncompface program is now supported.  You need to
-;; install No Gnus v0.2 (and later) in which the compface.el module
-;; provides that program.  The `x-face-use-uncompface-internal'
-;; variable switches whether to use it.
-
 ;; Displaying the `Face' header is now supported.  It is assumed that
 ;; the `Face' header contains a base64 encoded PNG image.  You need to
 ;; have installed Emacs 21 with the PNG support.  You also need the
@@ -602,34 +597,6 @@ X-Face: 2i'm.M0UyETCme?'R/?fE}i)R-aY$t;].MSLwmUfB\"^3H+so!vO79{mzviSR4#DM+}\"\"
 	 `(list (cons :format "%v" (sexp :format ,tag :size 0) ,selection)
 		(cons :format "%v" (sexp :format ,tag :size 0) ,selection)))))
 
-(put 'x-face-internal-function 'uncompface-internal
-     (lambda nil
-       "Check whether `uncompface-internal' is available."
-       (if noninteractive
-	   nil
-	 (and (or (and (featurep 'compface)
-		       (fboundp 'uncompface-internal))
-		  (let ((compface (locate-library "compface")))
-		    (and compface
-			 (string-match "\\.elc\\'" compface)
-			 (file-readable-p compface)
-			 (> (nth 7 (file-attributes compface)) 20000)
-			 (condition-case nil
-			     (progn
-			       (setq compface
-				     (if (fboundp 'uncompface)
-					 (symbol-function 'uncompface)))
-			       (require 'compface))
-			   (error nil))
-			 (or (fboundp 'uncompface-internal)
-			     (prog1
-				 nil
-			       (if compface
-				   (fset 'uncompface compface)
-				 (fmakunbound 'uncompface))
-			       (setq features
-				     (delq 'compface features)))))))))))
-
 (eval-when-compile
   (defmacro x-face-cleanup-plist (plist)
     "Remove properties with the value nil in PLIST."
@@ -700,18 +667,6 @@ The value form is the same as `x-face-image-attributes'."
 	 (prog1
 	     (custom-set-default symbol value)
 	   (funcall (get 'x-face-internal-function 'show-sample) t t)))
-  :group 'x-face)
-
-(defcustom x-face-use-uncompface-internal
-  (funcall (get 'x-face-internal-function 'uncompface-internal))
-  "Say whether to use the ELisp based uncompface program."
-  :version "21.1"
-  :type '(boolean :format "%{%t%}: %[%v%]")
-  :set (lambda (symbol value)
-	 (custom-set-default symbol
-			     (and value
-				  (funcall (get 'x-face-internal-function
-						'uncompface-internal)))))
   :group 'x-face)
 
 (defcustom uncompface-program "uncompface"
@@ -899,7 +854,6 @@ A value is a buffer in which images will be displayed.")
   (autoload 'mew-summary-display "mew-summary")
   (autoload 'mh-get-msg-num "mh-utils")
   (autoload 'mh-show-msg "mh-utils")
-  (autoload 'uncompface-internal "compface")
   (autoload 'vm-follow-summary-cursor "vm-motion")
   (autoload 'wl-message-get-original-buffer "wl-message")
   (autoload 'wl-summary-set-message-buffer-or-redisplay "wl-summary")
@@ -1221,66 +1175,37 @@ newlines."
 	(setq x-face (x-face-cleanup-x-face x-face))
       ;; Return an empty X-Face by default.
       (setq x-face ",\\m{?h\\)X")))
-  (if x-face-use-uncompface-internal
-      (let ((bits (uncompface-internal x-face t))
-	    (index 0)
-	    bytes)
-	(if bit-reverse
-	    (while (< index 2304)
-	      (push (+ (if (aref bits index) 1 0)
-		       (if (aref bits (1+ index)) 2 0)
-		       (if (aref bits (+ 2 index)) 4 0)
-		       (if (aref bits (+ 3 index)) 8 0)
-		       (if (aref bits (+ 4 index)) 16 0)
-		       (if (aref bits (+ 5 index)) 32 0)
-		       (if (aref bits (+ 6 index)) 64 0)
-		       (if (aref bits (+ 7 index)) 128 0))
-		    bytes)
-	      (setq index (+ 8 index)))
-	  (while (< index 2304)
-	    (push (+ (if (aref bits index) 128 0)
-		     (if (aref bits (1+ index)) 64 0)
-		     (if (aref bits (+ 2 index)) 32 0)
-		     (if (aref bits (+ 3 index)) 16 0)
-		     (if (aref bits (+ 4 index)) 8 0)
-		     (if (aref bits (+ 5 index)) 4 0)
-		     (if (aref bits (+ 6 index)) 2 0)
-		     (if (aref bits (+ 7 index)) 1 0))
-		  bytes)
-	    (setq index (+ 8 index))))
-	(if bool-vector
-	    (x-face-string-to-bool-vector (concat (nreverse bytes)))
-	  (concat (nreverse bytes))))
-    (with-temp-buffer
-      (insert x-face)
-      (call-process-region (point-min) (point-max)
-			   uncompface-program t '(t nil))
-      (goto-char (point-min))
-      (setq case-fold-search t)
-      (while (search-forward "0x" nil t)
-	(delete-char -2))
-      (goto-char (point-min))
-      (while (re-search-forward "[^[:xdigit:]]+" nil t)
-	(delete-region (match-beginning 0) (match-end 0)))
-      (goto-char (point-min))
-      (insert "\"")
-      (while (not (eobp))
-	(insert "\\x")
-	(forward-char 2))
-      (insert "\"")
-      (goto-char (point-min))
-      (if bit-reverse
-	  (let ((data (read (current-buffer))))
-	    (dolist (byte (prog1
-			      (append data nil)
-			    (setq data nil)))
-	      (push (aref x-face-mirror byte) data))
-	    (if bool-vector
-		(x-face-string-to-bool-vector (concat (nreverse data)))
-	      (concat (nreverse data))))
-	(if bool-vector
-	    (x-face-string-to-bool-vector (read (buffer-string)))
-	  (string-to-unibyte (read (current-buffer))))))))
+  (with-temp-buffer
+    (insert x-face)
+    (call-process-region (point-min) (point-max)
+			 uncompface-program t '(t nil))
+    (goto-char (point-min))
+    (setq case-fold-search t)
+    (while (search-forward "0x" nil t)
+      (delete-char -2))
+    (goto-char (point-min))
+    (while (re-search-forward "[^[:xdigit:]]+" nil t)
+      (delete-region (match-beginning 0) (match-end 0)))
+    (goto-char (point-min))
+    (insert "\"")
+    (while (not (eobp))
+      (insert "\\x")
+      (forward-char 2))
+    (insert "\"")
+    (goto-char (point-min))
+    (if bit-reverse
+	(let ((data
+               (apply #'unibyte-string
+                 (mapcar
+                  (lambda (byte)
+                    (aref x-face-mirror byte))
+                  (read (current-buffer))))))
+	  (if bool-vector
+	      (x-face-string-to-bool-vector data)
+	    data))
+      (if bool-vector
+          (x-face-string-to-bool-vector (read (buffer-string)))
+	(string-to-unibyte (read (current-buffer)))))))
 
 ;;;###autoload
 (defun x-face-bitmap-to-pbm (bitmap &optional plain)
@@ -1697,7 +1622,7 @@ function which is similar to the `x-face-possibly-change-buffer'
 function.  The optional IGNORE specifies the symbol of the type which
 should be ignored.  The valid values include nil, `face' and `x-face'.
 This requires a support for images in your Emacs and the external
-`uncompface' program or the ELisp based `uncompface' program."
+`uncompface' program."
   (when (and (display-images-p)
 	     (image-type-available-p 'pbm))
     (let ((inhibit-point-motion-hooks t)
