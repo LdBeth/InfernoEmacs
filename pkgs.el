@@ -1,3 +1,4 @@
+;; -*- lexical-binding:t -*-
 (require 'bind-key)
 
 (use-package diminish
@@ -78,6 +79,7 @@
   (progn
     (setq read-mail-command 'wl
           mail-user-agent 'wl-user-agent
+          mail-envelope-from 'header
           mail-specify-envelope-from t
           mime-header-accept-quoted-encoded-words t)
     (define-mail-user-agent
@@ -95,7 +97,11 @@
 
 (use-package x-face-e21
   :defer t
-  :commands (x-face-decode-message-header))
+  :commands (x-face-decode-message-header)
+  :init
+  (setq x-face-image-attributes
+        '((light :ascent 80 :foreground "#655370")
+          (dark :ascent 80 :foreground "#292b2e" :background "#b2b2b2"))))
 
 ;; Programming
 (use-package sly

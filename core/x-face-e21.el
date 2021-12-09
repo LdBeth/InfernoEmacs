@@ -840,9 +840,6 @@ A value is a buffer in which images will be displayed.")
 (defvar x-face-working-buffer " *x-face-working*"
   "Temporary buffer for the internal use.")
 
-(defconst x-face-most-positive-fixnum (eval '(lsh -1 -1))
-  "Maximum integer for this Emacs.")
-
 (eval-when-compile
   ;; Avoid byte-compile warnings.
   (autoload 'cmail-folder-buffer "cmail-misc")
@@ -888,7 +885,7 @@ from START to END, otherwise use overlay instead of text property."
 	   (if x-face-use-overlay
 	       (let ((overlay (make-overlay start end)))
 		 (overlay-put overlay 'evaporate t)
-		 (overlay-put overlay 'priority x-face-most-positive-fixnum)
+		 (overlay-put overlay 'priority most-positive-fixnum)
 		 ,(when mark
 		    `(overlay-put overlay ,mark t))
 		 (while properties
@@ -1773,7 +1770,7 @@ This requires a support for images in your Emacs and the external
 				   (concat rest "\n")
 				 rest))
 		  (overlay-put overlay 'x-face-image t)
-		  (overlay-put overlay 'priority x-face-most-positive-fixnum)
+		  (overlay-put overlay 'priority most-positive-fixnum)
 		  (overlay-put overlay 'evaporate t))
 	      (while images
 		(setq start (point))

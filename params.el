@@ -18,17 +18,23 @@
 			     :weight 'normal
                              :width 'normal) nil 'prepend)
 
+(set-face-attribute 'variable-pitch
+                    nil
+                    :font "IBM Plex Sans Text")
+
 (blink-cursor-mode -1)
 
 (setq scroll-preserve-screen-position t
       scroll-margin 0
-      scroll-conservatively 97)
+      scroll-conservatively 97
+      make-cursor-line-fully-visible nil
+      shr-width 72)
 
 (setq-default indent-tabs-mode nil)
 (setq ring-bell-function 'ignore)
 (defalias 'yes-or-no-p 'y-or-n-p)
 
-(setq recentf-exclude '("mime-example$" ".emacs.d/url/*"))
+(setq recentf-exclude '("mime-example$" ".emacs.d/\\([a-z]\\|-\\)*$"))
 
 ;; ERC
 (setq erc-server "irc.libera.chat"
