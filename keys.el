@@ -1,4 +1,4 @@
-;; bind keys -*- lexical-binding:t -*-
+;; -*- lexical-binding:t -*-
 (defun switch-to-scratch-buffer (&optional arg)
   "Switch to the `*scratch*' buffer, creating it first if needed.
 if prefix argument ARG is given, switch to it in an other, possibly new window."
@@ -10,7 +10,28 @@ if prefix argument ARG is given, switch to it in an other, possibly new window."
     (unless (or exists
                 (eq major-mode initial-major-mode))
       (funcall initial-major-mode))))
-  
+
+(defun now-playing ()
+  (interactive)
+  (let* ((script (eval-when-compile
+                   (mac-osa-compile "if application \"Music\" is running then
+  tell application \"Music\"
+    if player state is stopped then
+      set display to \"No Track Playing\"
+    else
+      set track_artist to artist of current track
+      set track_name to name of current track
+      set display to track_artist & \" - \" & track_name
+    end if
+  end tell
+else
+  set display to \"Music.app is not running\"
+end if")))
+         (nowplay (read (mac-osa-script script t nil))))
+    (if (called-interactively-p 'interactive)
+        (message nowplay)
+      nowplay)))
+
 (bind-keys
  :prefix "M-m"
  :prefix-map launchpad-key-map

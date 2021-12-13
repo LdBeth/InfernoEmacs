@@ -6,7 +6,8 @@
 (prefer-coding-system 'utf-8)
 
 (setq inhibit-startup-screen t)
-(setq make-backup-files nil)
+(setq make-backup-files nil
+      create-lockfiles nil)
 
 (set-frame-font (font-spec :name "SF Mono" :size 13
 			   :weight 'normal

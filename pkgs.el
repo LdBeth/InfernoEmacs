@@ -1,5 +1,7 @@
 ;; -*- lexical-binding:t -*-
 (require 'bind-key)
+(eval-when-compile
+  (setq use-package-expand-minimally t))
 
 (use-package diminish
   :config
@@ -15,8 +17,7 @@
   (global-paren-face-mode 1))
 
 (use-package hl-todo
-  :defer t
-  :init
+  :config
   (global-hl-todo-mode 1))
 
 (use-package ivy
