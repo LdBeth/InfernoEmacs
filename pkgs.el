@@ -94,15 +94,25 @@
   :disabled
   :defer t
   :init
-  (add-hook 'mail-citation-hook 'mu-cite-original))
+  (add-hook 'mail-citation-hook 'mu-cite-original)
+  :config
+  (lsdb-mu-insinuate))
 
 (use-package x-face-e21
   :defer t
-  :commands (x-face-decode-message-header)
+  :commands (x-face-decode-message-header x-face-create-image)
   :init
   (setq x-face-image-attributes
         '((light :ascent 80 :foreground "#655370")
           (dark :ascent 80 :foreground "#292b2e" :background "#b2b2b2"))))
+
+(use-package lsdb
+  :defer t
+  :init
+  (setq lsdb-insert-x-face-function
+        (lambda (x-face)
+          (insert-image (x-face-create-image x-face))))
+  :commands (lsdb lsdb-wl-insinuate))
 
 ;; Programming
 (use-package sly
