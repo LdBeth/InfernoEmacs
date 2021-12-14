@@ -753,24 +753,48 @@ Overrides `temp-buffer-show-function'.")
     (unless (eq last-command this-command)
       (setq lsdb-last-candidates nil
 	    lsdb-last-candidates-pointer nil
-	    lsdb-last-completion (buffer-substring-no-properties start (point)))
+	    lsdb-last-completion (buffer-substring start (point)))
       (if (and lsdb-use-migemo (fboundp 'migemo-get-pattern))
 	  (setq lsdb-last-completion (migemo-get-pattern lsdb-last-completion)
 		pattern (concat "\\<\\(" lsdb-last-completion "\\)"))
 	(setq pattern (concat "\\<" (regexp-quote lsdb-last-completion))))
-      (maphash
-       (lambda (_key value)
-	 (setq lsdb-last-candidates
-	       (nconc lsdb-last-candidates
-		      (delq nil (mapcar
-				 (lambda (candidate)
-				   (if (string-match pattern candidate)
-				       candidate))
-				 (if lsdb-strip-address
-				     (cdr (assq 'net value))
-				   (append (cdr (assq 'net value))
-					   (cdr (assq 'sender value)))))))))
-       lsdb-hash-table)
+      (let (matched)
+	(maphash
+	 (lambda (key value)
+	   (setq matched
+		 (string-match pattern key)
+		 key
+		 (if (and (string-match
+			   (eval-when-compile
+			     (concat "[" std11-special-char-list "]"))
+			   key)
+			  (null (eq (cdr (std11-analyze-quoted-string key 0))
+				    (length key))))
+		     ;; Entry name contains non-atom special chars and
+		     ;; are not quoted.
+		     (std11-wrap-as-quoted-string key)
+		   key)
+		 lsdb-last-candidates
+		 (cons (unless lsdb-strip-address
+			 (mapcar
+			  (lambda (candidate)
+			    (if (string-match pattern candidate)
+				candidate))
+			  (cdr (assq 'sender value))))
+		       (cons (mapcar
+			      (lambda (candidate)
+				;; Record's name is matched.
+				(if (or matched
+					(string-match pattern candidate))
+				    (concat key " <" candidate ">")))
+			      (cdr (assq 'net value)))
+			     lsdb-last-candidates))))
+	 lsdb-hash-table))
+      (setq lsdb-last-candidates
+	    (delq nil (apply 'nconc (nreverse lsdb-last-candidates))))
+      (let ((tmp lsdb-last-candidates))
+	(while tmp 
+	  (setq tmp (setcdr tmp (delete (car tmp) (cdr tmp))))))
       ;; Sort candidates by the position where the pattern occurred.
       (setq lsdb-last-candidates
 	    (sort lsdb-last-candidates
@@ -798,19 +822,19 @@ static char * lsdb_pointer_xpm[] = {
 \"#	c #FF7575\",
 \"$	c #FF5959\",
 \"              \",
-\"  +++   @@@   \",
-\" +++## @@@@@  \",
-\" ++  # @@@@@  \",
-\" +## ##@@@@@  \",
-\" +## $$@@@@@  \",
-\" +## $$@@ @@  \",
-\"  ##      @   \",
-\"   #$$$@@@    \",
-\"    $$@@@     \",
-\"     $@@      \",
-\"      @       \",
-\"              \",
-\"              \"};")
+\"  +++####@    \",
+\" ++$@+    @$  \",
+\" +#$@+    @$  \",
+\" +# @++++@$   \",
+\" +# @+    @$  \",
+\" +@ @+    @$  \",
+\" +@ @#####@   \",
+\" +@  +@+@$    \",
+\" +@      $+   \",
+\" +@       #+  \",
+\" +@@      @#$ \",
+\" $@@@@@@@@@+  \",
+\"  +$$$$$+     \"};")
 
 
 (require 'image)
