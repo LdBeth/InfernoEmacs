@@ -798,11 +798,11 @@ static char * lsdb_pointer_xpm[] = {
 \"              \",
 \"  +++   @@@   \",
 \" +++## @@@@@  \",
-\" ++### @@@@@  \",
-\" +#####@@@@@  \",
-\" +###$$@@@@@  \",
-\" +###$$@@@@@  \",
-\"  ##$$$@@@@   \",
+\" ++  # @@@@@  \",
+\" +## ##@@@@@  \",
+\" +## $$@@@@@  \",
+\" +## $$@@ @@  \",
+\"  ##      @   \",
 \"   #$$$@@@    \",
 \"    $$@@@     \",
 \"     $@@      \",
@@ -1169,17 +1169,16 @@ performed against the entry field."
   (let (records)
     (maphash
      (if entry-name
-	 (progn
-	   (lambda (key value)
-	     (let ((entry (cdr (assq entry-name value)))
-		   found)
-	       (unless (listp entry)
-		 (setq entry (list entry)))
-	       (while (and (not found) entry)
-		 (if (string-match regexp (pop entry))
-		     (setq found t)))
-	       (if found
-		   (push (cons key value) records)))))
+	 (lambda (key value)
+	   (let ((entry (cdr (assq entry-name value)))
+		 found)
+	     (unless (listp entry)
+	       (setq entry (list entry)))
+	     (while (and (not found) entry)
+	       (if (string-match regexp (pop entry))
+		   (setq found t)))
+	     (if found
+		 (push (cons key value) records))))
        (lambda (key value)
 	 (if (string-match regexp key)
 	     (push (cons key value) records))))
@@ -1212,7 +1211,46 @@ performed against the entry field."
 	(lsdb-display-records records))))
 
 ;;;###autoload
-(defalias 'lsdb 'lsdb-mode-lookup)
+(defalias 'lsdb
+  (static-if (featurep 'ivy)
+      (progn
+        (defun counsel-lsdb-candidates (&optional entry-name)
+          "Return a list of entries in LSDB."
+          (let (results)
+            (maphash
+             (if entry-name
+	         (lambda (_key value)
+	           (let ((entry (cdr (assq entry-name value))))
+	             (if entry
+		         (push entry results))))
+               (lambda (key _value)
+	         (push key results)))
+             lsdb-hash-table)
+            results))
+        (defun counsel-lsdb (&optional entry-name)
+          "Search LSDB with `ivy'."
+          (interactive
+           (let* ((completion-ignore-case t)
+	          (entry-name
+	           (if current-prefix-arg
+	               (completing-read "Entry name: "
+				        lsdb-known-entry-names))))
+             (list (if (and entry-name (not (equal entry-name "")))
+	               (intern (downcase entry-name))))))
+          (lsdb-maybe-load-hash-tables)
+          (let* ((regexp
+                  (ivy-read
+                   (if entry-name
+                       (format "Search records `%s' regexp: " entry-name)
+                     "Search records regexp: ")
+                   (counsel-lsdb-candidates entry-name)
+                   :re-builder #'ivy--regex
+                   :caller 'counsel-lsdb
+                   :history 'lsdb-mode-lookup-history))
+                 (records (lsdb-lookup-records regexp entry-name)))
+            (if records
+	        (lsdb-display-records records)))))
+    'lsdb-mode-lookup))
 
 (defun lsdb-mode-next-record (&optional arg)
   "Go to the next record."
