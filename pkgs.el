@@ -100,7 +100,9 @@
 
 (use-package x-face-e21
   :defer t
-  :commands (x-face-decode-message-header x-face-create-image)
+  :commands (x-face-decode-message-header
+             x-face-create-image
+             x-face-create-face-image)
   :init
   (setq x-face-image-attributes
         '((light :ascent 80 :foreground "#655370")
@@ -108,10 +110,6 @@
 
 (use-package lsdb
   :defer t
-  :init
-  (setq lsdb-insert-x-face-function
-        (lambda (x-face)
-          (insert-image (x-face-create-image x-face))))
   :commands (lsdb lsdb-wl-insinuate))
 
 ;; Programming
