@@ -73,7 +73,7 @@
   :group 'lsdb
   :type 'file)
 
-(defcustom lsdb-file-coding-system (find-coding-system 'ctext)
+(defcustom lsdb-file-coding-system (find-coding-system 'utf-8)
   "Coding system for `lsdb-file'."
   :group 'lsdb
   :type 'symbol)
@@ -352,44 +352,7 @@ Overrides `temp-buffer-show-function'.")
 (defsubst lsdb-secondary-hash-table-start (hash-table)
   (format lsdb-secondary-hash-table-start-format hash-table))
 
-(eval-and-compile
-  (condition-case nil
-      (and
-       ;; In XEmacs, hash tables can also be created by the lisp reader
-       ;; using structure syntax.
-       (read-from-string "#s(hash-table)")
-       (defalias 'lsdb-read 'read))
-    (invalid-read-syntax
-     (defun lsdb-read (&optional marker)
-       "Read one Lisp expression as text from MARKER, return as Lisp object."
-       (save-excursion
-	 (goto-char marker)
-	 (if (looking-at "^#s(")
-	     (let ((end-marker
-		    (progn
-		      (forward-char 2)	;skip "#s"
-		      (forward-sexp)	;move to the left paren
-		      (point-marker))))
-	       (with-temp-buffer
-		 (buffer-disable-undo)
-		 (insert-buffer-substring (marker-buffer marker)
-					  marker end-marker)
-		 (goto-char (point-min))
-		 (delete-char 2)
-		 (let ((object (read (current-buffer)))
-		       hash-table data)
-		   (if (eq 'hash-table (car object))
-		       (progn
-			 (setq hash-table
-			       (make-hash-table
-				:size (plist-get (cdr object) 'size)
-				:test 'equal)
-			       data (plist-get (cdr object) 'data))
-			 (while data
-			   (puthash (pop data) (pop data) hash-table))
-			 hash-table)
-		     object))))
-	   (read marker)))))))
+(defalias 'lsdb-read 'read)
 
 (defun lsdb-load-hash-tables ()
   "Read the contents of `lsdb-file' into the internal hash tables."
@@ -462,14 +425,16 @@ Overrides `temp-buffer-show-function'.")
       (while (re-search-forward (concat "^\\(" regexp "\\):[ \t]*")
 				nil t)
 	(push (cons (match-string 1)
-		    (buffer-substring-no-properties (point) (std11-field-end)))
+	            (string-to-unibyte
+                     (buffer-substring-no-properties
+                      (point) (std11-field-end))))
 	      field-bodies))
       (nreverse field-bodies))))
 
 (defun lsdb-canonicalize-spaces-and-dots (string)
   (while (string-match "  +\\|[\f\t\n\r\v]+\\|\\." string)
     (setq string (replace-match " " nil t string)))
-  string)
+  (string-to-unibyte string))
 
 (defun lsdb-extract-address-components (string)
   (let ((components (std11-extract-address-components string)))
