@@ -374,9 +374,8 @@ Overrides `temp-buffer-show-function'.")
       (while (re-search-forward (concat "^\\(" regexp "\\):[ \t]*")
 				nil t)
 	(push (cons (match-string 1)
-	            (string-to-unibyte
-                     (buffer-substring-no-properties
-                      (point) (std11-field-end))))
+                    (buffer-substring-no-properties
+                     (point) (std11-field-end)))
 	      field-bodies))
       (nreverse field-bodies))))
 
@@ -401,11 +400,14 @@ Overrides `temp-buffer-show-function'.")
 ;; stolen (and renamed) from nnheader.el
 (defun lsdb-decode-field-body (field-body field-name
 					  &optional mode max-column)
-  (mime-decode-field-body field-body
-			  (if (stringp field-name)
-			      (intern (capitalize field-name))
-			    field-name)
-			  mode max-column))
+  (let ((default-mime-charset
+          (car (find-coding-systems-string field-body))))
+    (substring-no-properties
+     (mime-decode-field-body field-body
+                             (if (stringp field-name)
+                                 (intern (capitalize field-name))
+                               field-name)
+                             mode max-column))))
 
 ;;;_. Record Management
 (defun lsdb-rebuild-secondary-hash-tables (&optional force)
@@ -1214,19 +1216,34 @@ performed against the entry field."
 (defalias 'lsdb
   (static-if (featurep 'ivy)
       (progn
-        (defun counsel-lsdb-candidates (&optional entry-name)
-          "Return a list of entries in LSDB."
-          (let (results)
-            (maphash
-             (if entry-name
-	         (lambda (_key value)
-	           (let ((entry (cdr (assq entry-name value))))
-	             (if entry
-		         (push entry results))))
-               (lambda (key _value)
-	         (push key results)))
-             lsdb-hash-table)
-            results))
+        (defun counsel-lsdb-candidates (entry-name)
+          "Build `counsel-lsdb' candidate list."
+          (if entry-name
+              (lambda (regexp)
+                (let (entries)
+                  (maphash
+                   (lambda (_key value)
+                     (let ((entry (cdr (assq entry-name value))))
+                       (unless (listp entry)
+	                 (setq entry (list entry)))
+                       (mapc
+                        (lambda (e)
+                          (if (and e
+                                   (not (member e entries))
+                                   (string-match regexp e))
+                              (push (propertize e 'entry t) entries)))
+                        entry)))
+                   lsdb-hash-table)
+                  entries))
+            (lambda (regexp)
+              (let (results)
+                (maphash
+                 (lambda (key value)
+                   (if (string-match regexp key)
+                       (push (propertize key 'record
+                                         (cons key value)) results)))
+                 lsdb-hash-table)
+                results))))
         (defun counsel-lsdb (&optional entry-name)
           "Search LSDB with `ivy'."
           (interactive
@@ -1245,11 +1262,18 @@ performed against the entry field."
                      "Search records regexp: ")
                    (counsel-lsdb-candidates entry-name)
                    :re-builder #'ivy--regex
+                   :dynamic-collection t
                    :caller 'counsel-lsdb
                    :history 'lsdb-mode-lookup-history))
-                 (records (lsdb-lookup-records regexp entry-name)))
-            (if records
-	        (lsdb-display-records records)))))
+                 (record (get-text-property 0 'record regexp)))
+            (if record
+	        (lsdb-display-record record)
+              (let ((records (lsdb-lookup-records
+                              (if (get-text-property 0 'entry regexp)
+                                  (regexp-quote regexp)
+                                regexp) entry-name)))
+                (if records
+	            (lsdb-display-records records)))))))
     'lsdb-mode-lookup))
 
 (defun lsdb-mode-next-record (&optional arg)

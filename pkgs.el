@@ -23,7 +23,8 @@
 (use-package ivy
   :diminish ivy-mode
   :init
-  (setq ivy-use-virtual-buffers t)
+  (setq ivy-use-virtual-buffers t
+        ivy-use-selectable-prompt t)
   :config
   (ivy-mode))
 
