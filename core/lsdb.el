@@ -1412,7 +1412,7 @@ of the buffer."
 ;;;###autoload
 (defun lsdb-wl-insinuate ()
   "Call this function to hook LSDB into Wanderlust."
-  (add-hook 'wl-message-redisplay-hook 'lsdb-wl-update-record)
+  ;(add-hook 'wl-message-redisplay-hook 'lsdb-wl-update-record)
   (add-hook 'wl-summary-exit-hook 'lsdb-hide-buffer)
   (add-hook 'wl-summary-toggle-disp-off-hook 'lsdb-hide-buffer)
   (add-hook 'wl-summary-toggle-disp-folder-on-hook 'lsdb-hide-buffer)

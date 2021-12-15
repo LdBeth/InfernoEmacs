@@ -1173,6 +1173,7 @@ newlines."
       ;; Return an empty X-Face by default.
       (setq x-face ",\\m{?h\\)X")))
   (with-temp-buffer
+    (set-buffer-multibyte nil)
     (insert x-face)
     (call-process-region (point-min) (point-max)
 			 uncompface-program t '(t nil))
@@ -1202,7 +1203,7 @@ newlines."
 	    data))
       (if bool-vector
           (x-face-string-to-bool-vector (read (buffer-string)))
-	(string-to-unibyte (read (current-buffer)))))))
+	(read (current-buffer))))))
 
 ;;;###autoload
 (defun x-face-bitmap-to-pbm (bitmap &optional plain)
