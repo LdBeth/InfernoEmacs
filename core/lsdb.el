@@ -1236,68 +1236,68 @@ performed against the entry field."
     (if records
 	(lsdb-display-records records))))
 
+(static-if (featurep 'ivy)
+    (defun counsel-lsdb-candidates (entry-name)
+      "Build `counsel-lsdb' candidate list."
+      (if entry-name
+          (lambda (regexp)
+            (let (entries)
+              (maphash
+               (lambda (_key value)
+                 (let ((entry (cdr (assq entry-name value))))
+                   (unless (listp entry)
+	             (setq entry (list entry)))
+                   (mapc
+                    (lambda (e)
+                      (if (and e
+                               (not (member e entries))
+                               (string-match regexp e))
+                          (push (propertize e 'entry t) entries)))
+                    entry)))
+               lsdb-hash-table)
+              entries))
+        (lambda (regexp)
+          (let (results)
+            (maphash
+             (lambda (key value)
+               (if (string-match regexp key)
+                   (push (propertize key 'record
+                                     (cons key value)) results)))
+             lsdb-hash-table)
+            results)))))
+
 ;;;###autoload
 (defalias 'lsdb
   (static-if (featurep 'ivy)
-      (progn
-        (defun counsel-lsdb-candidates (entry-name)
-          "Build `counsel-lsdb' candidate list."
-          (if entry-name
-              (lambda (regexp)
-                (let (entries)
-                  (maphash
-                   (lambda (_key value)
-                     (let ((entry (cdr (assq entry-name value))))
-                       (unless (listp entry)
-	                 (setq entry (list entry)))
-                       (mapc
-                        (lambda (e)
-                          (if (and e
-                                   (not (member e entries))
-                                   (string-match regexp e))
-                              (push (propertize e 'entry t) entries)))
-                        entry)))
-                   lsdb-hash-table)
-                  entries))
-            (lambda (regexp)
-              (let (results)
-                (maphash
-                 (lambda (key value)
-                   (if (string-match regexp key)
-                       (push (propertize key 'record
-                                         (cons key value)) results)))
-                 lsdb-hash-table)
-                results))))
-        (defun counsel-lsdb (&optional entry-name)
-          "Search LSDB with `ivy'."
-          (interactive
-           (let* ((completion-ignore-case t)
-	          (entry-name
-	           (if current-prefix-arg
-	               (completing-read "Entry name: "
-				        lsdb-known-entry-names))))
-             (list (if (and entry-name (not (equal entry-name "")))
-	               (intern (downcase entry-name))))))
-          (lsdb-maybe-load-hash-tables)
-          (let* ((regexp
-                  (ivy-read
-                   (if entry-name
-                       (format "Search records `%s' regexp: " entry-name)
-                     "Search records regexp: ")
-                   (counsel-lsdb-candidates entry-name)
-                   :re-builder #'ivy--regex
-                   :dynamic-collection t
-                   :caller 'counsel-lsdb
-                   :history 'lsdb-mode-lookup-history))
-                 (record (get-text-property 0 'record regexp)))
-            (if record
-	        (lsdb-display-record record)
-              (let ((records (lsdb-lookup-records
-                              (if (get-text-property 0 'entry regexp)
-                                  (regexp-quote regexp)
-                                regexp) entry-name)))
-                (if records
-	            (lsdb-display-records records)))))))
+      (defun counsel-lsdb (&optional entry-name)
+        "Search LSDB with `ivy'."
+        (interactive
+         (let* ((completion-ignore-case t)
+	        (entry-name
+	         (if current-prefix-arg
+	             (completing-read "Entry name: "
+				      lsdb-known-entry-names))))
+           (list (if (and entry-name (not (equal entry-name "")))
+	             (intern (downcase entry-name))))))
+        (lsdb-maybe-load-hash-tables)
+        (let* ((regexp
+                (ivy-read
+                 (if entry-name
+                     (format "Search records `%s' regexp: " entry-name)
+                   "Search records regexp: ")
+                 (counsel-lsdb-candidates entry-name)
+                 :dynamic-collection t
+                 :caller 'counsel-lsdb
+                 :history 'lsdb-mode-lookup-history))
+               (record (get-text-property 0 'record regexp)))
+          (if record
+	      (lsdb-display-record record)
+            (let ((records (lsdb-lookup-records
+                            (if (get-text-property 0 'entry regexp)
+                                (regexp-quote regexp)
+                              regexp) entry-name)))
+              (if records
+	          (lsdb-display-records records))))))
     'lsdb-mode-lookup))
 
 (defun lsdb-mode-next-record (&optional arg)
@@ -1423,7 +1423,8 @@ of the buffer."
   (add-hook 'wl-save-hook 'lsdb-mode-save))
 
 (eval-when-compile
-  (autoload 'wl-message-get-original-buffer "wl-message"))
+  (autoload 'wl-message-get-original-buffer "wl-message")
+  (autoload 'wl-address-make-completion-list "wl-address"))
 
 ;;;###autoload
 (defun lsdb-wl-update-record ()
@@ -1467,6 +1468,35 @@ always hide."
 			  (split-window-vertically)))))
 	(set-window-buffer window buffer)
 	(lsdb-fit-window-to-buffer window)))))
+
+(defvar wl-address-list)
+(defvar wl-address-completion-list)
+(defvar wl-address-petname-hash)
+
+;;;###autoload
+(defun lsdb-wl-address-init ()
+  "Reload `wl-address-file'.
+Refresh `wl-address-list', `wl-address-completion-list', and
+`wl-address-petname-hash'."
+  (message "Updating addresses...")
+  (lsdb-maybe-load-hash-tables)
+  (setq wl-address-list
+	(let (tmp)
+          (maphash (lambda (key value)
+                     (push (list (copy-sequence (cadr (assq 'net value)))
+                                 (copy-sequence key)
+                                 (copy-sequence key)) tmp)) lsdb-hash-table)
+          tmp))
+  (setq wl-address-completion-list
+	(wl-address-make-completion-list wl-address-list))
+  (setq wl-address-petname-hash (make-hash-table :test #'equal))
+  (mapc
+   (lambda (addr)
+     (puthash (downcase (car addr))
+	      (cadr addr)
+	      wl-address-petname-hash))
+   wl-address-list)
+  (message "Updating addresses...done"))
 
 ;;;_. Interface to Mew written by Hideyuki SHIRAI <shirai@meadowy.org>
 (eval-when-compile
