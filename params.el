@@ -48,6 +48,6 @@
 
 ;; Splash
 (defvar dotspacemacs-banner
-  (concat user-emacs-directory "banner.pbm"))
+  (eval-when-compile (concat user-emacs-directory "banner.pbm")))
 (defvar dotspacemacs-startup-lists
   '((recents  . 5)))

@@ -1,6 +1,7 @@
 ;; -*- lexical-binding:t -*-
 (require 'bind-key)
 (eval-when-compile
+  (require 'use-package)
   (setq use-package-expand-minimally t))
 
 (use-package diminish
@@ -118,3 +119,8 @@
   :defer t
   :init
   (setq inferior-lisp-program "ccl"))
+
+;; Net
+(use-package aria2
+  :defer t
+  :commands (aria2-downloads-list))

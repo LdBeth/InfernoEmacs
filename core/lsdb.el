@@ -500,8 +500,11 @@ Overrides `temp-buffer-show-function'.")
 	     'lsdb-lookup-full-name-functions
 	     sender))
       (when full-name
-	(setq old (gethash full-name lsdb-hash-table)
-	      new (cons (list 'aka (car sender)) new))
+	(setq old (gethash full-name lsdb-hash-table))
+        ;; ignores names that looks like email address.
+        (if (not (string-match "^[ _.-a-z0-9]+@[ _.-a-z0-9]+$"
+                               (car sender)))
+	    (setq new (cons (list 'aka (car sender)) new)))
 	(setcar sender full-name)))
     (unless old
       (setq new (cons (cons 'creation-date (format-time-string "%Y-%m-%d"))
@@ -714,7 +717,6 @@ Overrides `temp-buffer-show-function'.")
   (autoload 'migemo-get-pattern "migemo"))
 
 (defun lsdb-complete-name-highlight (start end)
-  (make-local-variable 'pre-command-hook)
   (add-hook 'pre-command-hook 'lsdb-complete-name-highlight-update nil t)
   (save-excursion
     (goto-char start)
@@ -881,7 +883,6 @@ Modify whole identification by side effect."
   (setq buffer-read-only t)
   (set (make-local-variable 'font-lock-defaults)
        '(lsdb-font-lock-keywords t))
-  (make-local-variable 'post-command-hook)
   (add-hook 'post-command-hook 'lsdb-modeline-update nil t)
   (make-local-variable 'lsdb-modeline-string)
   (setq mode-line-buffer-identification
@@ -1293,7 +1294,7 @@ performed against the entry field."
 	      (lsdb-display-record record)
             (let ((records (lsdb-lookup-records
                             (if (get-text-property 0 'entry regexp)
-                                (regexp-quote regexp)
+                                (concat "^" (regexp-quote regexp) "$")
                               regexp) entry-name)))
               (if records
 	          (lsdb-display-records records))))))
@@ -1411,7 +1412,7 @@ of the buffer."
 ;;;###autoload
 (defun lsdb-wl-insinuate ()
   "Call this function to hook LSDB into Wanderlust."
-  ;(add-hook 'wl-message-redisplay-hook 'lsdb-wl-update-record)
+  (add-hook 'wl-message-redisplay-hook 'lsdb-wl-update-record)
   (add-hook 'wl-summary-exit-hook 'lsdb-hide-buffer)
   (add-hook 'wl-summary-toggle-disp-off-hook 'lsdb-hide-buffer)
   (add-hook 'wl-summary-toggle-disp-folder-on-hook 'lsdb-hide-buffer)

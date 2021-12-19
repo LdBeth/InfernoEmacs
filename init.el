@@ -3,10 +3,8 @@
 ;;(package-initialize)
 
 (setq gc-cons-threshold 402653184 gc-cons-percentage 0.6)
-;; init
-(load (concat user-emacs-directory "params"))
 
-;(require 'use-package)
+(load (concat user-emacs-directory "params"))
 (load (concat user-emacs-directory "pkgs"))
 (load (concat user-emacs-directory "core/spacemacs-buffer"))
 (load (concat user-emacs-directory "keys"))
