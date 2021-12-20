@@ -857,23 +857,24 @@ Modify whole identification by side effect."
     line))
 
 (defvar lsdb-mode-map
-  (let ((keymap (make-sparse-keymap)))
-    (define-key keymap "a" 'lsdb-mode-add-entry)
-    (define-key keymap "d" 'lsdb-mode-delete-entry)
-    (define-key keymap "D" 'lsdb-mode-delete-record)
-    (define-key keymap "e" 'lsdb-mode-edit-entry)
-    (define-key keymap "E" 'lsdb-mode-edit-record)
-    (define-key keymap "l" 'lsdb-mode-load)
-    (define-key keymap "s" 'lsdb-mode-save)
-    (define-key keymap "q" 'lsdb-mode-quit-window)
-    (define-key keymap "g" 'lsdb-mode-lookup)
-    (define-key keymap "p" 'lsdb-mode-previous-record)
-    (define-key keymap "n" 'lsdb-mode-next-record)
-    (define-key keymap " " 'scroll-up)
-    (define-key keymap [delete] 'scroll-down)
-    (define-key keymap "\177" 'scroll-down)
-    (define-key keymap [backspace] 'scroll-down)
-    keymap)
+  (eval-when-compile
+    (let ((keymap (make-sparse-keymap)))
+      (define-key keymap "a" 'lsdb-mode-add-entry)
+      (define-key keymap "d" 'lsdb-mode-delete-entry)
+      (define-key keymap "D" 'lsdb-mode-delete-record)
+      (define-key keymap "e" 'lsdb-mode-edit-entry)
+      (define-key keymap "E" 'lsdb-mode-edit-record)
+      (define-key keymap "l" 'lsdb-mode-load)
+      (define-key keymap "s" 'lsdb-mode-save)
+      (define-key keymap "q" 'lsdb-mode-quit-window)
+      (define-key keymap "g" 'lsdb-mode-lookup)
+      (define-key keymap "p" 'lsdb-mode-previous-record)
+      (define-key keymap "n" 'lsdb-mode-next-record)
+      (define-key keymap " " 'scroll-up)
+      (define-key keymap [delete] 'scroll-down)
+      (define-key keymap "\177" 'scroll-down)
+      (define-key keymap [backspace] 'scroll-down)
+      keymap))
   "LSDB's keymap.")
 
 (defvar lsdb-modeline-string "")
@@ -1337,15 +1338,12 @@ performed against the entry field."
     keymap)
   "Edit form's keymap.")
 
-(defun lsdb-edit-form-mode ()
+(define-derived-mode lsdb-edit-form-mode
+  emacs-lisp-mode "LSDB Edit Form"
   "Major mode for editing forms.
 It is a slightly enhanced emacs-lisp-mode.
 
 \\{lsdb-edit-form-mode-map}"
-  (interactive)
-  (kill-all-local-variables)
-  (setq major-mode 'lsdb-edit-form-mode
-	mode-name "LSDB Edit Form")
   (use-local-map lsdb-edit-form-mode-map)
   (make-local-variable 'lsdb-edit-form-done-function)
   (make-local-variable 'lsdb-previous-window-configuration)

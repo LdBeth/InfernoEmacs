@@ -22,7 +22,7 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(custom-safe-themes
-   '("fa2b58bb98b62c3b8cf3b6f02f058ef7827a8e497125de0254f56e373abee088" "bffa9739ce0752a37d9b1eee78fc00ba159748f50dc328af4be661484848e476" default))
+   '("512fe37090a702098710d2a33ab1aad365d7f7e0063fe6afb75b20df25f16903" "4f87934838378e5bdd9a85a8ef46eb75e55a68b0a400a44ea45a3fd3c9167562" default))
  '(package-selected-packages
    '(notmuch gnu-elpa-keyring-update pinentry mu-cite wanderlust flyspell-correct-ivy mwim unfill hl-todo sly smex diminish which-key counsel ivy paren-face use-package)))
 (custom-set-faces
