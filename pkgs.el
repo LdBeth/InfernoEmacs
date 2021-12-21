@@ -93,9 +93,10 @@
         'mail-send-hook)))
 
 (use-package mu-cite
-  :disabled
   :defer t
+  :commands (mu-cite-original)
   :init
+  (setq mu-cite-prefix-format '(lsdb-prefix-register "> "))
   (add-hook 'mail-citation-hook 'mu-cite-original)
   :config
   (lsdb-mu-insinuate))
