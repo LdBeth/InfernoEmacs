@@ -47,7 +47,6 @@
 ;; For picking up the macros `char-next-index', `with-temp-buffer', etc.
 (require 'poem)
 
-(require 'pcustom)
 (require 'std11)
 (require 'alist)
 
@@ -96,6 +95,11 @@
 	        (lambda ()
 		  (std11-full-name-string
 		   (mu-cite-get-value 'address-structure))))
+          (cons 'firstname
+	        (lambda ()
+		  (let ((namestring (mu-cite-get-value 'full-name)))
+                    (if (string-match "[ \t]*\\([^ \t._]+\\)[ \t]*" namestring)
+                        (match-string 1 namestring)))))
 	  (cons 'address
 	        (lambda ()
 		  (std11-address-string

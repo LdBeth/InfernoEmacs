@@ -4,6 +4,9 @@
   (require 'use-package)
   (setq use-package-expand-minimally t))
 
+(use-package core-autoloads
+  :load-path "core/")
+
 (use-package diminish
   :config
   (diminish 'eldoc-mode))
@@ -51,7 +54,6 @@
   (which-key-mode 1))
 
 (use-package page-break-lines
-  :load-path "core/"
   :diminish page-break-lines-mode
   :config
   (global-page-break-lines-mode 1))
@@ -64,7 +66,6 @@
 
 (use-package unfill
   :defer t
-  :commands (unfill-region unfill-paragraph unfill-toggle)
   :bind
   ([remap fill-paragraph] . unfill-toggle))
 
@@ -94,7 +95,6 @@
 
 (use-package mu-cite
   :defer t
-  :commands (mu-cite-original)
   :init
   (setq mu-cite-prefix-format '(lsdb-prefix-register "> "))
   (add-hook 'mail-citation-hook 'mu-cite-original)
@@ -103,17 +103,14 @@
 
 (use-package x-face-e21
   :defer t
-  :commands (x-face-decode-message-header
-             x-face-create-image
-             x-face-create-face-image)
   :init
   (setq x-face-image-attributes
         '((light :ascent 80 :foreground "#655370")
           (dark :ascent 80 :foreground "#292b2e" :background "#b2b2b2"))))
 
 (use-package lsdb
-  :defer t
-  :commands (lsdb lsdb-wl-insinuate))
+  :disabled
+  :defer t)
 
 ;; Programming
 (use-package sly
@@ -123,5 +120,5 @@
 
 ;; Net
 (use-package aria2
-  :defer t
-  :commands (aria2-downloads-list))
+  :disabled
+  :defer t)

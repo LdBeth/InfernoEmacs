@@ -46,9 +46,7 @@
   :group 'mu-cite)
 
 (defcustom mu-registration-file-coding-system-for-write
-  (static-if (boundp 'MULE)
-      '*iso-2022-jp*
-    'iso-2022-7bit)
+  'utf-8)
   "Coding-system used when writing a registration file.  If you set this
 to nil, the value of `mu-registration-file-coding-system' will be used
 for writing a file."
@@ -126,9 +124,9 @@ registration file is read.")
 		(lambda (elem)
 		  (format "(%s . %s)"
 			  (prin1-to-string
-			   (mu-cite-remove-text-properties (car elem)))
+			   (substring-no-properties (car elem)))
 			  (prin1-to-string
-			   (mu-cite-remove-text-properties (cdr elem))))))
+			   (substring-no-properties (cdr elem))))))
 	       (symbol-value mu-registration-symbol) "\n\t"))
       (insert "))\n\n")
       (insert ";;; " name " ends here\n")
@@ -167,7 +165,7 @@ registration file is read.")
     (or (mu-register-get-citation-name addr)
 	(let* ((minibuffer-allow-text-properties nil)
 	       (return
-		(mu-cite-remove-text-properties
+		(substring-no-properties
 		 (read-string "Citation name? "
 			      (or (mu-cite-get-value 'x-attribution)
 				  (mu-cite-get-value 'x-cite-me)
@@ -185,7 +183,7 @@ registration file is read.")
   (let* ((addr (mu-cite-get-value 'address))
 	 (return1 (mu-register-get-citation-name addr))
 	 (minibuffer-allow-text-properties nil)
-	 (return (mu-cite-remove-text-properties
+	 (return (substring-no-properties
 		  (read-string "Citation name? "
 			       (or return1
 				   (mu-cite-get-value 'x-attribution)

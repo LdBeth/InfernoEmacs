@@ -67,7 +67,7 @@
   "The Lovely Sister Database."
   :group 'news
   :group 'mail)
-  
+
 (defcustom lsdb-file (expand-file-name "~/.lsdb")
   "The name of the Lovely Sister Database file."
   :group 'lsdb
@@ -312,31 +312,31 @@ Overrides `temp-buffer-show-function'.")
 (defun lsdb-load-hash-tables ()
   "Read the contents of `lsdb-file' into the internal hash tables."
   (let ((buffer (find-file-noselect lsdb-file))
-	tables)
+        tables)
     (unwind-protect
-	(with-current-buffer buffer
-	  (goto-char (point-min))
-	  (re-search-forward "^#s(")
-	  (goto-char (match-beginning 0))
-	  (setq lsdb-hash-table (lsdb-read (point-marker)))
-	  ;; Load the secondary hash tables following.
-	  (setq tables lsdb-secondary-hash-tables)
-	  (while tables
-	    (if (re-search-forward
-		 (concat "^" (lsdb-secondary-hash-table-start
-			      (car tables)))
-		 nil t)
-		(set (car tables) (lsdb-read (point-marker))))
-	    (setq tables (cdr tables))))
+        (with-current-buffer buffer
+          (goto-char (point-min))
+          (re-search-forward "^#s(")
+          (goto-char (match-beginning 0))
+          (setq lsdb-hash-table (lsdb-read (point-marker)))
+          ;; Load the secondary hash tables following.
+          (setq tables lsdb-secondary-hash-tables)
+          (while tables
+            (if (re-search-forward
+                 (concat "^" (lsdb-secondary-hash-table-start
+                              (car tables)))
+                 nil t)
+                (set (car tables) (lsdb-read (point-marker))))
+            (setq tables (cdr tables))))
       (kill-buffer buffer))))
 
 (defun lsdb-insert-hash-table (hash-table)
   (insert "#s(hash-table size "
-	  ;; Reduce the actual size of the close hash table, because
-	  ;; XEmacs doesn't have a distinction between index-size and
-	  ;; hash-table-size.
-	  (number-to-string (hash-table-count hash-table))
-	  " test equal data (")
+          ;; Reduce the actual size of the close hash table, because
+          ;; XEmacs doesn't have a distinction between index-size and
+          ;; hash-table-size.
+          (number-to-string (hash-table-count hash-table))
+          " test equal data (")
   (maphash
    (lambda (key value)
      (let (print-level print-length)
@@ -347,36 +347,36 @@ Overrides `temp-buffer-show-function'.")
 (defun lsdb-save-hash-tables ()
   "Write the records within the internal hash tables into `lsdb-file'."
   (let ((coding-system-for-write lsdb-file-coding-system)
-	tables)
+        tables)
     (with-temp-file lsdb-file
       (if lsdb-file-coding-system
-	  (let ((coding-system-name
-		 (if (symbolp lsdb-file-coding-system)
-		     (symbol-name lsdb-file-coding-system))))
-	    (if coding-system-name
-		(insert ";;; -*- mode: emacs-lisp; coding: "
-			coding-system-name " -*-\n"))))
+          (let ((coding-system-name
+                 (if (symbolp lsdb-file-coding-system)
+                     (symbol-name lsdb-file-coding-system))))
+            (if coding-system-name
+                (insert ";;; -*- mode: emacs-lisp; coding: "
+                        coding-system-name " -*-\n"))))
       (lsdb-insert-hash-table lsdb-hash-table)
       ;; Save the secondary hash tables following.
       (setq tables lsdb-secondary-hash-tables)
       (while tables
-	(insert "\n" (lsdb-secondary-hash-table-start
-		      (car tables)))
-	(lsdb-insert-hash-table (symbol-value (car tables)))
-	(setq tables (cdr tables))))))
+        (insert "\n" (lsdb-secondary-hash-table-start
+                      (car tables)))
+        (lsdb-insert-hash-table (symbol-value (car tables)))
+        (setq tables (cdr tables))))))
 
 ;;;_. Mail Header Extraction
 (defun lsdb-fetch-fields (regexp)
   (save-excursion
     (goto-char (point-min))
     (let ((case-fold-search t)
-	  field-bodies)
+          field-bodies)
       (while (re-search-forward (concat "^\\(" regexp "\\):[ \t]*")
-				nil t)
-	(push (cons (match-string 1)
+                                nil t)
+        (push (cons (match-string 1)
                     (buffer-substring-no-properties
                      (point) (std11-field-end)))
-	      field-bodies))
+              field-bodies))
       (nreverse field-bodies))))
 
 (defun lsdb-canonicalize-spaces-and-dots (string)
@@ -387,19 +387,19 @@ Overrides `temp-buffer-show-function'.")
 (defun lsdb-extract-address-components (string)
   (let ((components (std11-extract-address-components string)))
     (if (and (nth 1 components)
-	     ;; When parsing a group address,
-	     ;; std11-extract-address-components is likely to return
-	     ;; the ("GROUP" "") form.
-	     (not (equal (nth 1 components) "")))
-	(if (car components)
-	    (list (funcall lsdb-canonicalize-full-name-function
-			   (car components))
-		  (nth 1 components))
-	  (list (nth 1 components) (nth 1 components))))))
+             ;; When parsing a group address,
+             ;; std11-extract-address-components is likely to return
+             ;; the ("GROUP" "") form.
+             (not (equal (nth 1 components) "")))
+        (if (car components)
+            (list (funcall lsdb-canonicalize-full-name-function
+                           (car components))
+                  (nth 1 components))
+          (list (nth 1 components) (nth 1 components))))))
 
 ;; stolen (and renamed) from nnheader.el
 (defun lsdb-decode-field-body (field-body field-name
-					  &optional mode max-column)
+                                          &optional mode max-column)
   (let ((default-mime-charset
           (car (find-coding-systems-string field-body))))
     (substring-no-properties
@@ -414,21 +414,21 @@ Overrides `temp-buffer-show-function'.")
   (let ((tables lsdb-secondary-hash-tables))
     (while tables
       (when (or force (not (symbol-value (car tables))))
-	(set (car tables) (make-hash-table :test 'equal))
-	(setq lsdb-hash-tables-are-dirty t))
+        (set (car tables) (make-hash-table :test 'equal))
+        (setq lsdb-hash-tables-are-dirty t))
       (setq tables (cdr tables))))
   (if lsdb-hash-tables-are-dirty
       (maphash
        (lambda (key value)
-	 (run-hook-with-args
-	  'lsdb-after-update-record-functions
-	  (cons key value)))
+         (run-hook-with-args
+          'lsdb-after-update-record-functions
+          (cons key value)))
        lsdb-hash-table)))
 
 (defun lsdb-maybe-load-hash-tables ()
   (unless lsdb-hash-table
     (if (file-exists-p lsdb-file)
-	(lsdb-load-hash-tables)
+        (lsdb-load-hash-tables)
       (setq lsdb-hash-table (make-hash-table :test 'equal)))
     (lsdb-rebuild-secondary-hash-tables)))
 
@@ -450,76 +450,76 @@ Overrides `temp-buffer-show-function'.")
 ;;;_  , #2 Iterate on the All Records (very slow)
 (defun lsdb-lookup-full-name-by-fuzzy-matching (sender)
   (let ((names
-	 (if (string-match
-	      "\\`\\(.+\\)[ \t]+\\(/[ \t]+\\|(\\([^)]+\\))\\)"
-	      (car sender))
-	     (if (match-beginning 3)
-		 (list (match-string 1 (car sender))
-		       (match-string 3 (car sender)))
-	       (list (match-string 1 (car sender))
-		     (substring (car sender) (match-end 0))))
-	   (list (car sender))))
-	(case-fold-search t))
+         (if (string-match
+              "\\`\\(.+\\)[ \t]+\\(/[ \t]+\\|(\\([^)]+\\))\\)"
+              (car sender))
+             (if (match-beginning 3)
+                 (list (match-string 1 (car sender))
+                       (match-string 3 (car sender)))
+               (list (match-string 1 (car sender))
+                     (substring (car sender) (match-end 0))))
+           (list (car sender))))
+        (case-fold-search t))
     (catch 'found
       (maphash
        (lambda (key value)
-	 (while names
-	   (if (or (string-match
-		    (concat "\\<" (regexp-quote (car names)) "\\>")
-		    key)
-		   (string-match
-		    (concat
-		     "\\<"
-		     (regexp-quote
-		      (mapconcat #'identity
-				 (nreverse (split-string (car names)))
-				 " "))
-		     "\\>")
-		    key)
-		   ;; Don't assume that we are using address cache.
-		   (member (nth 1 sender) (cdr (assq 'net value))))
-	       (throw 'found key))
-	   (setq names (cdr names))))
+         (while names
+           (if (or (string-match
+                    (concat "\\<" (regexp-quote (car names)) "\\>")
+                    key)
+                   (string-match
+                    (concat
+                     "\\<"
+                     (regexp-quote
+                      (mapconcat #'identity
+                                 (nreverse (split-string (car names)))
+                                 " "))
+                     "\\>")
+                    key)
+                   ;; Don't assume that we are using address cache.
+                   (member (nth 1 sender) (cdr (assq 'net value))))
+               (throw 'found key))
+           (setq names (cdr names))))
        lsdb-hash-table))))
 
 ;;;_ : Update Records
 (defun lsdb-update-record (sender &optional interesting)
   (let ((old (gethash (car sender) lsdb-hash-table))
-	(new (if (nth 1 sender)
-		 (cons (cons 'net (list (nth 1 sender)))
-		       interesting)
-	       interesting))
-	merged
-	record
-	full-name)
+        (new (if (nth 1 sender)
+                 (cons (cons 'net (list (nth 1 sender)))
+                       interesting)
+               interesting))
+        merged
+        record
+        full-name)
     ;; Look for the existing record from the reverse hash table.
     ;; If it is found, regsiter the current full-name as AKA.
     (unless old
       (setq full-name
-	    (run-hook-with-args-until-success
-	     'lsdb-lookup-full-name-functions
-	     sender))
+            (run-hook-with-args-until-success
+             'lsdb-lookup-full-name-functions
+             sender))
       (when full-name
-	(setq old (gethash full-name lsdb-hash-table))
+        (setq old (gethash full-name lsdb-hash-table))
         ;; ignores names that looks like email address.
         (if (not (string-match "^[ _.-a-z0-9]+@[ _.-a-z0-9]+$"
                                (car sender)))
-	    (setq new (cons (list 'aka (car sender)) new)))
-	(setcar sender full-name)))
+            (setq new (cons (list 'aka (car sender)) new)))
+        (setcar sender full-name)))
     (unless old
       (setq new (cons (cons 'creation-date (format-time-string "%Y-%m-%d"))
-		      new)))
+                      new)))
     (setq merged (lsdb-merge-record-entries old new)
-	  record (cons (car sender) merged))
+          record (cons (car sender) merged))
     (unless (equal merged old)
       (let ((entry (assq 'last-modified (cdr record)))
-	    (last-modified (format-time-string "%Y-%m-%d")))
-	(if entry
-	    (setcdr entry last-modified)
-	  (setcdr record (cons (cons 'last-modified last-modified)
-			       (cdr record)))))
+            (last-modified (format-time-string "%Y-%m-%d")))
+        (if entry
+            (setcdr entry last-modified)
+          (setcdr record (cons (cons 'last-modified last-modified)
+                               (cdr record)))))
       (puthash (car record) (cdr record)
-		    lsdb-hash-table)
+                    lsdb-hash-table)
       (run-hook-with-args 'lsdb-after-update-record-functions record)
       (setq lsdb-hash-tables-are-dirty t))
     record))
@@ -530,57 +530,57 @@ Overrides `temp-buffer-show-function'.")
     (save-restriction
       (std11-narrow-to-header)
       (setq senders
-	    (delq nil (mapcar (lambda (field)
-				(let ((components
-				       (lsdb-extract-address-components
-					(cdr field))))
-				  (if components
-				      (setcar
-				       components
-				       (funcall lsdb-decode-field-body-function
-						(car components) (car field))))
-				  components))
-			      (lsdb-fetch-fields
-			       lsdb-sender-headers)))
-	    recipients
-	    (delq nil (mapcar (lambda (field)
-				(let ((components
-				       (lsdb-extract-address-components
-					(cdr field))))
-				  (if components
-				      (setcar
-				       components
-				       (funcall lsdb-decode-field-body-function
-						(car components) (car field))))
-				  components))
-			      (lsdb-fetch-fields
-			       lsdb-recipients-headers))))
+            (delq nil (mapcar (lambda (field)
+                                (let ((components
+                                       (lsdb-extract-address-components
+                                        (cdr field))))
+                                  (if components
+                                      (setcar
+                                       components
+                                       (funcall lsdb-decode-field-body-function
+                                                (car components) (car field))))
+                                  components))
+                              (lsdb-fetch-fields
+                               lsdb-sender-headers)))
+            recipients
+            (delq nil (mapcar (lambda (field)
+                                (let ((components
+                                       (lsdb-extract-address-components
+                                        (cdr field))))
+                                  (if components
+                                      (setcar
+                                       components
+                                       (funcall lsdb-decode-field-body-function
+                                                (car components) (car field))))
+                                  components))
+                              (lsdb-fetch-fields
+                               lsdb-recipients-headers))))
       (setq alist lsdb-interesting-header-alist)
       (while alist
-	(setq bodies
-	      (delq nil (mapcar
-			 (lambda (field)
-			   (let ((field-body
-				  (funcall lsdb-decode-field-body-function
-					   (cdr field) (car field))))
-			     (if (nth 1 (car alist))
-				 (and (string-match (nth 1 (car alist))
-						    field-body)
-				      (replace-match (nth 3 (car alist))
-						     nil nil field-body))
-			       field-body)))
-			 (lsdb-fetch-fields (car (car alist))))))
-	(when bodies
-	  (setq entry (or (nth 2 (car alist))
-			  'notes))
-	  (push (cons entry
-		      (if (eq ?. (nth 2 (assq entry lsdb-entry-type-alist)))
-			  (car bodies)
-			bodies))
-		interesting))
-	(setq alist (cdr alist))))
+        (setq bodies
+              (delq nil (mapcar
+                         (lambda (field)
+                           (let ((field-body
+                                  (funcall lsdb-decode-field-body-function
+                                           (cdr field) (car field))))
+                             (if (nth 1 (car alist))
+                                 (and (string-match (nth 1 (car alist))
+                                                    field-body)
+                                      (replace-match (nth 3 (car alist))
+                                                     nil nil field-body))
+                               field-body)))
+                         (lsdb-fetch-fields (car (car alist))))))
+        (when bodies
+          (setq entry (or (nth 2 (car alist))
+                          'notes))
+          (push (cons entry
+                      (if (eq ?. (nth 2 (assq entry lsdb-entry-type-alist)))
+                          (car bodies)
+                        bodies))
+                interesting))
+        (setq alist (cdr alist))))
     (if senders
-	(setq records (list (lsdb-update-record (pop senders) interesting))))
+        (setq records (list (lsdb-update-record (pop senders) interesting))))
     (setq alist (nconc senders recipients))
     (while alist
       (setq records (cons (lsdb-update-record (pop alist)) records)))
@@ -590,18 +590,18 @@ Overrides `temp-buffer-show-function'.")
   (setq old (copy-sequence old))
   (while new
     (let ((entry (assq (car (car new)) old))
-	  list pointer)
+          list pointer)
       (if (null entry)
-	  (setq old (nconc old (list (car new))))
-	(if (listp (cdr entry))
-	    (progn
-	      (setq list (cdr (car new)) pointer list)
-	      (while pointer
-		(if (member (car pointer) (cdr entry))
-		    (setq list (delq (car pointer) list)))
-		(setq pointer (cdr pointer)))
-	      (setcdr entry (nconc (cdr entry) list)))
-	  (setcdr entry (cdr (car new))))))
+          (setq old (nconc old (list (car new))))
+        (if (listp (cdr entry))
+            (progn
+              (setq list (cdr (car new)) pointer list)
+              (while pointer
+                (if (member (car pointer) (cdr entry))
+                    (setq list (delq (car pointer) list)))
+                (setq pointer (cdr pointer)))
+              (setcdr entry (nconc (cdr entry) list)))
+          (setcdr entry (cdr (car new))))))
     (setq new (cdr new)))
   old)
 
@@ -609,38 +609,38 @@ Overrides `temp-buffer-show-function'.")
 (defun lsdb-fit-window-to-buffer (&optional window)
   (save-selected-window
     (if window
-	(select-window window))
+        (select-window window))
     (unless (pos-visible-in-window-p (point-max))
       (enlarge-window (- lsdb-window-max-height (window-height))))
     (shrink-window-if-larger-than-buffer)
     (let ((height (window-height)))
       (if (> height lsdb-window-max-height)
-	  (shrink-window (- height lsdb-window-max-height)))
+          (shrink-window (- height lsdb-window-max-height)))
       (set-window-start window (point-min)))))
 
 (defun lsdb-temp-buffer-show-function (buffer)
   (when lsdb-pop-up-windows
     (save-selected-window
       (let ((window (or (get-buffer-window lsdb-buffer-name)
-			(progn
-			  (select-window (get-largest-window))
-			  (split-window-vertically)))))
-	(set-window-buffer window buffer)
-	(lsdb-fit-window-to-buffer window)))))
+                        (progn
+                          (select-window (get-largest-window))
+                          (split-window-vertically)))))
+        (set-window-buffer window buffer)
+        (lsdb-fit-window-to-buffer window)))))
 
 (defun lsdb-update-records-and-display ()
   (let ((records (lsdb-update-records)))
     (if lsdb-display-records-belong-to-user
-	(if records
-	    (lsdb-display-record (car records))
-	  (lsdb-hide-buffer))
+        (if records
+            (lsdb-display-record (car records))
+          (lsdb-hide-buffer))
       (catch 'lsdb-show-record
-	(while records
-	  (if (member user-mail-address (cdr (assq 'net (car records))))
-	      (setq records (cdr records))
-	    (lsdb-display-record (car records))
-	    (throw 'lsdb-show-record t)))
-	(lsdb-hide-buffer)))))
+        (while records
+          (if (member user-mail-address (cdr (assq 'net (car records))))
+              (setq records (cdr records))
+            (lsdb-display-record (car records))
+            (throw 'lsdb-show-record t)))
+        (lsdb-hide-buffer)))))
 
 (defun lsdb-display-record (record)
   "Display only one RECORD, then shrink the window as possible."
@@ -650,26 +650,26 @@ Overrides `temp-buffer-show-function'.")
 (defun lsdb-display-records (records)
   (with-current-buffer (get-buffer-create lsdb-buffer-name)
     (let ((standard-output (current-buffer))
-	  (inhibit-read-only t)
-	  buffer-read-only)
+          (inhibit-read-only t)
+          buffer-read-only)
       (buffer-disable-undo)
       (erase-buffer)
       (setq records
-	    (sort (copy-sequence records)
-		  (or lsdb-display-records-sort-predicate
-		      (lambda (record1 record2)
-			(string-lessp (car record1) (car record2))))))
+            (sort (copy-sequence records)
+                  (or lsdb-display-records-sort-predicate
+                      (lambda (record1 record2)
+                        (string-lessp (car record1) (car record2))))))
       (while records
-	(save-restriction
-	  (narrow-to-region (point) (point))
-	  (lsdb-print-record (car records)))
-	(goto-char (point-max))
-	(setq records (cdr records))))
+        (save-restriction
+          (narrow-to-region (point) (point))
+          (lsdb-print-record (car records)))
+        (goto-char (point-max))
+        (setq records (cdr records))))
     (lsdb-mode)
     (set-buffer-modified-p lsdb-hash-tables-are-dirty)
     (goto-char (point-min))
     (if temp-buffer-show-function
-	(funcall temp-buffer-show-function (current-buffer))
+        (funcall temp-buffer-show-function (current-buffer))
       (pop-to-buffer (current-buffer)))))
 
 (defsubst lsdb-entry-score (entry)
@@ -679,28 +679,28 @@ Overrides `temp-buffer-show-function'.")
   (let ((entry-name (capitalize (symbol-name (car entry)))))
     (intern entry-name lsdb-known-entry-names)
     (if (>= (lsdb-entry-score entry) 0)
-	(insert "\t" entry-name ": "
-		(if (listp (cdr entry))
-		    (mapconcat
-		     #'identity (cdr entry)
-		     (if (eq ?, (nth 2 (assq (car entry)
-					     lsdb-entry-type-alist)))
-			 ", "
-		       "\n\t\t"))
-		  (cdr entry))
-		"\n"))))
+        (insert "\t" entry-name ": "
+                (if (listp (cdr entry))
+                    (mapconcat
+                     #'identity (cdr entry)
+                     (if (eq ?, (nth 2 (assq (car entry)
+                                             lsdb-entry-type-alist)))
+                         ", "
+                       "\n\t\t"))
+                  (cdr entry))
+                "\n"))))
 
 (defun lsdb-print-record (record)
   (insert (car record) "\n")
   (let ((entries
-	 (sort (copy-sequence (cdr record))
-	       (lambda (entry1 entry2)
-		 (> (lsdb-entry-score entry1) (lsdb-entry-score entry2))))))
+         (sort (copy-sequence (cdr record))
+               (lambda (entry1 entry2)
+                 (> (lsdb-entry-score entry1) (lsdb-entry-score entry2))))))
     (while entries
       (lsdb-insert-entry (car entries))
       (setq entries (cdr entries))))
   (add-text-properties (point-min) (point-max)
-		       (list 'lsdb-record record))
+                       (list 'lsdb-record record))
   (run-hooks 'lsdb-print-record-hook))
 
 ;;;_. Completion
@@ -721,20 +721,20 @@ Overrides `temp-buffer-show-function'.")
   (save-excursion
     (goto-char start)
     (if (and lsdb-use-migemo (fboundp 'migemo-get-pattern))
-	(re-search-forward lsdb-last-completion end)
+        (re-search-forward lsdb-last-completion end)
       (search-forward lsdb-last-completion end))
     (setq lsdb-last-highlight-overlay
-	  (make-overlay (match-beginning 0) (match-end 0)))
+          (make-overlay (match-beginning 0) (match-end 0)))
     (overlay-put lsdb-last-highlight-overlay 'face
-		 'underline)))
+                 'underline)))
 
 (defun lsdb-complete-name-highlight-update ()
   (unless (eq this-command 'lsdb-complete-name)
     (if lsdb-last-highlight-overlay
-	(delete-overlay lsdb-last-highlight-overlay))
+        (delete-overlay lsdb-last-highlight-overlay))
     (set-marker lsdb-complete-marker nil)
     (remove-hook 'pre-command-hook
-		 'lsdb-complete-name-highlight-update t)))
+                 'lsdb-complete-name-highlight-update t)))
 
 ;;;_ : Name Completion
 (defun lsdb-complete-name ()
@@ -744,67 +744,67 @@ Overrides `temp-buffer-show-function'.")
   (unless (markerp lsdb-complete-marker)
     (setq lsdb-complete-marker (make-marker)))
   (let* ((start
-	  (or (and (eq (marker-buffer lsdb-complete-marker) (current-buffer))
-		   (marker-position lsdb-complete-marker))
-	      (save-excursion
-		(re-search-backward "\\(\\`\\|[\n:,]\\)[ \t]*")
-		(set-marker lsdb-complete-marker (match-end 0)))))
-	 pattern
-	 (case-fold-search t)
-	 (completion-ignore-case t))
+          (or (and (eq (marker-buffer lsdb-complete-marker) (current-buffer))
+                   (marker-position lsdb-complete-marker))
+              (save-excursion
+                (re-search-backward "\\(\\`\\|[\n:,]\\)[ \t]*")
+                (set-marker lsdb-complete-marker (match-end 0)))))
+         pattern
+         (case-fold-search t)
+         (completion-ignore-case t))
     (unless (eq last-command this-command)
       (setq lsdb-last-candidates nil
-	    lsdb-last-candidates-pointer nil
-	    lsdb-last-completion (buffer-substring start (point)))
+            lsdb-last-candidates-pointer nil
+            lsdb-last-completion (buffer-substring start (point)))
       (if (and lsdb-use-migemo (fboundp 'migemo-get-pattern))
-	  (setq lsdb-last-completion (migemo-get-pattern lsdb-last-completion)
-		pattern (concat "\\<\\(" lsdb-last-completion "\\)"))
-	(setq pattern (concat "\\<" (regexp-quote lsdb-last-completion))))
+          (setq lsdb-last-completion (migemo-get-pattern lsdb-last-completion)
+                pattern (concat "\\<\\(" lsdb-last-completion "\\)"))
+        (setq pattern (concat "\\<" (regexp-quote lsdb-last-completion))))
       (let (matched)
-	(maphash
-	 (lambda (key value)
-	   (setq matched
-		 (string-match pattern key)
-		 key
-		 (if (and (string-match
-			   (eval-when-compile
-			     (concat "[" std11-special-char-list "]"))
-			   key)
-			  (null (eq (cdr (std11-analyze-quoted-string key 0))
-				    (length key))))
-		     ;; Entry name contains non-atom special chars and
-		     ;; are not quoted.
-		     (std11-wrap-as-quoted-string key)
-		   key)
-		 lsdb-last-candidates
-		 (cons (unless lsdb-strip-address
-			 (mapcar
-			  (lambda (candidate)
-			    (if (string-match pattern candidate)
-				candidate))
-			  (cdr (assq 'sender value))))
-		       (cons (mapcar
-			      (lambda (candidate)
-				;; Record's name is matched.
-				(if (or matched
-					(string-match pattern candidate))
-				    (concat key " <" candidate ">")))
-			      (cdr (assq 'net value)))
-			     lsdb-last-candidates))))
-	 lsdb-hash-table))
+        (maphash
+         (lambda (key value)
+           (setq matched
+                 (string-match pattern key)
+                 key
+                 (if (and (string-match
+                           (eval-when-compile
+                             (concat "[" std11-special-char-list "]"))
+                           key)
+                          (null (eq (cdr (std11-analyze-quoted-string key 0))
+                                    (length key))))
+                     ;; Entry name contains non-atom special chars and
+                     ;; are not quoted.
+                     (std11-wrap-as-quoted-string key)
+                   key)
+                 lsdb-last-candidates
+                 (cons (unless lsdb-strip-address
+                         (mapcar
+                          (lambda (candidate)
+                            (if (string-match pattern candidate)
+                                candidate))
+                          (cdr (assq 'sender value))))
+                       (cons (mapcar
+                              (lambda (candidate)
+                                ;; Record's name is matched.
+                                (if (or matched
+                                        (string-match pattern candidate))
+                                    (concat key " <" candidate ">")))
+                              (cdr (assq 'net value)))
+                             lsdb-last-candidates))))
+         lsdb-hash-table))
       (setq lsdb-last-candidates
-	    (delq nil (apply 'nconc (nreverse lsdb-last-candidates))))
+            (delq nil (apply 'nconc (nreverse lsdb-last-candidates))))
       (let ((tmp lsdb-last-candidates))
-	(while tmp 
-	  (setq tmp (setcdr tmp (delete (car tmp) (cdr tmp))))))
+        (while tmp
+          (setq tmp (setcdr tmp (delete (car tmp) (cdr tmp))))))
       ;; Sort candidates by the position where the pattern occurred.
       (setq lsdb-last-candidates
-	    (sort lsdb-last-candidates
-		  (lambda (cand1 cand2)
-		    (< (if (string-match pattern cand1)
-			   (match-beginning 0))
-		       (if (string-match pattern cand2)
-			   (match-beginning 0)))))))
+            (sort lsdb-last-candidates
+                  (lambda (cand1 cand2)
+                    (< (if (string-match pattern cand1)
+                           (match-beginning 0))
+                       (if (string-match pattern cand2)
+                           (match-beginning 0)))))))
     (unless lsdb-last-candidates-pointer
       (setq lsdb-last-candidates-pointer lsdb-last-candidates))
     (when lsdb-last-candidates-pointer
@@ -818,7 +818,7 @@ Overrides `temp-buffer-show-function'.")
   "/* XPM */
 static char * lsdb_pointer_xpm[] = {
 \"14 14 5 1\",
-\" 	c None\",
+\"      c None\",
 \"+	c #FF9696\",
 \"@	c #FF0000\",
 \"#	c #FF7575\",
@@ -844,15 +844,15 @@ static char * lsdb_pointer_xpm[] = {
   "Decorate 1st element of `mode-line-buffer-identification' LINE.
 Modify whole identification by side effect."
   (let ((id (copy-sequence (car line)))
-	(image
-	 (if (image-type-available-p 'xpm)
-	     (create-image lsdb-pointer-xpm 'xpm t :ascent 'center))))
+        (image
+         (if (image-type-available-p 'xpm)
+             (create-image lsdb-pointer-xpm 'xpm t :ascent 'center))))
     (when (and image
-	       (stringp id) (string-match "^LSDB:" id))
+               (stringp id) (string-match "^LSDB:" id))
       (add-text-properties 0 (length id)
-			   (list 'display image
-				 'rear-nonsticky (list 'display))
-			   id)
+                           (list 'display image
+                                 'rear-nonsticky (list 'display))
+                           id)
       (setcar line id))
     line))
 
@@ -887,27 +887,27 @@ Modify whole identification by side effect."
   (add-hook 'post-command-hook 'lsdb-modeline-update nil t)
   (make-local-variable 'lsdb-modeline-string)
   (setq mode-line-buffer-identification
-	(lsdb-modeline-buffer-identification
-	 '("LSDB: " lsdb-modeline-string)))
+        (lsdb-modeline-buffer-identification
+         '("LSDB: " lsdb-modeline-string)))
   (lsdb-modeline-update)
   (force-mode-line-update))
 
 (defun lsdb-modeline-update ()
   (let ((record
-	 (get-text-property (if (eobp) (point-min) (point)) 'lsdb-record))
-	net)
+         (get-text-property (if (eobp) (point-min) (point)) 'lsdb-record))
+        net)
     (if record
-	(progn
-	  (setq net (car (cdr (assq 'net (cdr record)))))
-	  (if (and net (equal net (car record)))
-	      (setq lsdb-modeline-string net)
-	    (setq lsdb-modeline-string (concat (car record) " <" net ">"))))
+        (progn
+          (setq net (car (cdr (assq 'net (cdr record)))))
+          (if (and net (equal net (car record)))
+              (setq lsdb-modeline-string net)
+            (setq lsdb-modeline-string (concat (car record) " <" net ">"))))
       (setq lsdb-modeline-string ""))))
 
 (defun lsdb-narrow-to-record ()
   "Narrow to the current record."
   (let ((end (next-single-property-change (point) 'lsdb-record nil
-					  (point-max))))
+                                          (point-max))))
     (narrow-to-region
      (previous-single-property-change end 'lsdb-record nil (point-min))
      end)
@@ -928,19 +928,19 @@ Modify whole identification by side effect."
   (save-excursion
     (beginning-of-line)
     (if (looking-at "^\t\\([^\t][^:]+\\):")
-	(intern (downcase (match-string 1))))))
+        (intern (downcase (match-string 1))))))
 
 (defun lsdb-read-entry (record &optional prompt)
   "Prompt to select an entry in the given RECORD."
   (let* ((completion-ignore-case t)
-	 (entry-name
-	  (completing-read
-	   (or prompt
-	       "Which entry: ")
-	   (mapcar (lambda (entry)
-		     (list (capitalize (symbol-name (car entry)))))
-		   (cdr record))
-	   nil t)))
+         (entry-name
+          (completing-read
+           (or prompt
+               "Which entry: ")
+           (mapcar (lambda (entry)
+                     (list (capitalize (symbol-name (car entry)))))
+                   (cdr record))
+           nil t)))
     (unless (equal entry-name "")
       (intern (downcase entry-name)))))
 
@@ -948,7 +948,7 @@ Modify whole identification by side effect."
   "Delete given ENTRY from RECORD."
   (setcdr record (delq entry (cdr record)))
   (puthash (car record) (cdr record)
-		lsdb-hash-table)
+                lsdb-hash-table)
   (run-hook-with-args 'lsdb-after-update-record-functions record)
   (setq lsdb-hash-tables-are-dirty t))
 
@@ -967,56 +967,56 @@ Modify whole identification by side effect."
      nil "Editing the entry."
      (lambda (form)
        (when form
-	 (with-current-buffer lsdb-buffer-name
-	   (goto-char marker)
-	   (let ((record (lsdb-current-record))
-		 (inhibit-read-only t)
-		 buffer-read-only)
-	     (setcdr record (cons (cons entry-name form) (cdr record)))
-	     (puthash (car record) (cdr record)
-		      lsdb-hash-table)
-	     (run-hook-with-args 'lsdb-after-update-record-functions record)
-	     (setq lsdb-hash-tables-are-dirty t)
-	     (beginning-of-line 2)
-	     (add-text-properties
-	      (point)
-	      (progn
-		(lsdb-insert-entry (cons entry-name form))
-		(point))
-	      (list 'lsdb-record record)))))))))
+         (with-current-buffer lsdb-buffer-name
+           (goto-char marker)
+           (let ((record (lsdb-current-record))
+                 (inhibit-read-only t)
+                 buffer-read-only)
+             (setcdr record (cons (cons entry-name form) (cdr record)))
+             (puthash (car record) (cdr record)
+                      lsdb-hash-table)
+             (run-hook-with-args 'lsdb-after-update-record-functions record)
+             (setq lsdb-hash-tables-are-dirty t)
+             (beginning-of-line 2)
+             (add-text-properties
+              (point)
+              (progn
+                (lsdb-insert-entry (cons entry-name form))
+                (point))
+              (list 'lsdb-record record)))))))))
 
 (defun lsdb-mode-delete-entry-1 (entry)
   "Delete text contents of the ENTRY from the current buffer."
   (save-restriction
     (lsdb-narrow-to-record)
     (let ((case-fold-search t)
-	  (inhibit-read-only t)
-	  buffer-read-only)
+          (inhibit-read-only t)
+          buffer-read-only)
       (goto-char (point-min))
       (if (re-search-forward
-	   (concat "^\t" (capitalize (symbol-name (car entry))) ":")
-	   nil t)
-	  (delete-region (match-beginning 0)
-			 (if (re-search-forward
-			      "^\t[^\t][^:]+:" nil t)
-			     (match-beginning 0)
-			   (point-max)))))))
+           (concat "^\t" (capitalize (symbol-name (car entry))) ":")
+           nil t)
+          (delete-region (match-beginning 0)
+                         (if (re-search-forward
+                              "^\t[^\t][^:]+:" nil t)
+                             (match-beginning 0)
+                           (point-max)))))))
 
 (defun lsdb-mode-delete-entry ()
   "Delete the entry on the current line."
   (interactive)
   (let ((record (lsdb-current-record))
-	entry-name entry)
+        entry-name entry)
     (unless record
       (error "There is nothing to follow here"))
     (setq entry-name (or (lsdb-current-entry)
-			 (lsdb-read-entry record "Which entry to delete: "))
-	  entry (assq entry-name (cdr record)))
+                         (lsdb-read-entry record "Which entry to delete: "))
+          entry (assq entry-name (cdr record)))
     (when (and entry
-	       (or (not lsdb-verbose)
-		   (y-or-n-p
-		    (format "Do you really want to delete entry `%s' of `%s'? "
-			    entry-name (car record)))))
+               (or (not lsdb-verbose)
+                   (y-or-n-p
+                    (format "Do you really want to delete entry `%s' of `%s'? "
+                            entry-name (car record)))))
       (lsdb-delete-entry record entry)
       (lsdb-mode-delete-entry-1 entry))))
 
@@ -1027,15 +1027,15 @@ Modify whole identification by side effect."
     (unless record
       (error "%s" "There is nothing to follow here"))
     (when (or (not lsdb-verbose)
-	      (yes-or-no-p
-	       (format "Do you really want to delete entire record of `%s'? "
-		       (car record))))
+              (yes-or-no-p
+               (format "Do you really want to delete entire record of `%s'? "
+                       (car record))))
       (lsdb-delete-record record)
       (save-restriction
-	(lsdb-narrow-to-record)
-	(let ((inhibit-read-only t)
-	      buffer-read-only)
-	  (delete-region (point-min) (point-max)))))))
+        (lsdb-narrow-to-record)
+        (let ((inhibit-read-only t)
+              buffer-read-only)
+          (delete-region (point-min) (point-max)))))))
 
 (defun lsdb-mode-delete-entry-or-record ()
   "Delete the entry on the current line.
@@ -1053,32 +1053,32 @@ then the entire entry will be deleted."
     (unless record
       (error "There is nothing to follow here"))
     (let ((entry-name (or (lsdb-current-entry)
-			  (lsdb-read-entry record "Which entry to edit: "))))
+                          (lsdb-read-entry record "Which entry to edit: "))))
       (lsdb-edit-form
        (cdr (assq entry-name (cdr record))) "Editing the entry."
        (lambda (form)
-	 (let* ((record record)
-		(entry-name entry-name)
-		(entry (assq entry-name (cdr record))))
-	   (unless (equal form (cdr entry))
-	     (setcdr entry form)
-	     (run-hook-with-args 'lsdb-after-update-record-functions record)
-	     (setq lsdb-hash-tables-are-dirty t)
-	     (with-current-buffer lsdb-buffer-name
-	       (let ((inhibit-read-only t)
-		     buffer-read-only
-		     (pos (text-property-any (point-min) (point-max)
-					     'lsdb-record record)))
-		 (unless pos
-		   (error "%s" "The entry currently in editing is discarded"))
-		 (lsdb-mode-delete-entry-1 entry)
-		 (forward-line 0)
-		 (add-text-properties
-		  (point)
-		  (progn
-		    (lsdb-insert-entry (cons entry-name form))
-		    (point))
-		  (list 'lsdb-record record)))))))))))
+         (let* ((record record)
+                (entry-name entry-name)
+                (entry (assq entry-name (cdr record))))
+           (unless (equal form (cdr entry))
+             (setcdr entry form)
+             (run-hook-with-args 'lsdb-after-update-record-functions record)
+             (setq lsdb-hash-tables-are-dirty t)
+             (with-current-buffer lsdb-buffer-name
+               (let ((inhibit-read-only t)
+                     buffer-read-only
+                     (pos (text-property-any (point-min) (point-max)
+                                             'lsdb-record record)))
+                 (unless pos
+                   (error "%s" "The entry currently in editing is discarded"))
+                 (lsdb-mode-delete-entry-1 entry)
+                 (forward-line 0)
+                 (add-text-properties
+                  (point)
+                  (progn
+                    (lsdb-insert-entry (cons entry-name form))
+                    (point))
+                  (list 'lsdb-record record)))))))))))
 
 (defun lsdb-mode-edit-record ()
   "Edit the name of the record on the current line."
@@ -1090,25 +1090,25 @@ then the entire entry will be deleted."
      (car record) "Editing the name."
      (lambda (new-name)
        (unless (stringp new-name)
-	 (error "String is required: `%s'" new-name))
+         (error "String is required: `%s'" new-name))
        (let ((old-name (car record)))
-	 (unless (equal new-name old-name)
-	   (lsdb-delete-record record)
-	   (setcar record new-name)
-	   (puthash new-name (cdr record) lsdb-hash-table)
-	   (run-hook-with-args 'lsdb-after-update-record-functions record)
-	   (setq lsdb-hash-tables-are-dirty t)
-	   (with-current-buffer lsdb-buffer-name
-	     (let ((inhibit-read-only t)
-		   buffer-read-only
-		   (pos (text-property-any (point-min) (point-max)
-					   'lsdb-record record)))
-	       (unless pos
-		 (error "The entry currently in editing is discarded"))
-	       (delete-region pos (+ pos (length old-name)))
-	       (add-text-properties pos
-				    (progn (insert new-name) pos)
-				    (list 'lsdb-record record))))))))))
+         (unless (equal new-name old-name)
+           (lsdb-delete-record record)
+           (setcar record new-name)
+           (puthash new-name (cdr record) lsdb-hash-table)
+           (run-hook-with-args 'lsdb-after-update-record-functions record)
+           (setq lsdb-hash-tables-are-dirty t)
+           (with-current-buffer lsdb-buffer-name
+             (let ((inhibit-read-only t)
+                   buffer-read-only
+                   (pos (text-property-any (point-min) (point-max)
+                                           'lsdb-record record)))
+               (unless pos
+                 (error "The entry currently in editing is discarded"))
+               (delete-region pos (+ pos (length old-name)))
+               (add-text-properties pos
+                                    (progn (insert new-name) pos)
+                                    (list 'lsdb-record record))))))))))
 
 (defun lsdb-mode-edit-entry-or-record ()
   "Edit the entry on the current line.
@@ -1125,8 +1125,8 @@ then the name of this record will be edited."
   (if (not lsdb-hash-tables-are-dirty)
       (message "(No changes need to be saved)")
     (when (or dont-ask
-	      (not lsdb-verbose)
-	      (y-or-n-p "Save the LSDB now? "))
+              (not lsdb-verbose)
+              (y-or-n-p "Save the LSDB now? "))
       (lsdb-save-hash-tables)
       (set-buffer-modified-p (setq lsdb-hash-tables-are-dirty nil))
       (message "The LSDB was saved successfully."))))
@@ -1148,26 +1148,26 @@ It partially emulates the GNU Emacs' of `quit-window'."
     (setq window (selected-window)))
   (let ((buffer (window-buffer window)))
     (unless (save-selected-window
-	      (select-window window)
-	      (one-window-p))
+              (select-window window)
+              (one-window-p))
       (delete-window window))
     (if kill
-	(kill-buffer buffer)
+        (kill-buffer buffer)
       (bury-buffer (unless (eq buffer (current-buffer)) buffer)))))
 
 (defun lsdb-hide-buffer ()
   "Hide the LSDB window."
   (let ((window (get-buffer-window lsdb-buffer-name)))
     (if window
-	(lsdb-mode-quit-window nil window))))
+        (lsdb-mode-quit-window nil window))))
 
 (defun lsdb-show-buffer ()
   "Show the LSDB window."
   (if (get-buffer lsdb-buffer-name)
       (if lsdb-temp-buffer-show-function
-	  (let ((lsdb-pop-up-windows t))
-	    (funcall lsdb-temp-buffer-show-function lsdb-buffer-name))
-	(pop-to-buffer lsdb-buffer-name))))
+          (let ((lsdb-pop-up-windows t))
+            (funcall lsdb-temp-buffer-show-function lsdb-buffer-name))
+        (pop-to-buffer lsdb-buffer-name))))
 
 (defun lsdb-toggle-buffer (&optional arg)
   "Toggle hiding of the LSDB window.
@@ -1175,18 +1175,18 @@ If given a negative prefix, always show; if given a positive prefix,
 always hide."
   (interactive
    (list (if current-prefix-arg
-	     (prefix-numeric-value current-prefix-arg)
-	   0)))
+             (prefix-numeric-value current-prefix-arg)
+           0)))
   (unless arg				;called noninteractively?
     (setq arg 0))
   (cond
    ((or (< arg 0)
-	(and (zerop arg)
-	     (not (get-buffer-window lsdb-buffer-name))))
+        (and (zerop arg)
+             (not (get-buffer-window lsdb-buffer-name))))
     (lsdb-show-buffer))
    ((or (> arg 0)
-	(and (zerop arg)
-	     (get-buffer-window lsdb-buffer-name)))
+        (and (zerop arg)
+             (get-buffer-window lsdb-buffer-name)))
     (lsdb-hide-buffer))))
 
 (defun lsdb-lookup-records (regexp &optional entry-name)
@@ -1196,19 +1196,19 @@ performed against the entry field."
   (let (records)
     (maphash
      (if entry-name
-	 (lambda (key value)
-	   (let ((entry (cdr (assq entry-name value)))
-		 found)
-	     (unless (listp entry)
-	       (setq entry (list entry)))
-	     (while (and (not found) entry)
-	       (if (string-match regexp (pop entry))
-		   (setq found t)))
-	     (if found
-		 (push (cons key value) records))))
+         (lambda (key value)
+           (let ((entry (cdr (assq entry-name value)))
+                 found)
+             (unless (listp entry)
+               (setq entry (list entry)))
+             (while (and (not found) entry)
+               (if (string-match regexp (pop entry))
+                   (setq found t)))
+             (if found
+                 (push (cons key value) records))))
        (lambda (key value)
-	 (if (string-match regexp key)
-	     (push (cons key value) records))))
+         (if (string-match regexp key)
+             (push (cons key value) records))))
      lsdb-hash-table)
     records))
 
@@ -1220,86 +1220,89 @@ If the optional 2nd argument ENTRY-NAME is given, matching only
 performed against the entry field."
   (interactive
    (let* ((completion-ignore-case t)
-	  (entry-name
-	   (if current-prefix-arg
-	       (completing-read "Entry name: "
-				lsdb-known-entry-names))))
+          (entry-name
+           (if current-prefix-arg
+               (completing-read "Entry name: "
+                                lsdb-known-entry-names))))
      (list
       (read-from-minibuffer
        (if entry-name
-	   (format "Search records `%s' regexp: " entry-name)
-	 "Search records regexp: ")
+           (format "Search records `%s' regexp: " entry-name)
+         "Search records regexp: ")
        nil nil nil 'lsdb-mode-lookup-history)
       (if (and entry-name (not (equal entry-name "")))
-	  (intern (downcase entry-name))))))
+          (intern (downcase entry-name))))))
   (lsdb-maybe-load-hash-tables)
   (let ((records (lsdb-lookup-records regexp entry-name)))
     (if records
-	(lsdb-display-records records))))
+        (lsdb-display-records records))))
 
-(static-if (featurep 'ivy)
-    (defun counsel-lsdb-candidates (entry-name)
-      "Build `counsel-lsdb' candidate list."
-      (if entry-name
-          (lambda (regexp)
-            (let (entries)
-              (maphash
-               (lambda (_key value)
-                 (let ((entry (cdr (assq entry-name value))))
-                   (unless (listp entry)
-	             (setq entry (list entry)))
-                   (mapc
-                    (lambda (e)
-                      (if (and e
-                               (not (member e entries))
-                               (string-match regexp e))
-                          (push (propertize e 'entry t) entries)))
-                    entry)))
-               lsdb-hash-table)
-              entries))
-        (lambda (regexp)
-          (let (results)
-            (maphash
-             (lambda (key value)
-               (if (string-match regexp key)
-                   (push (propertize key 'record
-                                     (cons key value)) results)))
-             lsdb-hash-table)
-            results)))))
+(defun counsel-lsdb-candidates (entry-name)
+  "Build `counsel-lsdb' candidate list."
+  (if entry-name
+      (lambda (regexp)
+        (let (entries)
+          (maphash
+           (lambda (_key value)
+             (let ((entry (cdr (assq entry-name value))))
+               (unless (listp entry)
+                 (setq entry (list entry)))
+               (mapc
+                (lambda (e)
+                  (if (and e
+                           (not (member e entries))
+                           (string-match regexp e))
+                      (push (propertize e 'entry t) entries)))
+                entry)))
+           lsdb-hash-table)
+          entries))
+    (lambda (regexp)
+      (let (results)
+        (maphash
+         (lambda (key value)
+           (if (string-match regexp key)
+               (push (propertize key 'record
+                                 (cons key value)) results)))
+         lsdb-hash-table)
+        results))))
+
+(defun counsel-lsdb (&optional entry-name)
+  "Search LSDB with `ivy'."
+  (interactive
+   (let* ((completion-ignore-case t)
+          (entry-name
+           (if current-prefix-arg
+               (completing-read "Entry name: "
+                                lsdb-known-entry-names))))
+     (list (if (and entry-name (not (equal entry-name "")))
+               (intern (downcase entry-name))))))
+  (lsdb-maybe-load-hash-tables)
+  (let* ((regexp
+          (ivy-read
+           (if entry-name
+               (format "Search records `%s' regexp: " entry-name)
+             "Search records regexp: ")
+           (counsel-lsdb-candidates entry-name)
+           :dynamic-collection t
+           :caller 'counsel-lsdb
+           :history 'lsdb-mode-lookup-history))
+         (record (get-text-property 0 'record regexp)))
+    (if record
+        (lsdb-display-record record)
+      (let ((records (lsdb-lookup-records
+                      (if (get-text-property 0 'entry regexp)
+                          (concat "^" (regexp-quote regexp) "$")
+                        regexp) entry-name)))
+        (if records
+            (lsdb-display-records records))))))
 
 ;;;###autoload
-(defalias 'lsdb
-  (static-if (featurep 'ivy)
-      (defun counsel-lsdb (&optional entry-name)
-        "Search LSDB with `ivy'."
-        (interactive
-         (let* ((completion-ignore-case t)
-	        (entry-name
-	         (if current-prefix-arg
-	             (completing-read "Entry name: "
-				      lsdb-known-entry-names))))
-           (list (if (and entry-name (not (equal entry-name "")))
-	             (intern (downcase entry-name))))))
-        (lsdb-maybe-load-hash-tables)
-        (let* ((regexp
-                (ivy-read
-                 (if entry-name
-                     (format "Search records `%s' regexp: " entry-name)
-                   "Search records regexp: ")
-                 (counsel-lsdb-candidates entry-name)
-                 :dynamic-collection t
-                 :caller 'counsel-lsdb
-                 :history 'lsdb-mode-lookup-history))
-               (record (get-text-property 0 'record regexp)))
-          (if record
-	      (lsdb-display-record record)
-            (let ((records (lsdb-lookup-records
-                            (if (get-text-property 0 'entry regexp)
-                                (concat "^" (regexp-quote regexp) "$")
-                              regexp) entry-name)))
-              (if records
-	          (lsdb-display-records records))))))
-    'lsdb-mode-lookup))
+(defun lsdb ()
+  (interactive)
+  (call-interactively
+   (static-if (featurep 'ivy)
+       'counsel-lsdb
+     lsdb-mode-lookup)))
 
 (defun lsdb-mode-next-record (&optional arg)
   "Go to the next record."
@@ -1310,7 +1313,7 @@ performed against the entry field."
       (lsdb-mode-previous-record (- arg))
     (while (> arg 0)
       (goto-char (next-single-property-change
-		  (point) 'lsdb-record nil (point-max)))
+                  (point) 'lsdb-record nil (point-max)))
       (setq arg (1- arg)))))
 
 (defun lsdb-mode-previous-record (&optional arg)
@@ -1322,7 +1325,7 @@ performed against the entry field."
       (lsdb-mode-next-record (- arg))
     (while (> arg 0)
       (goto-char (previous-single-property-change
-		  (point) 'lsdb-record nil (point-min)))
+                  (point) 'lsdb-record nil (point-min)))
       (setq arg (1- arg)))))
 
 ;;;_ : Edit Forms -- stolen (and renamed) from gnus-eform.el
@@ -1354,11 +1357,11 @@ It is a slightly enhanced emacs-lisp-mode.
 Call EXIT-FUNC on exit.  Display DOCUMENTATION in the beginning
 of the buffer."
   (let ((window-configuration
-	 (current-window-configuration)))
+         (current-window-configuration)))
     (switch-to-buffer (get-buffer-create lsdb-edit-form-buffer))
     (lsdb-edit-form-mode)
     (setq lsdb-previous-window-configuration window-configuration
-	  lsdb-edit-form-done-function exit-func)
+          lsdb-edit-form-done-function exit-func)
     (erase-buffer)
     (insert documentation)
     (unless (bolp)
@@ -1379,9 +1382,9 @@ of the buffer."
   (interactive)
   (goto-char (point-min))
   (let ((form (condition-case nil
-		  (read (current-buffer))
-		(end-of-file nil)))
-	(func lsdb-edit-form-done-function))
+                  (read (current-buffer))
+                (end-of-file nil)))
+        (func lsdb-edit-form-done-function))
     (lsdb-edit-form-exit)
     (funcall func form)))
 
@@ -1403,7 +1406,7 @@ of the buffer."
 (defvar gnus-original-article-buffer)
 (defun lsdb-gnus-update-record ()
   (with-current-buffer (with-current-buffer gnus-article-current-summary
-			 gnus-original-article-buffer)
+                         gnus-original-article-buffer)
     (lsdb-update-records-and-display)))
 
 ;;;_. Interface to Wanderlust
@@ -1416,7 +1419,7 @@ of the buffer."
   (add-hook 'wl-summary-toggle-disp-folder-on-hook 'lsdb-hide-buffer)
   (add-hook 'wl-summary-toggle-disp-folder-off-hook 'lsdb-hide-buffer)
   (add-hook 'wl-summary-toggle-disp-folder-message-resumed-hook
-	    'lsdb-wl-show-buffer)
+            'lsdb-wl-show-buffer)
   (add-hook 'wl-exit-hook 'lsdb-mode-save)
   (add-hook 'wl-save-hook 'lsdb-mode-save))
 
@@ -1429,7 +1432,7 @@ of the buffer."
   (interactive)
   (with-current-buffer (wl-message-get-original-buffer)
     (let ((lsdb-temp-buffer-show-function
-	   #'lsdb-wl-temp-buffer-show-function))
+           #'lsdb-wl-temp-buffer-show-function))
       (lsdb-update-records-and-display))))
 
 (defun lsdb-wl-toggle-buffer (&optional arg)
@@ -1438,16 +1441,16 @@ If given a negative prefix, always show; if given a positive prefix,
 always hide."
   (interactive
    (list (if current-prefix-arg
-	     (prefix-numeric-value current-prefix-arg)
-	   0)))
+             (prefix-numeric-value current-prefix-arg)
+           0)))
   (let ((lsdb-temp-buffer-show-function
-	 #'lsdb-wl-temp-buffer-show-function))
+         #'lsdb-wl-temp-buffer-show-function))
     (lsdb-toggle-buffer arg)))
 
 (defun lsdb-wl-show-buffer ()
   (when lsdb-pop-up-windows
     (let ((lsdb-temp-buffer-show-function
-	   #'lsdb-wl-temp-buffer-show-function))
+           #'lsdb-wl-temp-buffer-show-function))
       (lsdb-show-buffer))))
 
 (defvar wl-current-summary-buffer)
@@ -1456,16 +1459,16 @@ always hide."
   (when lsdb-pop-up-windows
     (save-selected-window
       (let ((window (or (get-buffer-window lsdb-buffer-name)
-			(progn
-			  (select-window 
-			   (or (save-excursion
-				 (if (buffer-live-p wl-current-summary-buffer)
-				     (set-buffer wl-current-summary-buffer))
-				 (get-buffer-window wl-message-buffer))
-			       (get-largest-window)))
-			  (split-window-vertically)))))
-	(set-window-buffer window buffer)
-	(lsdb-fit-window-to-buffer window)))))
+                        (progn
+                          (select-window
+                           (or (save-excursion
+                                 (if (buffer-live-p wl-current-summary-buffer)
+                                     (set-buffer wl-current-summary-buffer))
+                                 (get-buffer-window wl-message-buffer))
+                               (get-largest-window)))
+                          (split-window-vertically)))))
+        (set-window-buffer window buffer)
+        (lsdb-fit-window-to-buffer window)))))
 
 (defvar wl-address-list)
 (defvar wl-address-completion-list)
@@ -1479,20 +1482,20 @@ Refresh `wl-address-list', `wl-address-completion-list', and
   (message "Updating addresses...")
   (lsdb-maybe-load-hash-tables)
   (setq wl-address-list
-	(let (tmp)
+        (let (tmp)
           (maphash (lambda (key value)
                      (push (list (copy-sequence (cadr (assq 'net value)))
-                                 (copy-sequence key)
+                                 (copy-sequence (cadr (assq 'attribution value)))
                                  (copy-sequence key)) tmp)) lsdb-hash-table)
           tmp))
   (setq wl-address-completion-list
-	(wl-address-make-completion-list wl-address-list))
+        (wl-address-make-completion-list wl-address-list))
   (setq wl-address-petname-hash (make-hash-table :test #'equal))
   (mapc
    (lambda (addr)
      (puthash (downcase (car addr))
-	      (cadr addr)
-	      wl-address-petname-hash))
+              (cadr addr)
+              wl-address-petname-hash))
    wl-address-list)
   (message "Updating addresses...done"))
 
@@ -1500,13 +1503,13 @@ Refresh `wl-address-list', `wl-address-completion-list', and
 (eval-when-compile
   (condition-case nil
       (progn
-	(require 'mew)
-	;; Avoid macro `mew-cache-hit' expand (Mew 1.94.2 or earlier).
-	;; Changed `mew-cache-hit' from macro to function at Mew 2.0.
-	(if (not (fboundp 'mew-current-get-fld))
-	    (setq byte-compile-macro-environment
-		  (cons '(mew-cache-hit . nil)
-			byte-compile-macro-environment))))
+        (require 'mew)
+        ;; Avoid macro `mew-cache-hit' expand (Mew 1.94.2 or earlier).
+        ;; Changed `mew-cache-hit' from macro to function at Mew 2.0.
+        (if (not (fboundp 'mew-current-get-fld))
+            (setq byte-compile-macro-environment
+                  (cons '(mew-cache-hit . nil)
+                        byte-compile-macro-environment))))
     (error
      ;; Silence byte compiler for environments where Mew does not installed.
      (autoload 'mew-sinfo-get-disp-msg "mew")
@@ -1522,9 +1525,9 @@ Refresh `wl-address-list', `wl-address-completion-list', and
   "Call this function to hook LSDB into Mew."
   (add-hook 'mew-message-hook 'lsdb-mew-update-record)
   (add-hook 'mew-summary-toggle-disp-msg-hook
-	    (lambda ()
-	      (unless (mew-sinfo-get-disp-msg)
-		(lsdb-hide-buffer))))
+            (lambda ()
+              (unless (mew-sinfo-get-disp-msg)
+                (lsdb-hide-buffer))))
   (add-hook 'mew-suspend-hook 'lsdb-hide-buffer)
   (add-hook 'mew-quit-hook 'lsdb-mode-save)
   (add-hook 'kill-emacs-hook 'lsdb-mode-save)
@@ -1540,17 +1543,17 @@ Refresh `wl-address-list', `wl-address-completion-list', and
 
 (defun lsdb-mew-update-record ()
   (let* ((fld (mew-current-get-fld (mew-frame-id)))
-	 (msg (mew-current-get-msg (mew-frame-id)))
-	 (cache (mew-cache-hit fld msg)))
+         (msg (mew-current-get-msg (mew-frame-id)))
+         (cache (mew-cache-hit fld msg)))
     (when cache
       (with-current-buffer cache
-	(unless (or (mew-xinfo-get-decode-err) (mew-xinfo-get-action))
-	  (make-local-variable 'lsdb-decode-field-body-function)
-	  (setq lsdb-decode-field-body-function
-		(lambda (body _name)
-		  (set-text-properties 0 (length body) nil body)
-		  body))
-	  (lsdb-update-records-and-display))))))
+        (unless (or (mew-xinfo-get-decode-err) (mew-xinfo-get-action))
+          (make-local-variable 'lsdb-decode-field-body-function)
+          (setq lsdb-decode-field-body-function
+                (lambda (body _name)
+                  (set-text-properties 0 (length body) nil body)
+                  body))
+          (lsdb-update-records-and-display))))))
 
 ;;;_. Interface to MU-CITE
 (eval-when-compile
@@ -1559,25 +1562,25 @@ Refresh `wl-address-list', `wl-address-completion-list', and
 (defun lsdb-mu-attribution (address)
   "Extract attribute information from LSDB."
   (let ((records
-	 (lsdb-lookup-records (concat "\\<" address "\\>") 'net)))
+         (lsdb-lookup-records (concat "\\<" address "\\>") 'net)))
     (if records
-	(cdr (assq 'attribution (cdr (car records)))))))
+        (cdr (assq 'attribution (cdr (car records)))))))
 
 (defun lsdb-mu-set-attribution (attribution address)
   "Add attribute information to LSDB."
   (let ((records
-	 (lsdb-lookup-records (concat "\\<" address "\\>") 'net))
-	entry)
+         (lsdb-lookup-records (concat "\\<" address "\\>") 'net))
+        entry)
     (when records
       (setq entry (assq 'attribution (cdr (car records))))
       (if entry
-	  (setcdr entry attribution)
-	(setcdr (car records) (cons (cons 'attribution attribution)
-				    (cdr (car records))))
-	(puthash (car (car records)) (cdr (car records))
-		      lsdb-hash-table)
-	(run-hook-with-args 'lsdb-after-update-record-functions (car records))
-	(setq lsdb-hash-tables-are-dirty t)))))
+          (setcdr entry attribution)
+        (setcdr (car records) (cons (cons 'attribution attribution)
+                                    (cdr (car records))))
+        (puthash (car (car records)) (cdr (car records))
+                      lsdb-hash-table)
+        (run-hook-with-args 'lsdb-after-update-record-functions (car records))
+        (setq lsdb-hash-tables-are-dirty t)))))
 
 (defun lsdb-mu-get-prefix-method ()
   "A mu-cite method to return a prefix from LSDB or \">\".
@@ -1597,15 +1600,15 @@ Otherwise the function requests a prefix from a user.  The prefix will
 be registered to LSDB if the user wants it."
   (let ((address (mu-cite-get-value 'address)))
     (or (lsdb-mu-attribution address)
-	(let* (minibuffer-allow-text-properties
-	       (result (read-string "Citation name? "
-				    (or (mu-cite-get-value 'x-attribution)
-					(mu-cite-get-value 'full-name))
-				    'lsdb-mu-history)))
-	  (if (and (not (string-equal result ""))
-		   (y-or-n-p (format "Register \"%s\"? " result)))
-	      (lsdb-mu-set-attribution result address))
-	  result))))
+        (let* (minibuffer-allow-text-properties
+               (result (read-string "Citation name? "
+                                    (or (mu-cite-get-value 'x-attribution)
+                                        (mu-cite-get-value 'firstname))
+                                    'lsdb-mu-history)))
+          (if (and (not (string-equal result ""))
+                   (y-or-n-p (format "Register \"%s\"? " result)))
+              (lsdb-mu-set-attribution result address))
+          result))))
 
 (defun lsdb-mu-get-prefix-register-verbose-method ()
   "A mu-cite method to return a prefix using LSDB.
@@ -1615,71 +1618,71 @@ In this method, a user must specify a prefix unconditionally.  If an
 value to input the prefix.  The prefix will be registered to LSDB if
 the user wants it."
   (let* ((address (mu-cite-get-value 'address))
-	 (attribution (lsdb-mu-attribution address))
-	 minibuffer-allow-text-properties
-	 (result (read-string "Citation name? "
-			      (or attribution
-				  (mu-cite-get-value 'x-attribution)
-				  (mu-cite-get-value 'full-name))
-			      'lsdb-mu-history)))
+         (attribution (lsdb-mu-attribution address))
+         minibuffer-allow-text-properties
+         (result (read-string "Citation name? "
+                              (or attribution
+                                  (mu-cite-get-value 'x-attribution)
+                                  (mu-cite-get-value 'firstname))
+                              'lsdb-mu-history)))
     (if (and (not (string-equal result ""))
-	     (not (string-equal result attribution))
-	     (y-or-n-p (format "Register \"%s\"? " result)))
-	(lsdb-mu-set-attribution result address))
+             (not (string-equal result attribution))
+             (y-or-n-p (format "Register \"%s\"? " result)))
+        (lsdb-mu-set-attribution result address))
     result))
 
 (defvar mu-cite-methods-alist)
 ;;;###autoload
 (defun lsdb-mu-insinuate ()
   (add-hook 'mu-cite-instantiation-hook
-	    (lambda ()
-	      (setq mu-cite-methods-alist
-		    (nconc
-		     mu-cite-methods-alist
-		     (list
-		      (cons 'lsdb-prefix
-			    #'lsdb-mu-get-prefix-method)
-		      (cons 'lsdb-prefix-register
-			    #'lsdb-mu-get-prefix-register-method)
-		      (cons 'lsdb-prefix-register-verbose
-			    #'lsdb-mu-get-prefix-register-verbose-method)))))))
+            (lambda ()
+              (setq mu-cite-methods-alist
+                    (nconc
+                     mu-cite-methods-alist
+                     (list
+                      (cons 'lsdb-prefix
+                            #'lsdb-mu-get-prefix-method)
+                      (cons 'lsdb-prefix-register
+                            #'lsdb-mu-get-prefix-register-method)
+                      (cons 'lsdb-prefix-register-verbose
+                            #'lsdb-mu-get-prefix-register-verbose-method)))))))
 
 ;;;_. X-Face Rendering
 (defun lsdb-expose-x-face ()
   (let* ((record (get-text-property (point-min) 'lsdb-record))
-	 (x-face (cdr (assq 'x-face (cdr record))))
-	 (delimiter "\r "))
+         (x-face (cdr (assq 'x-face (cdr record))))
+         (delimiter "\r "))
     (when (and lsdb-insert-x-face-function
-	       x-face)
+               x-face)
       (goto-char (point-min))
       (end-of-line)
       (put-text-property 0 1 'invisible t delimiter) ;hide "\r"
       (put-text-property
        (point)
        (progn
-	 (insert delimiter)
-	 (while x-face
-	   (funcall lsdb-insert-x-face-function (pop x-face)))
-	 (point))
+         (insert delimiter)
+         (while x-face
+           (funcall lsdb-insert-x-face-function (pop x-face)))
+         (point))
        'lsdb-record record))))
 
 ;;;_. Face Rendering
 (defun lsdb-expose-face ()
   (let* ((record (get-text-property (point-min) 'lsdb-record))
-	 (face (cdr (assq 'face (cdr record))))
-	 (delimiter "\r "))
+         (face (cdr (assq 'face (cdr record))))
+         (delimiter "\r "))
     (when (and lsdb-insert-face-function
-	       face)
+               face)
       (goto-char (point-min))
       (end-of-line)
       (put-text-property 0 1 'invisible t delimiter) ;hide "\r"
       (put-text-property
        (point)
        (progn
-	 (insert delimiter)
-	 (while face
-	   (funcall lsdb-insert-face-function (pop face)))
-	 (point))
+         (insert delimiter)
+         (while face
+           (funcall lsdb-insert-face-function (pop face)))
+         (point))
        'lsdb-record record))))
 
 (require 'product)
