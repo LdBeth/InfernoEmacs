@@ -144,7 +144,7 @@
 ;;;
 
 (defcustom mu-cite-cited-prefix-regexp
-  "\\(^[^ \t\n<>]+>+[ \t]*\\|^[ \t]*$\\)"
+  "\\(^[^ \t\n<>]*>+[ \t]*\\|^[ \t]*$\\)"
   "Regexp to match the citation prefix.
 If match, mu-cite doesn't insert citation prefix."
   :type 'regexp

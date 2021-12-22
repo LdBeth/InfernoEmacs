@@ -46,8 +46,8 @@
       '(("gnu" . "https://elpa.gnu.org/packages/")
 	("melpa" . "https://melpa.org/packages/")))
 
-;; Splash
-(defvar dotspacemacs-banner
-  (eval-when-compile (concat user-emacs-directory "banner.pbm")))
-(defvar dotspacemacs-startup-lists
-  '((recents  . 5)))
+(if (not (boundp 'dumped-load-path))
+    (load (concat user-emacs-directory "pkgs"))
+  (setq load-path dumped-load-path)
+  (global-font-lock-mode t)
+  (transient-mark-mode t))

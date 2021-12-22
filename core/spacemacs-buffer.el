@@ -617,6 +617,6 @@ Useful for making the home buffer the only visible buffer in the frame."
   (spacemacs/home)
   (delete-other-windows))
 
-(provide 'core-spacemacs-buffer)
+(provide 'spacemacs-buffer)
 
 ;;; core-spacemacs-buffer ends here

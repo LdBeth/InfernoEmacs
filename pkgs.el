@@ -9,12 +9,20 @@
 
 (use-package diminish
   :config
-  (diminish 'eldoc-mode))
+  (diminish 'eldoc-mode)
+  (diminish 'visual-line-mode))
 
 (use-package spacemacs-common
   :load-path "core/spacemacs-theme/"
   :config
   (load-theme 'spacemacs-dark t))
+
+(use-package spacemacs-buffer
+  :init
+  (defvar dotspacemacs-banner
+    (eval-when-compile (concat user-emacs-directory "banner.pbm")))
+  (defvar dotspacemacs-startup-lists
+    '((recents  . 5))))
 
 (use-package paren-face
   :config
