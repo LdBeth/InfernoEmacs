@@ -52,6 +52,7 @@ Internal use, do not set this variable.")
 (defvar spacemacs-buffer-mode-map
   (eval-when-compile
     (let ((map (make-sparse-keymap)))
+      (suppress-keymap map)
       (define-key map (kbd "0") 'spacemacs-buffer/jump-to-number-startup-list-line)
       (define-key map (kbd "1") 'spacemacs-buffer/jump-to-number-startup-list-line)
       (define-key map (kbd "2") 'spacemacs-buffer/jump-to-number-startup-list-line)

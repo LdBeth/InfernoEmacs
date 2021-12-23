@@ -24,6 +24,11 @@
   (defvar dotspacemacs-startup-lists
     '((recents  . 5))))
 
+(use-package tecoline
+  :config
+  (setq-default mode-line-buffer-identification "%12b"
+                mode-line-format '(:eval (nano-modeline-default-mode))))
+
 (use-package paren-face
   :config
   (global-paren-face-mode 1))

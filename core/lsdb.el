@@ -502,8 +502,10 @@ Overrides `temp-buffer-show-function'.")
       (when full-name
         (setq old (gethash full-name lsdb-hash-table))
         ;; ignores names that looks like email address.
-        (if (not (string-match "^[ _.-a-z0-9]+@[ _.-a-z0-9]+$"
-                               (car sender)))
+        ;; or "send via" mailing lists
+        (if (not (string-match
+                  "^[ _.-a-z0-9]+@[ _.-a-z0-9]+$\\|\s+via\s+"
+                  (car sender)))
             (setq new (cons (list 'aka (car sender)) new)))
         (setcar sender full-name)))
     (unless old
@@ -1588,8 +1590,6 @@ If an `attribution' value is found in LSDB, the value is returned.
 Otherwise \">\" is returned."
   (or (lsdb-mu-attribution (mu-cite-get-value 'address))
       ">"))
-
-(defvar minibuffer-allow-text-properties)
 
 (defvar lsdb-mu-history nil)
 

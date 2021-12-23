@@ -325,7 +325,16 @@ to 'auto, tags may not be properly aligned. "
 
 ;;;;; doom-modeline
      '(doom-modeline-bar ((,class (:background ,keyword))))
-
+;;;;; nano-modeline
+     '(nano-modeline ((,class (:foreground ,base))))
+     '(nano-modeline-primary ((,class (:inherit nano-modeline :foreground ,act2))))
+     '(nano-modeline-secondary ((,class (:foreground ,base-dim))))
+     '(nano-modeline-name ((,class (:inherit mode-line-buffer-id))))
+     '(nano-modeline-status-RO ((,class (:background ,red-bg
+                                                     :foreground ,yellow))))
+     '(nano-modeline-status-RW ((,class (:inherit nano-modeline-primary
+                                                  :foreground ,magenta))))
+     '(nano-modeline-status-** ((,class (:background "SkyBlue2" :foreground ,keyword))))
 ;;;;; ediff
      '(ediff-current-diff-A ((,class(:background ,red-bg :foreground ,red :extend t))))
      '(ediff-current-diff-Ancestor ((,class(:background ,aqua-bg :foreground ,aqua :extend t))))
@@ -817,12 +826,6 @@ to 'auto, tags may not be properly aligned. "
      '(solaire-minibuffer-face ((,class (:inherit default :background ,bg2))))
      '(solaire-hl-line-face ((,class (:inherit hl-line :background ,bg2))))
      '(solaire-org-hide-face ((,class (:inherit org-hide :background ,bg2))))
-
-;;;;; spaceline
-     '(spaceline-flycheck-error  ((,class (:foreground ,err))))
-     '(spaceline-flycheck-info   ((,class (:foreground ,keyword))))
-     '(spaceline-flycheck-warning((,class (:foreground ,war))))
-     '(spaceline-python-venv ((,class (:foreground ,comp))))
 
 ;;;;; spacemacs-specific
      '(spacemacs-transient-state-title-face ((,class (:background nil :foreground ,comp :box nil :inherit bold))))
