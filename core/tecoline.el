@@ -67,7 +67,7 @@
                        (propertize (if (window-dedicated-p)"•RO " " RO ")
                                    'face 'nano-modeline-status-RO))
                       ((string= status "**")
-                       (propertize (if (window-dedicated-p)"•** " " ** ")
+                       (propertize (if (window-dedicated-p)"•RW " " RW ")
                                    'face 'nano-modeline-status-**))
                       ((string= status "RW")
                        (propertize (if (window-dedicated-p) "•RW " " RW ")
