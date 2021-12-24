@@ -1,7 +1,7 @@
 (package-initialize)
 (load (concat user-emacs-directory "pkgs"))
 (dolist (package
-         '(mwim unfill hl-todo smex diminish swiper
+         '(mwim unfill hl-todo smex swiper
                 which-key paren-face
                 bind-key))
   (require package))

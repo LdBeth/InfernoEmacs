@@ -8,6 +8,7 @@
   :load-path "core/")
 
 (use-package diminish
+  :disabled
   :config
   (diminish 'eldoc-mode)
   (diminish 'visual-line-mode))
@@ -20,14 +21,14 @@
 (use-package spacemacs-buffer
   :init
   (defvar dotspacemacs-banner
-    (eval-when-compile (concat user-emacs-directory "banner.pbm")))
+    (eval-when-compile (concat user-emacs-directory "banner.ppm")))
   (defvar dotspacemacs-startup-lists
     '((recents  . 5))))
 
 (use-package tecoline
   :config
   (setq-default mode-line-buffer-identification "%12b"
-                mode-line-format '(:eval (nano-modeline-default-mode))))
+                mode-line-format (nano-modeline-default-mode)))
 
 (use-package paren-face
   :config

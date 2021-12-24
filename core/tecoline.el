@@ -63,55 +63,45 @@
 
 (defun nano-modeline-compose (status name primary secondary)
   "Compose a string with provided information"
-  (let ((prefix (cond ((string= status "RO")
-                       (propertize (if (window-dedicated-p)"•RO " " RO ")
-                                   'face 'nano-modeline-status-RO))
-                      ((string= status "**")
-                       (propertize (if (window-dedicated-p)"•RW " " RW ")
-                                   'face 'nano-modeline-status-**))
-                      ((string= status "RW")
-                       (propertize (if (window-dedicated-p) "•RW " " RW ")
-                                   'face 'nano-modeline-status-RW))
-                      (t (propertize status
-                                     'face 'nano-modeline-status-**))))
-        (left (concat
-               (propertize " "  'face 'nano-modeline)
-               (propertize name 'face 'nano-modeline-name)
-               (propertize " "  'face 'nano-modeline)
-               (propertize primary 'face 'nano-modeline-primary)))
-        (right (concat secondary " ")))
-
-    (concat prefix
-            left
-            " >> "
-            (propertize right 'face 'nano-modeline-secondary))))
+  (list status
+        " "
+        `(:propertize ,name face nano-modeline-name)
+        " "
+        `(:propertize ,primary face nano-modeline-primary)
+        '(:propertize " >> " nano-modeline)
+        `(:propertize ,secondary face nano-modeline-secondary)))
 
 (defun nano-modeline-status ()
   "Return buffer status: read-only (RO), modified (**) or read-write (RW)"
-  (let ((read-only   buffer-read-only)
-        (modified    (and buffer-file-name (buffer-modified-p))))
-    (cond (modified  "**") (read-only "RO") (t "RW"))))
+  (cond ((and buffer-file-name (buffer-modified-p))
+         (eval-when-compile
+           (propertize " RW " 'face 'nano-modeline-status-**)))
+        (buffer-read-only
+         (eval-when-compile
+           (propertize " RO " 'face 'nano-modeline-status-RO)))
+        (t
+         (eval-when-compile
+           (propertize " RW " 'face 'nano-modeline-status-RW)))))
 
 (defun nano-modeline-vc-branch ()
   "Return current VC branch if any."
-  (if vc-mode
-      (let ((backend (vc-backend buffer-file-name)))
-        (concat "#"
-                (substring-no-properties
-                 vc-mode
-                 (+ (if (eq backend 'Hg) 2 3) 2))))  nil))
+  (when vc-mode
+    (let ((backend (vc-backend buffer-file-name)))
+      (concat "#"
+              (substring-no-properties
+               vc-mode
+               (+ (if (eq backend 'Hg) 2 3) 2))))))
 
 (defun nano-modeline-default-mode ()
-  (let ((buffer-name (format-mode-line mode-line-buffer-identification))
-        (mode-name   (format-mode-line mode-name))
-        (branch      (nano-modeline-vc-branch))
-        (position    (format-mode-line "%l:%c")))
-    (nano-modeline-compose (nano-modeline-status)
-                           buffer-name
-                           (concat mode-name
-                                   (if branch (concat ", "
-                                                      (propertize branch 'face 'italic)))
-                                   )
+  (let ((position '((-3 "%p") " %l:%c " modeline-misc-info)))
+    (nano-modeline-compose '(:eval (nano-modeline-status))
+                           '(:eval mode-line-buffer-identification)
+                           '(" " mode-name
+                             (:eval (let ((branch
+                                           (nano-modeline-vc-branch)))
+                                      (if branch
+                                          (concat ", " branch " ")
+                                        " "))))
                            position)))
 
 (provide 'tecoline)
