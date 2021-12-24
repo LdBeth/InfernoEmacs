@@ -27,7 +27,8 @@
 
 (use-package tecoline
   :config
-  (setq-default mode-line-buffer-identification "%12b"
+  (setq-default mode-line-buffer-identification
+                '(:propertize "%12b" face nano-modeline-name)
                 mode-line-format (nano-modeline-default-mode)))
 
 (use-package paren-face

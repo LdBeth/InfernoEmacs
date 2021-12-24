@@ -65,7 +65,7 @@
   "Compose a string with provided information"
   (list status
         " "
-        `(:propertize ,name face nano-modeline-name)
+        name
         " "
         `(:propertize ,primary face nano-modeline-primary)
         '(:propertize " >> " nano-modeline)
@@ -85,23 +85,21 @@
 
 (defun nano-modeline-vc-branch ()
   "Return current VC branch if any."
-  (when vc-mode
-    (let ((backend (vc-backend buffer-file-name)))
-      (concat "#"
-              (substring-no-properties
-               vc-mode
-               (+ (if (eq backend 'Hg) 2 3) 2))))))
+  (if vc-mode
+      (let ((backend (vc-backend buffer-file-name)))
+        (concat ", #"
+                (substring-no-properties
+                 vc-mode
+                 (+ (if (eq backend 'Hg) 2 3) 2))
+                " "))
+    " "))
 
 (defun nano-modeline-default-mode ()
   (let ((position '((-3 "%p") " %l:%c " modeline-misc-info)))
     (nano-modeline-compose '(:eval (nano-modeline-status))
-                           '(:eval mode-line-buffer-identification)
+                           'mode-line-buffer-identification
                            '(" " mode-name
-                             (:eval (let ((branch
-                                           (nano-modeline-vc-branch)))
-                                      (if branch
-                                          (concat ", " branch " ")
-                                        " "))))
+                             (:eval (nano-modeline-vc-branch)))
                            position)))
 
 (provide 'tecoline)

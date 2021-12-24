@@ -135,6 +135,19 @@ entry cannot be modified."
   :group 'lsdb
   :type 'list)
 
+(defcustom lsdb-name-filter-regexp
+  "^[ _.-a-z0-9]+@[ _.-a-z0-9]+$\\|\s+via\s+"
+  "Ignores names matched by this regexp.
+For example, names look like email addresses, or uses \"send
+via\" feature from mailing lists."
+  :group 'lsdb
+  :type 'string)
+
+(defcustom lsdb-boring-names-list '()
+  "List of senders that are not worth to save record."
+  :group 'lsdb
+  :type 'list)
+
 (defcustom lsdb-decode-field-body-function #'lsdb-decode-field-body
   "Field body decoder."
   :group 'lsdb
@@ -311,8 +324,7 @@ Overrides `temp-buffer-show-function'.")
 
 (defun lsdb-load-hash-tables ()
   "Read the contents of `lsdb-file' into the internal hash tables."
-  (let ((buffer (find-file-noselect lsdb-file))
-        tables)
+  (let ((buffer (find-file-noselect lsdb-file)))
     (unwind-protect
         (with-current-buffer buffer
           (goto-char (point-min))
@@ -320,14 +332,12 @@ Overrides `temp-buffer-show-function'.")
           (goto-char (match-beginning 0))
           (setq lsdb-hash-table (lsdb-read (point-marker)))
           ;; Load the secondary hash tables following.
-          (setq tables lsdb-secondary-hash-tables)
-          (while tables
+          (dolist (table lsdb-secondary-hash-tables)
             (if (re-search-forward
                  (concat "^" (lsdb-secondary-hash-table-start
-                              (car tables)))
+                              table))
                  nil t)
-                (set (car tables) (lsdb-read (point-marker))))
-            (setq tables (cdr tables))))
+                (set table (lsdb-read (point-marker))))))
       (kill-buffer buffer))))
 
 (defun lsdb-insert-hash-table (hash-table)
@@ -346,8 +356,7 @@ Overrides `temp-buffer-show-function'.")
 
 (defun lsdb-save-hash-tables ()
   "Write the records within the internal hash tables into `lsdb-file'."
-  (let ((coding-system-for-write lsdb-file-coding-system)
-        tables)
+  (let ((coding-system-for-write lsdb-file-coding-system))
     (with-temp-file lsdb-file
       (if lsdb-file-coding-system
           (let ((coding-system-name
@@ -358,12 +367,10 @@ Overrides `temp-buffer-show-function'.")
                         coding-system-name " -*-\n"))))
       (lsdb-insert-hash-table lsdb-hash-table)
       ;; Save the secondary hash tables following.
-      (setq tables lsdb-secondary-hash-tables)
-      (while tables
+      (dolist (table lsdb-secondary-hash-tables)
         (insert "\n" (lsdb-secondary-hash-table-start
-                      (car tables)))
-        (lsdb-insert-hash-table (symbol-value (car tables)))
-        (setq tables (cdr tables))))))
+                      table))
+        (lsdb-insert-hash-table (symbol-value table))))))
 
 ;;;_. Mail Header Extraction
 (defun lsdb-fetch-fields (regexp)
@@ -411,12 +418,10 @@ Overrides `temp-buffer-show-function'.")
 
 ;;;_. Record Management
 (defun lsdb-rebuild-secondary-hash-tables (&optional force)
-  (let ((tables lsdb-secondary-hash-tables))
-    (while tables
-      (when (or force (not (symbol-value (car tables))))
-        (set (car tables) (make-hash-table :test 'equal))
-        (setq lsdb-hash-tables-are-dirty t))
-      (setq tables (cdr tables))))
+  (dolist (table lsdb-secondary-hash-tables)
+    (when (or force (not (symbol-value table)))
+      (set table (make-hash-table :test 'equal))
+      (setq lsdb-hash-tables-are-dirty t)))
   (if lsdb-hash-tables-are-dirty
       (maphash
        (lambda (key value)
@@ -438,14 +443,12 @@ Overrides `temp-buffer-show-function'.")
   (gethash (nth 1 sender) lsdb-address-cache))
 
 (defun lsdb-update-address-cache (record)
-  (let ((net (cdr (assq 'net record))))
-    (while net
-      (puthash (pop net) (car record) lsdb-address-cache))))
+  (dolist (net (cdr (assq 'net record)))
+    (puthash net (car record) lsdb-address-cache)))
 
 (defun lsdb-delete-address-cache (record)
-  (let ((net (cdr (assq 'net record))))
-    (while net
-      (remhash (pop net) lsdb-address-cache))))
+  (dolist (net (cdr (assq 'net record)))
+    (remhash net lsdb-address-cache)))
 
 ;;;_  , #2 Iterate on the All Records (very slow)
 (defun lsdb-lookup-full-name-by-fuzzy-matching (sender)
@@ -501,10 +504,8 @@ Overrides `temp-buffer-show-function'.")
              sender))
       (when full-name
         (setq old (gethash full-name lsdb-hash-table))
-        ;; ignores names that looks like email address.
-        ;; or "send via" mailing lists
         (if (not (string-match
-                  "^[ _.-a-z0-9]+@[ _.-a-z0-9]+$\\|\s+via\s+"
+                  lsdb-name-filter-regexp
                   (car sender)))
             (setq new (cons (list 'aka (car sender)) new)))
         (setcar sender full-name)))
@@ -526,66 +527,63 @@ Overrides `temp-buffer-show-function'.")
       (setq lsdb-hash-tables-are-dirty t))
     record))
 
+(defun lsdb-decode-address-field (field)
+  (let ((components
+         (lsdb-extract-address-components
+          (cdr field))))
+    (if components
+        (setcar
+         components
+         (funcall lsdb-decode-field-body-function
+                  (car components) (car field))))
+    (let ((names lsdb-boring-names-list)
+          (test t))
+      (while (and names test)
+        (setq test (not (string-match (car names)
+                                      (car components)))
+              names (cdr names)))
+      (when test
+        components))))
+
 (defun lsdb-update-records ()
   (lsdb-maybe-load-hash-tables)
-  (let (senders recipients interesting alist records bodies entry)
+  (let (senders recipients interesting records bodies entry)
     (save-restriction
       (std11-narrow-to-header)
       (setq senders
-            (delq nil (mapcar (lambda (field)
-                                (let ((components
-                                       (lsdb-extract-address-components
-                                        (cdr field))))
-                                  (if components
-                                      (setcar
-                                       components
-                                       (funcall lsdb-decode-field-body-function
-                                                (car components) (car field))))
-                                  components))
+            (delq nil (mapcar #'lsdb-decode-address-field
                               (lsdb-fetch-fields
                                lsdb-sender-headers)))
             recipients
-            (delq nil (mapcar (lambda (field)
-                                (let ((components
-                                       (lsdb-extract-address-components
-                                        (cdr field))))
-                                  (if components
-                                      (setcar
-                                       components
-                                       (funcall lsdb-decode-field-body-function
-                                                (car components) (car field))))
-                                  components))
+            (delq nil (mapcar #'lsdb-decode-address-field
                               (lsdb-fetch-fields
                                lsdb-recipients-headers))))
-      (setq alist lsdb-interesting-header-alist)
-      (while alist
+      (dolist (header lsdb-interesting-header-alist)
         (setq bodies
               (delq nil (mapcar
                          (lambda (field)
                            (let ((field-body
                                   (funcall lsdb-decode-field-body-function
                                            (cdr field) (car field))))
-                             (if (nth 1 (car alist))
-                                 (and (string-match (nth 1 (car alist))
+                             (if (nth 1 header)
+                                 (and (string-match (nth 1 header)
                                                     field-body)
-                                      (replace-match (nth 3 (car alist))
+                                      (replace-match (nth 3 header)
                                                      nil nil field-body))
                                field-body)))
-                         (lsdb-fetch-fields (car (car alist))))))
+                         (lsdb-fetch-fields (car header)))))
         (when bodies
-          (setq entry (or (nth 2 (car alist))
+          (setq entry (or (nth 2 header)
                           'notes))
           (push (cons entry
                       (if (eq ?. (nth 2 (assq entry lsdb-entry-type-alist)))
                           (car bodies)
                         bodies))
-                interesting))
-        (setq alist (cdr alist))))
+                interesting))))
     (if senders
         (setq records (list (lsdb-update-record (pop senders) interesting))))
-    (setq alist (nconc senders recipients))
-    (while alist
-      (setq records (cons (lsdb-update-record (pop alist)) records)))
+    (dolist (sender (nconc senders recipients))
+      (push (lsdb-update-record sender) records))
     (nreverse records)))
 
 (defun lsdb-merge-record-entries (old new)
