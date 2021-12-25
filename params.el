@@ -29,7 +29,8 @@
       scroll-margin 0
       scroll-conservatively 97
       make-cursor-line-fully-visible nil
-      shr-width 72)
+      shr-width 72
+      gamegrid-glyph-height-mm 3.0)
 
 (setq-default indent-tabs-mode nil)
 (setq ring-bell-function 'ignore)

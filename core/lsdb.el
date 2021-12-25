@@ -466,23 +466,22 @@ Overrides `temp-buffer-show-function'.")
     (catch 'found
       (maphash
        (lambda (key value)
-         (while names
+         (dolist (name names)
            (if (or (string-match
-                    (concat "\\<" (regexp-quote (car names)) "\\>")
+                    (concat "\\<" (regexp-quote name) "\\>")
                     key)
                    (string-match
                     (concat
                      "\\<"
                      (regexp-quote
                       (mapconcat #'identity
-                                 (nreverse (split-string (car names)))
+                                 (nreverse (split-string name))
                                  " "))
                      "\\>")
                     key)
                    ;; Don't assume that we are using address cache.
                    (member (nth 1 sender) (cdr (assq 'net value))))
-               (throw 'found key))
-           (setq names (cdr names))))
+               (throw 'found key))))
        lsdb-hash-table))))
 
 ;;;_ : Update Records
@@ -588,21 +587,17 @@ Overrides `temp-buffer-show-function'.")
 
 (defun lsdb-merge-record-entries (old new)
   (setq old (copy-sequence old))
-  (while new
-    (let ((entry (assq (car (car new)) old))
-          list pointer)
+  (dolist (e new)
+    (let ((entry (assq (car e) old)))
       (if (null entry)
-          (setq old (nconc old (list (car new))))
+          (setq old (nconc old (list e)))
         (if (listp (cdr entry))
-            (progn
-              (setq list (cdr (car new)) pointer list)
-              (while pointer
-                (if (member (car pointer) (cdr entry))
-                    (setq list (delq (car pointer) list)))
-                (setq pointer (cdr pointer)))
+            (let ((list (cdr e)))
+              (dolist (pointer list)
+                (if (member pointer (cdr entry))
+                    (setq list (delq pointer list))))
               (setcdr entry (nconc (cdr entry) list)))
-          (setcdr entry (cdr (car new))))))
-    (setq new (cdr new)))
+          (setcdr entry (cdr e))))))
   old)
 
 ;;;_. Display Management
@@ -654,17 +649,15 @@ Overrides `temp-buffer-show-function'.")
           buffer-read-only)
       (buffer-disable-undo)
       (erase-buffer)
-      (setq records
-            (sort (copy-sequence records)
-                  (or lsdb-display-records-sort-predicate
-                      (lambda (record1 record2)
-                        (string-lessp (car record1) (car record2))))))
-      (while records
+      (dolist (record
+               (sort (copy-sequence records)
+                     (or lsdb-display-records-sort-predicate
+                         (lambda (record1 record2)
+                           (string-lessp (car record1) (car record2))))))
         (save-restriction
           (narrow-to-region (point) (point))
-          (lsdb-print-record (car records)))
-        (goto-char (point-max))
-        (setq records (cdr records))))
+          (lsdb-print-record record))
+        (goto-char (point-max))))
     (lsdb-mode)
     (set-buffer-modified-p lsdb-hash-tables-are-dirty)
     (goto-char (point-min))
@@ -692,13 +685,11 @@ Overrides `temp-buffer-show-function'.")
 
 (defun lsdb-print-record (record)
   (insert (car record) "\n")
-  (let ((entries
-         (sort (copy-sequence (cdr record))
-               (lambda (entry1 entry2)
-                 (> (lsdb-entry-score entry1) (lsdb-entry-score entry2))))))
-    (while entries
-      (lsdb-insert-entry (car entries))
-      (setq entries (cdr entries))))
+  (dolist (entry
+           (sort (copy-sequence (cdr record))
+                 (lambda (entry1 entry2)
+                   (> (lsdb-entry-score entry1) (lsdb-entry-score entry2)))))
+    (lsdb-insert-entry entry))
   (add-text-properties (point-min) (point-max)
                        (list 'lsdb-record record))
   (run-hooks 'lsdb-print-record-hook))
@@ -1589,7 +1580,16 @@ Otherwise \">\" is returned."
   (or (lsdb-mu-attribution (mu-cite-get-value 'address))
       ">"))
 
-(defvar lsdb-mu-history nil)
+(defun lsdb-mu-prompt-for-citation-name ()
+  (let ((completion
+         (delq nil
+               (nconc (list (mu-cite-get-value 'x-attribution)
+                            (mu-cite-get-value 'firstname))
+                      (when (< 1 (length (mu-cite-get-value 'name-list)))
+                          (list (mu-cite-get-value 'initials)
+                                (mu-cite-get-value 'lastname)
+                                (mu-cite-get-value 'full-name)))))))
+    (completing-read "Citation name? " completion)))
 
 (defun lsdb-mu-get-prefix-register-method ()
   "A mu-cite method to return a prefix from LSDB or register it.
@@ -1599,10 +1599,7 @@ be registered to LSDB if the user wants it."
   (let ((address (mu-cite-get-value 'address)))
     (or (lsdb-mu-attribution address)
         (let* (minibuffer-allow-text-properties
-               (result (read-string "Citation name? "
-                                    (or (mu-cite-get-value 'x-attribution)
-                                        (mu-cite-get-value 'firstname))
-                                    'lsdb-mu-history)))
+               (result (lsdb-mu-prompt-for-citation-name)))
           (if (and (not (string-equal result ""))
                    (y-or-n-p (format "Register \"%s\"? " result)))
               (lsdb-mu-set-attribution result address))
@@ -1618,11 +1615,7 @@ the user wants it."
   (let* ((address (mu-cite-get-value 'address))
          (attribution (lsdb-mu-attribution address))
          minibuffer-allow-text-properties
-         (result (read-string "Citation name? "
-                              (or attribution
-                                  (mu-cite-get-value 'x-attribution)
-                                  (mu-cite-get-value 'firstname))
-                              'lsdb-mu-history)))
+         (result (lsdb-mu-prompt-for-citation-name)))
     (if (and (not (string-equal result ""))
              (not (string-equal result attribution))
              (y-or-n-p (format "Register \"%s\"? " result)))

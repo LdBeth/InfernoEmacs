@@ -11,9 +11,10 @@ if prefix argument ARG is given, switch to it in an other, possibly new window."
                 (eq major-mode initial-major-mode))
       (funcall initial-major-mode))))
 
-(defun logging-disabled-command (&optional cmd _keys)
+(defun logging-disabled-command (&optional cmd keys)
   (unless cmd (setq cmd this-command))
-  (message "%s was disabled." cmd))
+  (message "%s was disabled." cmd)
+  (call-interactively cmd nil keys))
 
 (setq disabled-command-function #'logging-disabled-command)
 

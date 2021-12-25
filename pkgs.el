@@ -40,7 +40,7 @@
   (global-hl-todo-mode 1))
 
 (use-package ivy
-  :diminish ivy-mode
+  ; :diminish ivy-mode
   :init
   (setq ivy-use-virtual-buffers t
         ivy-use-selectable-prompt t)
@@ -52,7 +52,7 @@
   :init (setq smex-history-length 32))
 
 (use-package counsel
-  :diminish counsel-mode
+  ; :diminish counsel-mode
   :config
   (counsel-mode))
 
@@ -62,14 +62,14 @@
   ([remap isearch-forward] . swiper-isearch))
 
 (use-package which-key
-  :diminish which-key-mode
+  ; :diminish which-key-mode
   :config
   (setq which-key-show-early-on-C-h t
 	which-key-idle-secondary-delay 0.05)
   (which-key-mode 1))
 
 (use-package page-break-lines
-  :diminish page-break-lines-mode
+  ; :diminish page-break-lines-mode
   :config
   (global-page-break-lines-mode 1))
 
@@ -84,10 +84,14 @@
   :bind
   ([remap fill-paragraph] . unfill-toggle))
 
+(use-package filladapt
+  :init
+  (setq-default filladapt-mode t))
+
 ;; Spell
 (use-package flyspell
   :defer t
-  :diminish " s"
+  ; :diminish " s"
   :bind (:map flyspell-mode-map
               ("C-;" . flyspell-correct-wrapper)))
 
@@ -124,7 +128,6 @@
           (dark :ascent 80 :foreground "#292b2e" :background "#b2b2b2"))))
 
 (use-package lsdb
-  :disabled
   :defer t)
 
 ;; Programming
@@ -133,7 +136,11 @@
   :init
   (setq inferior-lisp-program "ccl"))
 
+(use-package dyalog-mode
+  :defer t
+  :init
+  (add-to-list 'auto-mode-alist '("\\.apl[afno]" . dyalog-mode)))
+
 ;; Net
 (use-package aria2
-  :disabled
   :defer t)

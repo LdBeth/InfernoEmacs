@@ -95,11 +95,23 @@
 	        (lambda ()
 		  (std11-full-name-string
 		   (mu-cite-get-value 'address-structure))))
-          (cons 'firstname
+          (cons 'name-list
 	        (lambda ()
 		  (let ((namestring (mu-cite-get-value 'full-name)))
-                    (if (string-match "[ \t]*\\([^ \t._]+\\)[ \t]*" namestring)
-                        (match-string 1 namestring)))))
+                    (split-string namestring "[ \t._]+" t))))
+          (cons 'firstname
+	        (lambda ()
+		  (car (mu-cite-get-value 'name-list))))
+          (cons 'lastname
+	        (lambda ()
+		  (car (reverse (mu-cite-get-value 'name-list)))))
+          (cons 'initials
+	        (lambda ()
+		  (mapconcat
+                   (lambda (name)
+                     (if (< 0 (length name))
+	                 (substring name 0 1)))
+                   (mu-cite-get-value 'name-list) "")))
 	  (cons 'address
 	        (lambda ()
 		  (std11-address-string
