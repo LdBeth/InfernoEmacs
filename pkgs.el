@@ -13,10 +13,11 @@
   (diminish 'eldoc-mode)
   (diminish 'visual-line-mode))
 
-(use-package spacemacs-common
+(use-package spacemacs-theme-autoloads
   :load-path "core/spacemacs-theme/"
   :config
-  (load-theme 'spacemacs-dark t))
+  (load-theme 'spacemacs-dark t)
+  (load-theme 'spacemacs-light t t))
 
 (use-package spacemacs-buffer
   :init

@@ -342,17 +342,11 @@ Overrides `temp-buffer-show-function'.")
 
 (defun lsdb-insert-hash-table (hash-table)
   (insert "#s(hash-table size "
-          ;; Reduce the actual size of the close hash table, because
-          ;; XEmacs doesn't have a distinction between index-size and
-          ;; hash-table-size.
           (number-to-string (hash-table-count hash-table))
-          " test equal data (")
-  (maphash
-   (lambda (key value)
-     (let (print-level print-length)
-       (insert (prin1-to-string key) " " (prin1-to-string value) " ")))
-   hash-table)
-  (insert "))"))
+          " test equal ")
+  (let (print-level print-length)
+    (let ((string (prin1-to-string hash-table)))
+      (insert (substring string (string-match "data" string))))))
 
 (defun lsdb-save-hash-tables ()
   "Write the records within the internal hash tables into `lsdb-file'."
@@ -586,7 +580,7 @@ Overrides `temp-buffer-show-function'.")
     (nreverse records)))
 
 (defun lsdb-merge-record-entries (old new)
-  (setq old (copy-sequence old))
+  (setq old (copy-alist old))
   (dolist (e new)
     (let ((entry (assq (car e) old)))
       (if (null entry)
@@ -1325,11 +1319,12 @@ performed against the entry field."
 (defvar lsdb-previous-window-configuration nil)
 
 (defvar lsdb-edit-form-mode-map
-  (let ((keymap (make-sparse-keymap)))
-    (set-keymap-parent keymap emacs-lisp-mode-map)
-    (define-key keymap "\C-c\C-c" 'lsdb-edit-form-done)
-    (define-key keymap "\C-c\C-k" 'lsdb-edit-form-exit)
-    keymap)
+  (eval-when-compile
+    (let ((keymap (make-sparse-keymap)))
+      (set-keymap-parent keymap emacs-lisp-mode-map)
+      (define-key keymap "\C-c\C-c" 'lsdb-edit-form-done)
+      (define-key keymap "\C-c\C-k" 'lsdb-edit-form-exit)
+      keymap))
   "Edit form's keymap.")
 
 (define-derived-mode lsdb-edit-form-mode

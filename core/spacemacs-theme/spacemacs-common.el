@@ -92,7 +92,6 @@ to 'auto, tags may not be properly aligned. "
   :type 'boolean
   :group 'spacemacs-theme)
 
-(eval-when-compile
 (defun true-color-p ()
   (or
    (display-graphic-p)
@@ -979,8 +978,7 @@ to 'auto, tags may not be properly aligned. "
 
 ;;;;; pdf-tools
     '(pdf-view-midnight-colors '(,base . ,bg1))))
-    ))
-)
+  ))
 
 
 ;;;###autoload

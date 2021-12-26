@@ -68,11 +68,11 @@ Internal use, do not set this variable.")
       (define-key map (kbd "RET") 'widget-button-press)
 
       (define-key map [tab] 'widget-forward)
-      (define-key map (kbd "J") 'widget-forward)
+      (define-key map (kbd "n") 'widget-forward)
       (define-key map (kbd "C-i") 'widget-forward)
 
       (define-key map [backtab] 'widget-backward)
-      (define-key map (kbd "K") 'widget-backward)
+      (define-key map (kbd "p") 'widget-backward)
 
       (define-key map (kbd "C-r") 'spacemacs-buffer/refresh)
       (define-key map "q" 'quit-window)

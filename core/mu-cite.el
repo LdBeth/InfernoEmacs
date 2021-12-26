@@ -377,14 +377,11 @@ field.
 
 Notice that please use (mu-cite-get-value 'ml-count)
 instead of to call the function directly."
-  (let ((field-list mu-cite-ml-count-field-list))
-    (catch 'tag
-      (while field-list
-	(let* ((field (car field-list))
-	       (ml-count (mu-cite-get-field-value field)))
-	  (if (and ml-count (string-match "[0-9]+" ml-count))
-	      (throw 'tag (match-string 0 ml-count)))
-	  (setq field-list (cdr field-list)))))))
+  (catch 'tag
+    (dolist (field mu-cite-ml-count-field-list)
+      (let ((ml-count (mu-cite-get-field-value field)))
+	(if (and ml-count (string-match "[0-9]+" ml-count))
+	    (throw 'tag (match-string 0 ml-count)))))))
 
 
 ;;; @ fundamentals
