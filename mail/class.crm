@@ -1,5 +1,5 @@
 {
     isolate (:stats:)
-    classify <osbf microgroom> (info.css news.css bug.css boring.css) (:stats:)
+    classify <osb unique microgroom> (news.css help.css boring.css) (:stats:)
     output /:*:stats:/
 }

@@ -1,7 +1,7 @@
 {
     match (:: :body:) /\n\n(.*)/
     call /:normalize:/ [:*:body:] (:norm:)
-    learn <osbf unique microgroom> (:*:_arg2:) [:norm:]
+    learn <osb unique microgroom> (:*:_arg2:) [:norm:]
 }
 fail /BEGIN LIBRARY!/
 :normalize: (:text:)

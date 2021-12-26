@@ -1,13 +1,13 @@
 #!/usr/bin/env crm
 {
     isolate (:es:) /\/Users\/ldbeth\/.emacs.d\/mail\/emacs-devel\//
-    isolate (:application:) /(MS|QQ|BQ|OQ|Microsoft|YMail|Google)/
+    isolate (:application:) /(MS|QQ|BQ|OQ|Microsoft|YMail|Google|Crm)/
     {
         match (:: :current_headers:) /(([^\n]+\n)+)\n/
         # remove application headers
         {
             match <fromend> (:app_header:) \
- /\nX-:*:application:-[[:graph:]]+: ([[:graph:]]*)(\n\s+([[:graph:]]*))*/ \
+ /\nX-:*:application:-[[:graph:]]+: ([[:graph:] ]*)(\n\s+([[:graph:] ]*))*/ \
  [:current_headers:]
             alter (:app_header:) //
             liaf
@@ -16,20 +16,24 @@
             match /emacs-devel.gnu.org/ [:current_headers:]
             # It's emacs!
             match (:: :body:) /\n\n(.*)/
-            call /:normalize:/ (:norm:)
+            call /:normalize:/ (:norm:) [:*:body:]
             isolate (:new_header:)
             {
-                isolate (:stats:)
-                classify <osbf microgroom> [:norm:] (:stats:) \
-                        (:*:es:info.css :*:es:news.css :*:es:bug.css :*:es:boring.css)
-                match [:stats:] <nomultiline> \
-                        /^Best match to file #[0-9]+ \((.+)\) (.+[[:digit:]])[[:space:]]*$/ (:x: :file: :prob:)
-                match [:file:] /\/([[:alnum:]]+)\.css$/ (:: :tag:)
-                alter (:new_header:) /X-Crm-Result: tag: :*:tag: :*:prob:/
-            }
-            alius
-            {
-                alter (:new_header:) /X-Crm-Result: FAILED/
+                {
+                    isolate (:stats:)
+                    classify <osb unique microgroom> [:norm:] \
+                            (:*:es:news.css :*:es:help.css :*:es:boring.css) (:stats:)
+                    match [:stats:] <nomultiline> \
+                            /^Best match to file #[0-9]+ \((.+)\).* pR: ([-. 0-9]+)/ (:x: :file: :prob:)
+                    # eval /:@: :*:prob: > 10 :/
+                    match [:file:] /\/([[:alnum:]]+)\.css$/ (:: :tag:)
+                    alter (:new_header:) /X-Crm-Result: tag: :*:tag: pR: :*:prob:/
+                    output /:*:new_header:/
+                }
+                alius
+                {
+                    alter (:new_header:) /X-Crm-Result: FAILED/
+                }
             }
             alter (:current_headers:) /:*:current_headers::*:new_header:\n/
         }
@@ -37,4 +41,14 @@
     accept
 }
 fail /BEGIN LIBRARY!/
-insert maillib.crm
+:normalize: (:text:)
+{
+    {
+        # remove quotes
+        match <nomultiline> (:quote:) \
+                /^[[:space:]]*[[:graph:]]*>+[ \t]*[^\n]+$/ [:text:]
+        alter (:quote:) /QUOTELINE/
+        liaf
+    }
+return /:*:text:/
+}
