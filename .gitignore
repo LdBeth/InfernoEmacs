@@ -1,5 +1,6 @@
 *.elc
 *-autoloads.el
 *~
+*.css
 elpa/
 .DS_Store

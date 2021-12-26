@@ -1,0 +1,40 @@
+#!/usr/bin/env crm
+{
+    isolate (:es:) /\/Users\/ldbeth\/.emacs.d\/mail\/emacs-devel\//
+    isolate (:application:) /(MS|QQ|BQ|OQ|Microsoft|YMail|Google)/
+    {
+        match (:: :current_headers:) /(([^\n]+\n)+)\n/
+        # remove application headers
+        {
+            match <fromend> (:app_header:) \
+ /\nX-:*:application:-[[:graph:]]+: ([[:graph:]]*)(\n\s+([[:graph:]]*))*/ \
+ [:current_headers:]
+            alter (:app_header:) //
+            liaf
+        }
+        {
+            match /emacs-devel.gnu.org/ [:current_headers:]
+            # It's emacs!
+            match (:: :body:) /\n\n(.*)/
+            call /:normalize:/ (:norm:)
+            isolate (:new_header:)
+            {
+                isolate (:stats:)
+                classify <osbf microgroom> [:norm:] (:stats:) \
+                        (:*:es:info.css :*:es:news.css :*:es:bug.css :*:es:boring.css)
+                match [:stats:] <nomultiline> \
+                        /^Best match to file #[0-9]+ \((.+)\) (.+[[:digit:]])[[:space:]]*$/ (:x: :file: :prob:)
+                match [:file:] /\/([[:alnum:]]+)\.css$/ (:: :tag:)
+                alter (:new_header:) /X-Crm-Result: tag: :*:tag: :*:prob:/
+            }
+            alius
+            {
+                alter (:new_header:) /X-Crm-Result: FAILED/
+            }
+            alter (:current_headers:) /:*:current_headers::*:new_header:\n/
+        }
+    }
+    accept
+}
+fail /BEGIN LIBRARY!/
+insert maillib.crm

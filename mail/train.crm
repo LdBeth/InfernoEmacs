@@ -1,0 +1,17 @@
+{
+    match (:: :body:) /\n\n(.*)/
+    call /:normalize:/ [:*:body:] (:norm:)
+    learn <osbf unique microgroom> (:*:_arg2:) [:norm:]
+}
+fail /BEGIN LIBRARY!/
+:normalize: (:text:)
+{
+    {
+        # remove quotes
+        match <nomultiline> (:quote:) \
+                /^[[:space:]]*[[:graph:]]*>+[ \t]*[^\n]+$/ [:text:]
+        alter (:quote:) /QUOTELINE/
+        liaf
+    }
+return /:*:text:/
+}
