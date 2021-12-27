@@ -156,9 +156,16 @@
 ;;;
 
 (defcustom mu-cite-cited-prefix-regexp
-  "\\(^[^ \t\n<>]*>+[ \t]*\\|^[ \t]*$\\)"
+  "^[ \t]*[^ \t\n<>]+>+[ \t]*"
   "Regexp to match the citation prefix.
 If match, mu-cite doesn't insert citation prefix."
+  :type 'regexp
+  :group 'mu-cite)
+
+(defcustom mu-cite-cited-line-regexp
+  "^[ \t]*>+[ \t]*"
+  "Regexp to match cited line.
+If match, mu-cite insert a citation mark only."
   :type 'regexp
   :group 'mu-cite)
 
@@ -436,9 +443,17 @@ function according to the agreed upon standard."
       (insert top)
       (setq last-point (point))
       (while (< (point)(mark t))
-	(or (and mu-cite-cited-prefix-regexp
-		 (looking-at mu-cite-cited-prefix-regexp))
-	    (insert prefix))
+	(cond ((looking-at "^>>>>>\\|^[ \t]*$"))
+              ((looking-at mu-cite-cited-prefix-regexp)
+               (let ((beg (point)))
+                 (skip-chars-forward " \t")
+                 (delete-region beg (point))))
+              ((looking-at mu-cite-cited-line-regexp)
+               (let ((beg (point)))
+                 (skip-chars-forward " \t")
+                 (delete-region beg (point))
+                 (insert ">")))
+	      (t (insert prefix)))
 	(forward-line 1))
       (goto-char last-point))
     (run-hooks 'mu-cite-post-cite-hook)))
