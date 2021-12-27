@@ -22,7 +22,9 @@
 (use-package spacemacs-buffer
   :init
   (defvar dotspacemacs-banner
-    (eval-when-compile (concat user-emacs-directory "banner.ppm")))
+    (eval-when-compile
+      (create-image (concat user-emacs-directory "banner.xpm")
+                    'xpm nil)))
   (defvar dotspacemacs-startup-lists
     '((recents  . 5))))
 

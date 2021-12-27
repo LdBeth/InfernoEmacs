@@ -119,14 +119,18 @@ Cate special text banner can de reachable via `998', `cat' or `random*'.
 (defun spacemacs-buffer//insert-image-banner (banner)
   "Display an image banner.
 BANNER: the path to an ascii banner file."
-  (when (file-exists-p banner)
+  (when banner
     (let* ((title spacemacs-buffer-logo-title)
-           (spec (create-image banner))
-           (size (image-size spec))
+           (size (image-size banner))
            (width (car size))
            (left-margin (max 0 (floor (- spacemacs-buffer--window-width width) 2))))
       (insert (make-string left-margin ?\s))
-      (insert-image spec)
+      (let ((start (point)))
+        (insert " ")
+        (add-text-properties
+         start (point)
+	 `(display ,banner
+                   rear-nonsticky t)))
       (insert "\n\n")
       (insert (make-string (max 0 (floor (/ (- spacemacs-buffer--window-width
                                                (+ (length title) 1)) 2))) ?\s))
