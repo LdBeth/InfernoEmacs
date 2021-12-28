@@ -569,7 +569,7 @@ Overrides `temp-buffer-show-function'.")
           (setq entry (or (nth 2 header)
                           'notes))
           (push (cons entry
-                      (if (eq ?. (nth 2 (assq entry lsdb-entry-type-alist)))
+                      (if (eql ?. (nth 2 (assq entry lsdb-entry-type-alist)))
                           (car bodies)
                         bodies))
                 interesting))))
@@ -586,11 +586,12 @@ Overrides `temp-buffer-show-function'.")
       (if (null entry)
           (setq old (nconc old (list e)))
         (if (listp (cdr entry))
-            (let ((list (cdr e)))
+            (let ((list (cdr e))
+                  (existed (copy-sequence (cdr entry))))
               (dolist (pointer list)
-                (if (member pointer (cdr entry))
+                (if (member pointer existed)
                     (setq list (delq pointer list))))
-              (setcdr entry (nconc (cdr entry) list)))
+              (setcdr entry (nconc existed list)))
           (setcdr entry (cdr e))))))
   old)
 
@@ -619,17 +620,14 @@ Overrides `temp-buffer-show-function'.")
 
 (defun lsdb-update-records-and-display ()
   (let ((records (lsdb-update-records)))
-    (if lsdb-display-records-belong-to-user
-        (if records
-            (lsdb-display-record (car records))
-          (lsdb-hide-buffer))
-      (catch 'lsdb-show-record
-        (while records
-          (if (member user-mail-address (cdr (assq 'net (car records))))
-              (setq records (cdr records))
-            (lsdb-display-record (car records))
-            (throw 'lsdb-show-record t)))
-        (lsdb-hide-buffer)))))
+    (unless lsdb-display-records-belong-to-user
+      (while (and records
+                  (member user-mail-address
+                          (cdr (assq 'net (car records)))))
+        (setq records (cdr records))))
+    (if records
+        (lsdb-display-record (car records))
+      (lsdb-hide-buffer))))
 
 (defun lsdb-display-record (record)
   "Display only one RECORD, then shrink the window as possible."
@@ -670,8 +668,8 @@ Overrides `temp-buffer-show-function'.")
                 (if (listp (cdr entry))
                     (mapconcat
                      #'identity (cdr entry)
-                     (if (eq ?, (nth 2 (assq (car entry)
-                                             lsdb-entry-type-alist)))
+                     (if (eql ?, (nth 2 (assq (car entry)
+                                              lsdb-entry-type-alist)))
                          ", "
                        "\n\t\t"))
                   (cdr entry))

@@ -25,10 +25,9 @@
                             (:*:es:news.css :*:es:help.css :*:es:boring.css) (:stats:)
                     match [:stats:] <nomultiline> \
                             /^Best match to file #[0-9]+ \((.+)\).* pR: ([-. 0-9]+)/ (:x: :file: :prob:)
-                    # eval /:@: :*:prob: > 10 :/
+                    eval /:@: :*:prob: > 0 :/
                     match [:file:] /\/([[:alnum:]]+)\.css$/ (:: :tag:)
                     alter (:new_header:) /X-Crm-Result: tag: :*:tag: pR: :*:prob:/
-                    output /:*:new_header:/
                 }
                 alius
                 {
