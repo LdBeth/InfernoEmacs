@@ -1,4 +1,4 @@
-;;; x-face-e21.el --- X-Face utilities for Emacs 21 (and possibly 22)
+;;; x-face-e21.el -*- lexical-binding:t -*- --- X-Face utilities for Emacs 21 (and possibly 22)
 
 ;; Copyright (C) 2000, 2001, 2002, 2003, 2004, 2007 Katsumi Yamaoka
 
@@ -564,7 +564,7 @@ X-Face: 2i'm.M0UyETCme?'R/?fE}i)R-aY$t;].MSLwmUfB\"^3H+so!vO79{mzviSR4#DM+}\"\"
 		   (delete-region (point) (point-max))))))))))
 
 (put 'x-face-internal-function 'image-attributes
-     (lambda nil
+     (lambda ()
        "Return a widget type for entering X-Face image attributes."
        (let* ((props (list :ascent :margin :relief :conversion
 			   :foreground :background
@@ -578,22 +578,21 @@ X-Face: 2i'm.M0UyETCme?'R/?fE}i)R-aY$t;].MSLwmUfB\"^3H+so!vO79{mzviSR4#DM+}\"\"
 	      (left (- (length tag) lmax 4))
 	      (selection `(checklist :format
 				     ,(format (format "%%%ds%%%%v" (- left 2))
-					      "")))
-	      prop)
-	 (while (setq prop (pop props))
-	   (setq selection
-		 (nconc
-		  selection
-		  `((list :format "%v" :inline t
-			  (const :format "%v " :value ,prop)
-			  (sexp :format
-				,(format
-				  (format
-				   "%%%ds%%-%ds"
-				   (- lmax (length (symbol-name prop)))
-				   (if props left 0))
-				  "" "%v\n")
-				:size 0))))))
+					      ""))))
+	 (setq selection
+	       (nconc
+		selection
+		(mapcar (lambda (prop)
+                          `(list :format "%v" :inline t
+			         (const :format "%v " :value ,prop)
+			         (sexp :format
+				       ,(format
+				         (format
+				          "%%%ds%%-%ds"
+				          (- lmax (length (symbol-name prop)))
+				          (if props left 0))
+				         "" "%v\n")
+				       :size 0))) props)))
 	 `(list (cons :format "%v" (sexp :format ,tag :size 0) ,selection)
 		(cons :format "%v" (sexp :format ,tag :size 0) ,selection)))))
 
@@ -998,25 +997,20 @@ header in each X-FACE."
     (if (or (eq t with-header)
 	    (and with-header
 		 (eq 'quote (car-safe with-header))))
-	`(let ((x-faces ,x-faces)
-	       faces)
-	   (while x-faces
-	     (push (apply 'concat (cdr (split-string (pop x-faces))))
-		   faces))
-	   (nreverse faces))
-      `(let ((x-faces ,x-faces)
-	     (header ,with-header)
+	`(mapcar (lambda (x-face)
+                   (apply 'concat (cdr (split-string x-face))))
+                 ,x-faces)
+      `(let ((header ,with-header)
 	     face faces)
-	 (while x-faces
+	 (dolist (x-face ,x-faces)
 	   (if header
-	       (push (apply 'concat (cdr (split-string (car x-faces)))) faces)
+	       (push (apply 'concat (cdr (split-string x-face))) faces)
 	     (if (string-match "^\\(X-\\)?Face\\(-[[:digit:]]+\\)?:$"
-			       (car (setq face (split-string (car x-faces)))))
+			       (car (setq face (split-string x-face))))
 		 (progn
 		   (setq header t)
 		   (push (apply 'concat (cdr face)) faces))
-	       (push (apply 'concat face) faces)))
-	   (setq x-faces (cdr x-faces)))
+	       (push (apply 'concat face) faces))))
 	 (nreverse faces)))))
 
 (defconst x-face-mirror (eval-when-compile
@@ -1470,7 +1464,7 @@ Here are some examples of how to use this function:
 		  (setq image (x-face-to-bitmap x-face nil nil t))
 		  (let ((coding-system-for-read 'binary)
 			(coding-system-for-write 'binary)
-			default-enable-multibyte-characters)
+			enable-multibyte-characters)
 		    (with-temp-buffer
 		      (insert "P4\n48 48\n" image)
 		      (call-process-region (point-min) (point-max)
@@ -1521,7 +1515,7 @@ assumed that X-FACES are sorted in order from msb to lsb."
 	       (/= 1 size))
 	  (let ((coding-system-for-read 'binary)
 		(coding-system-for-write 'binary)
-		default-enable-multibyte-characters)
+		enable-multibyte-characters)
 	    (with-temp-buffer
 	      (insert (x-face-gray-pixmap-to-pgm
 		       (x-face-gray-x-faces-to-pixmap x-faces t)
@@ -1586,7 +1580,7 @@ cQqAAAAEElEQVR4nGP4DwYMoxR1KABPVB7waCGvfwAAAABJRU5ErkJggg==")
 		(progn
 		  (let ((coding-system-for-read 'binary)
 			(coding-system-for-write 'binary)
-			default-enable-multibyte-characters)
+			enable-multibyte-characters)
 		    (with-temp-buffer
 		      (insert image)
 		      (call-process-region (point-min) (point-max)
@@ -1611,7 +1605,7 @@ cQqAAAAEElEQVR4nGP4DwYMoxR1KABPVB7waCGvfwAAAABJRU5ErkJggg==")
 ;;  (defvar last))
 
 ;;;###autoload
-(defun x-face-decode-message-header (&optional beg end buffer ignore)
+(defun x-face-decode-message-header (&optional _beg _end buffer ignore)
   "Display X-Face images in the current message.
 Optional BEG and END are no more than placeholders to keep the backward
 compatibility.  If optional BUFFER is specified, it is assumed that the
@@ -1813,8 +1807,10 @@ if ARG is positive."
       ;; The non-nil value for `message-strip-special-text-properties'
       ;; (by default) prevents hiding raw X-Face headers (some users
       ;; likely show her/his own face in the message buffer :-).
-      (let (message-strip-special-text-properties)
-	(x-face-decode-message-header))
+      (let (_)
+        (defvar message-strip-special-text-properties)
+        (let (message-strip-special-text-properties)
+	  (x-face-decode-message-header)))
     (x-face-remove-x-face-images)
     (x-face-expose-hidden-text)))
 

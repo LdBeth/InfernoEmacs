@@ -10,7 +10,7 @@ fail /BEGIN LIBRARY!/
         # remove quotes
         match <nomultiline> (:quote:) \
                 /^[[:space:]]*[[:graph:]]*>+[ \t]*[^\n]+$/ [:text:]
-        alter (:quote:) /QUOTELINE/
+        alter (:quote:) //
         liaf
     }
 return /:*:text:/

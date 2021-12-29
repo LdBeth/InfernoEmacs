@@ -320,8 +320,6 @@ Overrides `temp-buffer-show-function'.")
 (defsubst lsdb-secondary-hash-table-start (hash-table)
   (format lsdb-secondary-hash-table-start-format hash-table))
 
-(defalias 'lsdb-read 'read)
-
 (defun lsdb-load-hash-tables ()
   "Read the contents of `lsdb-file' into the internal hash tables."
   (let ((buffer (find-file-noselect lsdb-file)))
@@ -330,14 +328,22 @@ Overrides `temp-buffer-show-function'.")
           (goto-char (point-min))
           (re-search-forward "^#s(")
           (goto-char (match-beginning 0))
-          (setq lsdb-hash-table (lsdb-read (point-marker)))
+          (setq lsdb-hash-table (read (point-marker)))
+          ;; Load entry names.
+          (if (re-search-forward
+                 (concat "^" (lsdb-secondary-hash-table-start
+                              'lsdb-known-entry-names))
+                 nil t)
+              (mapc (lambda (e)
+                      (intern e lsdb-known-entry-names))
+                    (read (point-marker))))
           ;; Load the secondary hash tables following.
           (dolist (table lsdb-secondary-hash-tables)
             (if (re-search-forward
                  (concat "^" (lsdb-secondary-hash-table-start
                               table))
                  nil t)
-                (set table (lsdb-read (point-marker))))))
+                (set table (read (point-marker))))))
       (kill-buffer buffer))))
 
 (defun lsdb-insert-hash-table (hash-table)
@@ -360,6 +366,14 @@ Overrides `temp-buffer-show-function'.")
                 (insert ";;; -*- mode: emacs-lisp; coding: "
                         coding-system-name " -*-\n"))))
       (lsdb-insert-hash-table lsdb-hash-table)
+      ;; Save entry names.
+      (insert "\n" (lsdb-secondary-hash-table-start
+                    'lsdb-known-entry-names)
+              (let (print-level print-length names)
+                (mapatoms (lambda (sym)
+                            (push (symbol-name sym) names))
+                          lsdb-known-entry-names)
+                (prin1-to-string names)))
       ;; Save the secondary hash tables following.
       (dolist (table lsdb-secondary-hash-tables)
         (insert "\n" (lsdb-secondary-hash-table-start
@@ -1251,15 +1265,15 @@ performed against the entry field."
 
 (defun counsel-lsdb (&optional entry-name)
   "Search LSDB with `ivy'."
-  (interactive
-   (let* ((completion-ignore-case t)
-          (entry-name
-           (if current-prefix-arg
-               (completing-read "Entry name: "
-                                lsdb-known-entry-names))))
-     (list (if (and entry-name (not (equal entry-name "")))
-               (intern (downcase entry-name))))))
+  (interactive)
   (lsdb-maybe-load-hash-tables)
+  (let* ((completion-ignore-case t)
+         (name
+          (if current-prefix-arg
+              (completing-read "Entry name: "
+                               lsdb-known-entry-names))))
+    (setq entry-name (if (and name (not (equal name "")))
+                         (intern (downcase name)))))
   (let* ((regexp
           (ivy-read
            (if entry-name

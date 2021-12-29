@@ -1,5 +1,17 @@
 {
     isolate (:stats:)
+    call /:normalize:/ (:norm:) [:*:_dw:]
     classify <osb unique microgroom> (news.css help.css boring.css) (:stats:)
     output /:*:stats:/
+}
+:normalize: (:text:)
+{
+    {
+        # remove quotes
+        match <nomultiline> (:quote:) \
+                /^[[:space:]]*[[:graph:]]*>+[ \t]*[^\n]+$/ [:text:]
+        alter (:quote:) //
+        liaf
+    }
+return /:*:text:/
 }
