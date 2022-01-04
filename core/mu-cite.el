@@ -36,11 +36,6 @@
 ;;		(add-hook 'mail-citation-hook (function mu-cite-original))
 ;;		;; for message-mode only
 ;;		(setq message-cite-function (function mu-cite-original))
-;;      For EMACS 18
-;;		;; for all but mh-e
-;;		(add-hook 'mail-yank-hooks (function mu-cite-original))
-;;		;; for mh-e only
-;;		(add-hook 'mh-yank-hooks (function mu-cite-original))
 
 ;;; Code:
 

@@ -39,6 +39,7 @@
   (global-paren-face-mode 1))
 
 (use-package hl-todo
+  :disabled
   :config
   (global-hl-todo-mode 1))
 
@@ -65,14 +66,12 @@
   ([remap isearch-forward] . swiper-isearch))
 
 (use-package which-key
-  ; :diminish which-key-mode
   :config
   (setq which-key-show-early-on-C-h t
 	which-key-idle-secondary-delay 0.05)
   (which-key-mode 1))
 
 (use-package page-break-lines
-  ; :diminish page-break-lines-mode
   :config
   (global-page-break-lines-mode 1))
 
@@ -94,7 +93,6 @@
 ;; Spell
 (use-package flyspell
   :defer t
-  ; :diminish " s"
   :bind (:map flyspell-mode-map
               ("C-;" . flyspell-correct-wrapper)))
 

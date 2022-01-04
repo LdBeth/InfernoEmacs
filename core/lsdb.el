@@ -57,10 +57,10 @@
 
 ;;; Code:
 
-(require 'poem)
-(require 'pces)
 (require 'mime)
-(require 'static)
+(eval-when-compile
+  (require 'static)
+  (require 'x-face-e21 nil t))
 
 ;;;_* USER CUSTOMIZATION VARIABLES:
 (defgroup lsdb nil
@@ -73,7 +73,7 @@
   :group 'lsdb
   :type 'file)
 
-(defcustom lsdb-file-coding-system (find-coding-system 'utf-8)
+(defcustom lsdb-file-coding-system 'utf-8
   "Coding system for `lsdb-file'."
   :group 'lsdb
   :type 'symbol)
@@ -136,7 +136,7 @@ entry cannot be modified."
   :type 'list)
 
 (defcustom lsdb-name-filter-regexp
-  "^[ _.-a-z0-9]+@[ _.-a-z0-9]+$\\|\s+via\s+"
+  "[[:print:]]+@[[:print:]]+\\|\s+via\s+"
   "Ignores names matched by this regexp.
 For example, names look like email addresses, or uses \"send
 via\" feature from mailing lists."
@@ -416,7 +416,7 @@ Overrides `temp-buffer-show-function'.")
 (defun lsdb-decode-field-body (field-body field-name
                                           &optional mode max-column)
   (let ((default-mime-charset
-          (car (find-coding-systems-string field-body))))
+          (detect-coding-string field-body t)))
     (substring-no-properties
      (mime-decode-field-body field-body
                              (if (stringp field-name)
@@ -543,55 +543,58 @@ Overrides `temp-buffer-show-function'.")
          components
          (funcall lsdb-decode-field-body-function
                   (car components) (car field))))
-    (let ((names lsdb-boring-names-list)
-          (test t))
-      (while (and names test)
-        (setq test (not (string-match (car names)
-                                      (car components)))
-              names (cdr names)))
-      (when test
-        components))))
+    components))
 
 (defun lsdb-update-records ()
   (lsdb-maybe-load-hash-tables)
-  (let (senders recipients interesting records bodies entry)
+  (let ((test t) senders recipients interesting records)
     (save-restriction
       (std11-narrow-to-header)
+      (setq senders (lsdb-fetch-fields lsdb-sender-headers))
+      (let ((names lsdb-boring-names-list)
+            (field (mapconcat (lambda (field)
+                                 (std11-unfold-string (cdr field)))
+                              senders " ")))
+        (while (and names test)
+          (setq test (not (string-match (car names)
+                                        field))
+                names (cdr names))))
+      (when test
+        (setq recipients (lsdb-fetch-fields lsdb-recipients-headers))
+        (dolist (header lsdb-interesting-header-alist)
+          (let ((bodies
+                 (delq nil (mapcar
+                            (lambda (field)
+                              (let ((field-body
+                                     (funcall lsdb-decode-field-body-function
+                                              (cdr field) (car field))))
+                                (if (nth 1 header)
+                                    (and (string-match (nth 1 header)
+                                                       field-body)
+                                         (replace-match (nth 3 header)
+                                                        nil nil field-body))
+                                  field-body)))
+                            (lsdb-fetch-fields (car header))))))
+            (when bodies
+              (let ((entry (or (nth 2 header)
+                               'notes)))
+                (push (cons entry
+                            (if (eql ?. (nth 2 (assq entry lsdb-entry-type-alist)))
+                                (car bodies)
+                              bodies))
+                      interesting)))))))
+    (when test
       (setq senders
             (delq nil (mapcar #'lsdb-decode-address-field
-                              (lsdb-fetch-fields
-                               lsdb-sender-headers)))
+                              senders))
             recipients
             (delq nil (mapcar #'lsdb-decode-address-field
-                              (lsdb-fetch-fields
-                               lsdb-recipients-headers))))
-      (dolist (header lsdb-interesting-header-alist)
-        (setq bodies
-              (delq nil (mapcar
-                         (lambda (field)
-                           (let ((field-body
-                                  (funcall lsdb-decode-field-body-function
-                                           (cdr field) (car field))))
-                             (if (nth 1 header)
-                                 (and (string-match (nth 1 header)
-                                                    field-body)
-                                      (replace-match (nth 3 header)
-                                                     nil nil field-body))
-                               field-body)))
-                         (lsdb-fetch-fields (car header)))))
-        (when bodies
-          (setq entry (or (nth 2 header)
-                          'notes))
-          (push (cons entry
-                      (if (eql ?. (nth 2 (assq entry lsdb-entry-type-alist)))
-                          (car bodies)
-                        bodies))
-                interesting))))
-    (if senders
-        (setq records (list (lsdb-update-record (pop senders) interesting))))
-    (dolist (sender (nconc senders recipients))
-      (push (lsdb-update-record sender) records))
-    (nreverse records)))
+                              recipients)))
+      (if senders
+          (setq records (list (lsdb-update-record (pop senders) interesting))))
+      (dolist (sender (nconc senders recipients))
+        (push (lsdb-update-record sender) records))
+      (nreverse records))))
 
 (defun lsdb-merge-record-entries (old new)
   (setq old (copy-alist old))
@@ -1467,35 +1470,6 @@ always hide."
                           (split-window-vertically)))))
         (set-window-buffer window buffer)
         (lsdb-fit-window-to-buffer window)))))
-
-(defvar wl-address-list)
-(defvar wl-address-completion-list)
-(defvar wl-address-petname-hash)
-
-;;;###autoload
-(defun lsdb-wl-address-init ()
-  "Reload `wl-address-file'.
-Refresh `wl-address-list', `wl-address-completion-list', and
-`wl-address-petname-hash'."
-  (message "Updating addresses...")
-  (lsdb-maybe-load-hash-tables)
-  (setq wl-address-list
-        (let (tmp)
-          (maphash (lambda (key value)
-                     (push (list (copy-sequence (cadr (assq 'net value)))
-                                 (copy-sequence (cadr (assq 'attribution value)))
-                                 (copy-sequence key)) tmp)) lsdb-hash-table)
-          tmp))
-  (setq wl-address-completion-list
-        (wl-address-make-completion-list wl-address-list))
-  (setq wl-address-petname-hash (make-hash-table :test #'equal))
-  (mapc
-   (lambda (addr)
-     (puthash (downcase (car addr))
-              (cadr addr)
-              wl-address-petname-hash))
-   wl-address-list)
-  (message "Updating addresses...done"))
 
 ;;;_. Interface to Mew written by Hideyuki SHIRAI <shirai@meadowy.org>
 (eval-when-compile

@@ -76,12 +76,6 @@
 
 ;;; Code:
 
-(eval-when-compile
-  (unless (and (fboundp 'dolist)
-               (fboundp 'push)
-               (fboundp 'declare))
-    (require 'cl))) ;; for macros in emacs20 (though it would need puthash)
-
 ;; quieten byte compiler
 (defvar align-mode-rules-list)    ;; in align.el
 (defvar align-open-comment-modes) ;; in align.el
@@ -106,25 +100,6 @@ first use."
   :group 'accjournal)
 ;;;###autoload
 (put 'accjournal-mandatory-open 'safe-local-variable 'booleanp)
-
-
-;;-----------------------------------------------------------------------------
-;; emacs22 new stuff
-
-(if (eval-when-compile (fboundp 'complete-with-action))
-    ;; emacs22 (and in emacs23 recognising the "boundaries" thing)
-    (eval-and-compile
-      (defalias 'accjournal--complete-with-action
-        'complete-with-action))
-
-  ;; emacs21,xemacs21
-  (defun accjournal--complete-with-action (action table string pred)
-    (cond ((null action)
-           (try-completion string table pred))
-          ((eq action t)
-           (all-completions string table pred))
-          (t
-           (eq t (try-completion string table pred))))))
 
 
 ;;-----------------------------------------------------------------------------

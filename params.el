@@ -40,7 +40,15 @@
 
 ;; ERC
 (setq erc-server "irc.libera.chat"
-      erc-nick "ldb")
+      erc-nick "ldb"
+      erc-insert-timestamp-function 'erc-insert-timestamp-left
+      erc-timestamp-format "%H%M ")
+
+;; Newsticker
+(setq newsticker-retrieval-interval -1
+      newsticker-url-list
+      '(("xkcd" "https://xkcd.com/rss.xml")
+        ("williamlong" "http://feed.williamlong.info/")))
 
 ;; elpa
 (setq package-archives
