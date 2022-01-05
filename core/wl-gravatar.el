@@ -1,4 +1,4 @@
-;;; wl-gravatar.el --- gravatar fetch/store functions
+;;; wl-gravatar.el --- gravatar fetch/store functions -*- lexical-binding:t -*-
 
 ;; Copyright (C) 2010  Kazuhiro NISHIYAMA
 
@@ -35,16 +35,14 @@
 
 (defvar wl-gravatar-retrieve-once nil)
 
-(defun wl-gravatar-insert (&rest dummy)
+(defun wl-gravatar-insert (&rest _dummy)
   "Display Gravatar images."
   (let ((field (std11-fetch-field "From"))
         image)
     (message "wl-gravatar-insert: field=%s, address=%s" field (when field (wl-address-header-extract-address field)))
     (when field
       (gravatar-retrieve 
-
        (wl-address-header-extract-address field)
-
        (lambda (image buffer)
          (unless (eq image 'error)
            (with-current-buffer buffer
@@ -55,7 +53,7 @@
                    ; (message "inserting gravatar in buffer %s" (buffer-name))
                    (insert-image image)))))))
 
-       `(,(current-buffer))))))
+       (list (current-buffer))))))
 
 (provide 'wl-gravatar)
 ;;; wl-gravatar.el ends here

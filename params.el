@@ -15,7 +15,7 @@
 
 (set-fontset-font "fontset-default"
                   'unicode
-                  (font-spec :name "SImPL Medium" :size 13
+                  (font-spec :name "Monospace" :size 13
 			     :weight 'normal
                              :width 'normal) nil 'prepend)
 

@@ -342,13 +342,6 @@
 ;;		      result)))))))
 
 ;;; Code:
-
-(eval-and-compile
-  (if (or (featurep 'xemacs)
-	  (not (boundp 'emacs-major-version))
-	  (< emacs-major-version 21))
-      (error "This program is for Emacs 21+, good-bye")))
-
 (defconst x-face-e21-version "0.129")
 
 (defgroup x-face nil
@@ -678,99 +671,6 @@ The value form is the same as `x-face-image-attributes'."
   "Program used to encode X-Face."
   :version "21.1"
   :type '(string :size 0)
-  :group 'x-face)
-
-(defcustom x-face-pnmscale-program "pnmscale"
-  "The pnmscale executable which comes from the netpbm package.
-It will be used to scale down or scale up X-Face images if the value
-for the `:scale-factor' keyword in the `x-face-image-attributes'
-variable or the `x-face-image-attributes-for-bbdb' variable is neither
-nil nor the number 1.  For quickly scaling, you can alter it to the
-\"pnmscalefixed\" command."
-  :version "21.1"
-  :type '(radio (const :format "Not specified " nil)
-		(string :format "%v" :size 0))
-  :set (lambda (symbol value)
-	 (custom-set-default
-	  symbol
-	  (and (not noninteractive)
-	       (stringp value)
-	       (with-temp-buffer
-		 (set-buffer-multibyte nil)
-		 (insert "P1\n1 1\n0\n")
-		 (condition-case nil
-		     (let ((coding-system-for-read 'binary)
-			   (coding-system-for-write 'binary))
-		       (call-process-region (point-min) (point-max)
-					    value t '(t nil) nil "2")
-		       (goto-char (point-min))
-		       (let (case-fold-search)
-			 (re-search-forward "\
-^P5[[:blank:]\n\r]+2[[:blank:]\n\r]+2[[:blank:]\n\r]+" nil t)))
-		   (error nil)))
-	       value)))
-  :group 'x-face)
-
-(defcustom x-face-pgmtoppm-program "pgmtoppm"
-  "The pgmtoppm executable which comes from the netpbm package.
-It will be used to colorize scaled X-Face images."
-  :version "21.1"
-  :type '(radio (const :format "Not specified " nil)
-		(string :format "%v" :size 0))
-  :set (lambda (symbol value)
-	 (custom-set-default
-	  symbol
-	  (and (not noninteractive)
-	       (stringp value)
-	       (with-temp-buffer
-		 (set-buffer-multibyte nil)
-		 (insert "P1\n2 1\n0 1\n")
-		 (condition-case nil
-		     (let ((coding-system-for-read 'binary)
-			   (coding-system-for-write 'binary))
-		       (call-process-region (point-min) (point-max)
-					    value t '(t nil) nil
-					    "#000000-#ffffff")
-		       (goto-char (point-min))
-		       (let (case-fold-search)
-			 (re-search-forward "\
-^P6[[:blank:]\n\r]+2[[:blank:]\n\r]+1[[:blank:]\n\r]+\
-\[[:digit:]]+[[:blank:]\n\r]+"
-					    nil t)))
-		   (error nil)))
-	       value)))
-  :group 'x-face)
-
-(defcustom x-face-pngtopnm-program "pngtopnm"
-  "The pngtopnm executable which comes from the netpbm package.
-It will be used to scale down or scale up Face images together with
-the pnmscale program if the value for the `:scale-factor' keyword in
-the `x-face-image-attributes' variable or the
-`x-face-image-attributes-for-bbdb' variable is neither nil nor the
-number 1."
-  :version "21.1"
-  :type '(radio (const :format "Not specified " nil)
-		(string :format "%v" :size 0))
-  :set (lambda (symbol value)
-	 (custom-set-default
-	  symbol
-	  (and (not noninteractive)
-	       (stringp value)
-	       (with-temp-buffer
-		 (set-buffer-multibyte nil)
-		 (insert (base64-decode-string "iVBORw0KGgoAAAANSUhEUg\
-AAAAIAAAABAQAAAADcWUInAAAACklEQVR4nGM4AAAAwgDBUl5XUQAAAABJRU5ErkJggg=="))
-		 (condition-case nil
-		     (let ((coding-system-for-read 'binary)
-			   (coding-system-for-write 'binary))
-		       (call-process-region (point-min) (point-max)
-					    value t '(t nil))
-		       (goto-char (point-min))
-		       (let (case-fold-search)
-			 (re-search-forward "\
-^P4[[:blank:]\n\r]+2[[:blank:]\n\r]+1[[:blank:]\n\r]+\000" nil t)))
-		   (error nil)))
-	       value)))
   :group 'x-face)
 
 (defvar x-face-field-icon
@@ -1432,7 +1332,7 @@ Here are some examples of how to use this function:
 	 (scale (or (plist-get props :scale-factor)
 		    (plist-get params :scale-factor)
 		    1))
-	 bg fg should-colorize siblings image)
+	 bg fg siblings image)
     (while props
       (setq params (plist-put params (pop props) (pop props))))
     (setq params (x-face-cleanup-plist (plist-put params :scale-factor nil))
@@ -1441,13 +1341,7 @@ Here are some examples of how to use this function:
 		 "#ffffff")
 	  fg (or (plist-get params :foreground)
 		 (face-foreground 'default)
-		 "#000000")
-	  should-colorize
-	  (and x-face-pgmtoppm-program
-	       (not (and (string-match
-			  "^white$\\|^gr[ae]y100$\\|^#\\(?:fff\\)+$" bg)
-			 (string-match
-			  "^black$\\|^gr[ae]y0$\\|^#\\(?:000\\)+$" fg)))))
+		 "#000000"))
     (plist-put params :background bg)
     (plist-put params :foreground fg)
     (when x-face-enable-cache
@@ -1458,26 +1352,7 @@ Here are some examples of how to use this function:
     (unless image
       ;; Create an image.
       (setq image
-	    (if (and x-face-pnmscale-program
-		     (/= 1 scale))
-		(progn
-		  (setq image (x-face-to-bitmap x-face nil nil t))
-		  (let ((coding-system-for-read 'binary)
-			(coding-system-for-write 'binary)
-			enable-multibyte-characters)
-		    (with-temp-buffer
-		      (insert "P4\n48 48\n" image)
-		      (call-process-region (point-min) (point-max)
-					   x-face-pnmscale-program
-					   t '(t nil) nil
-					   (number-to-string scale))
-		      (when should-colorize
-			(call-process-region (point-min) (point-max)
-					     x-face-pgmtoppm-program
-					     t '(t nil) nil
-					     (concat fg "-" bg)))
-		      (create-image (buffer-string) 'pbm t))))
-	      (create-image (x-face-to-pbm x-face) 'pbm t)))
+	    (create-image (x-face-to-pbm x-face) 'pbm t :scale scale))
       (when x-face-enable-cache
 	(if siblings
 	    (push (cons scale image) siblings)
@@ -1511,23 +1386,11 @@ assumed that X-FACES are sorted in order from msb to lsb."
 		image (cdr (assoc size siblings)))
 	(setq x-face-ring (make-ring x-face-ring-size))))
     (unless image
-      (if (and x-face-pnmscale-program
-	       (/= 1 size))
-	  (let ((coding-system-for-read 'binary)
-		(coding-system-for-write 'binary)
-		enable-multibyte-characters)
-	    (with-temp-buffer
-	      (insert (x-face-gray-pixmap-to-pgm
-		       (x-face-gray-x-faces-to-pixmap x-faces t)
-		       (1- (expt 2 (length x-faces)))))
-	      (call-process-region (point-min) (point-max)
-				   x-face-pnmscale-program t '(t nil) nil
-				   (number-to-string size))
-	      (setq image (create-image (buffer-string) 'pbm t))))
-	(setq image (create-image (x-face-gray-pixmap-to-pgm
-				   (x-face-gray-x-faces-to-pixmap x-faces t)
-				   (1- (expt 2 (length x-faces))))
-				  'pbm t)))
+      (setq image
+            (create-image (x-face-gray-pixmap-to-pgm
+			   (x-face-gray-x-faces-to-pixmap x-faces t)
+			   (1- (expt 2 (length x-faces))))
+                          'pbm t :scale size))
       (when x-face-enable-cache
 	(if siblings
 	    (push (cons size image) siblings)
@@ -1574,24 +1437,7 @@ cQqAAAAEElEQVR4nGP4DwYMoxR1KABPVB7waCGvfwAAAABJRU5ErkJggg==")
 		    (error
 		     (base64-decode-string empty))))
       (setq image
-	    (if (and x-face-pngtopnm-program
-		     x-face-pnmscale-program
-		     (/= 1 scale))
-		(progn
-		  (let ((coding-system-for-read 'binary)
-			(coding-system-for-write 'binary)
-			enable-multibyte-characters)
-		    (with-temp-buffer
-		      (insert image)
-		      (call-process-region (point-min) (point-max)
-					   x-face-pngtopnm-program
-					   t '(t nil))
-		      (call-process-region (point-min) (point-max)
-					   x-face-pnmscale-program
-					   t '(t nil) nil
-					   (number-to-string scale))
-		      (create-image (buffer-string) 'pbm t))))
-	      (create-image image 'png t)))
+	    (create-image image 'png t :scale scale))
       (when x-face-enable-cache
 	(if siblings
 	    (push (cons scale image) siblings)
@@ -2127,11 +1973,10 @@ buffer-locally."
 ;;;###autoload
 (defun x-face-save ()
   "Save X-Face headers to XBM, PNG or XPM files.
-This requires the external `uncompface' program or the ELisp based
-`uncompface' program.  It doesn't work with forwarded MIME parts,
-except for Mew.  Files will be named uniquely and saved into the
-directory specified by the `x-face-image-file-directory-for-save'
-variable."
+This requires the external `uncompface' program.  It doesn't work
+with forwarded MIME parts, except for Mew.  Files will be named
+uniquely and saved into the directory specified by the
+`x-face-image-file-directory-for-save' variable."
   (interactive)
   (let ((case-fold-search t)
 	type x-faces basename)

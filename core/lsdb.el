@@ -194,7 +194,8 @@ The removed record is passed to each function as the argument."
 (defcustom lsdb-insert-x-face-function
   (static-if (featurep 'x-face-e21)
       (lambda (x-face)
-        (insert-image (x-face-create-image x-face))))
+        (insert-image
+         (x-face-create-image x-face :scale-factor 0.5))))
   "Function to display X-Face."
   :group 'lsdb
   :type 'function)
@@ -202,7 +203,8 @@ The removed record is passed to each function as the argument."
 (defcustom lsdb-insert-face-function
   (static-if (featurep 'x-face-e21)
       (lambda (face)
-        (insert-image (x-face-create-face-image face))))
+        (insert-image
+         (x-face-create-face-image face :scale-factor 0.5))))
   "Function to display Face."
   :group 'lsdb
   :type 'function)
