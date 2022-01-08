@@ -323,7 +323,7 @@
     ("make a stab at") ("meditate upon")
     ("look at deeply")))
 
-(defvar horoscope-random-state)
+(defvar horoscope-random-state nil)
 
 
 ;;;###autoload

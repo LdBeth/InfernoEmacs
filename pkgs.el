@@ -26,7 +26,7 @@
       (create-image (concat user-emacs-directory "banner.xpm")
                     'xpm nil)))
   (defvar dotspacemacs-startup-lists
-    '((recents  . 5))))
+    '((bookmarks . 3) (recents  . 5))))
 
 (use-package tecoline
   :config

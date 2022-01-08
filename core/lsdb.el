@@ -73,7 +73,7 @@
   :group 'lsdb
   :type 'file)
 
-(defcustom lsdb-file-coding-system 'utf-8
+(defcustom lsdb-file-coding-system 'utf-8-emacs
   "Coding system for `lsdb-file'."
   :group 'lsdb
   :type 'symbol)

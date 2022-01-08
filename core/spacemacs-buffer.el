@@ -357,17 +357,11 @@ LIST: a list of string bookmark names made interactive in this function."
     (insert list-display-name)
     (mapc (lambda (el)
             (insert "\n    ")
-            (let* ((filename (bookmark-get-filename el))
-                   (button-text-prefix
-                    (format "%2s" (number-to-string
-                                   spacemacs-buffer--startup-list-nr)))
-                   (button-text
-                    (concat
-                     (concat button-text-prefix " ")
-                     (if filename
-                         (format "%s - %s"
-                                 el (abbreviate-file-name filename))
-                       (format "%s" el)))))
+            (let ((button-text
+                   (format "%2s %s"
+                           (number-to-string
+                            spacemacs-buffer--startup-list-nr)
+                           el)))
               (widget-create 'push-button
                              :action (lambda (&rest _) (bookmark-jump el))
                              :mouse-face 'highlight

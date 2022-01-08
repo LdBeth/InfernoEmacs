@@ -4,6 +4,7 @@
 (tool-bar-mode -1)
 (tooltip-mode -1)
 (prefer-coding-system 'utf-8)
+(blink-cursor-mode -1)
 
 (setq inhibit-startup-screen t)
 (setq make-backup-files nil
@@ -15,7 +16,7 @@
 
 (set-fontset-font "fontset-default"
                   'unicode
-                  (font-spec :name "Monospace" :size 13
+                  (font-spec :name "SImPL Medium" :size 13
 			     :weight 'normal
                              :width 'normal) nil 'prepend)
 
@@ -23,14 +24,16 @@
                     nil
                     :font "IBM Plex Sans Text")
 
-(blink-cursor-mode -1)
-
 (setq scroll-preserve-screen-position t
       scroll-margin 0
       scroll-conservatively 97
       make-cursor-line-fully-visible nil
       shr-width 72
       gamegrid-glyph-height-mm 3.0)
+
+(setq mac-emulate-three-button-mouse t
+      track-eol t
+      kill-whole-line t)
 
 (setq-default indent-tabs-mode nil)
 (setq ring-bell-function 'ignore)

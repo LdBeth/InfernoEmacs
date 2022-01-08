@@ -68,7 +68,7 @@
         name
         " "
         `(:propertize ,primary face nano-modeline-primary)
-        '(:propertize " >> " nano-modeline)
+        '(:propertize " >> " face nano-modeline)
         `(:propertize ,secondary face nano-modeline-secondary)))
 
 (defun nano-modeline-status ()
