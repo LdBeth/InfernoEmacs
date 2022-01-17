@@ -145,3 +145,25 @@
 ;; Net
 (use-package aria2
   :defer t)
+
+(use-package newst-plainview
+  :defer t
+  :init
+  (setq newsticker-retrieval-interval -1
+        newsticker-frontend 'newsticker-plainview
+        newsticker-download-logos nil)
+  :config
+  (defun newsticker-setup-mode-line ()
+    (setq mode-line-format
+          (nano-modeline-compose
+           '(newsticker--buffer-uptodate-p
+             (:propertize " SC " face nano-modeline-status-RO)
+             (:propertize " NI " face nano-modeline-status-**))
+           '(:propertize " Newsticker " face nano-modeline-name)
+           '(:eval (format " %d " (length newsticker--process-ids)))
+           '((-3 "%p") " "
+             (:eval (newsticker--buffer-get-feed-title-at-point))
+             ": "
+             (:eval (newsticker--buffer-get-item-title-at-point))))))
+  (add-hook
+   'newsticker-mode-hook 'newsticker-setup-mode-line))

@@ -48,10 +48,10 @@
       erc-timestamp-format "%H%M ")
 
 ;; Newsticker
-(setq newsticker-retrieval-interval -1
-      newsticker-url-list
+(setq newsticker-url-list
       '(("xkcd" "https://xkcd.com/rss.xml")
-        ("williamlong" "http://feed.williamlong.info/")))
+        ("williamlong" "http://feed.williamlong.info/")
+        ("ACG" "http://www.acgpiping.net/feed/")))
 
 ;; elpa
 (setq package-archives

@@ -52,3 +52,7 @@ end if")))
 (unbind-key "C-h ?" global-map)
 
 (add-to-list 'auto-mode-alist '("\\.spad" . prog-mode) t)
+
+;; fixed in latest emacs
+(advice-add 'newsticker--cache-read
+            :override #'newsticker--cache-read-version1)
