@@ -3,8 +3,8 @@
 (scroll-bar-mode -1)
 (tool-bar-mode -1)
 (tooltip-mode -1)
-(prefer-coding-system 'utf-8)
 (blink-cursor-mode -1)
+(prefer-coding-system 'utf-8)
 
 (setq inhibit-startup-screen t)
 (setq make-backup-files nil

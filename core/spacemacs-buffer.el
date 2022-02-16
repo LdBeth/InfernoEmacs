@@ -226,12 +226,14 @@ REAL-WIDTH: the real width of the line.  If the line contains an image, the size
                  (propertize "Wanderlust" 'face 'font-lock-keyword-face))
   (insert " ")
   (widget-create 'push-button
-                 :help-echo "Just an email system."
+                 :help-echo "Read some RSS."
                  :action (lambda (&rest _)
-                           (notmuch))
+                           (newsticker-show-news))
                  :mouse-face 'highlight
                  :follow-link "\C-m"
-                 (propertize "Notmuch" 'face 'font-lock-keyword-face))
+                 (propertize "Newsticker" 'face 'font-lock-keyword-face))
+  ;; (spacemacs-buffer//center-line)
+  ;; (insert "\n")
   (insert " ")
   (widget-create 'push-button
                  :help-echo
@@ -243,8 +245,6 @@ REAL-WIDTH: the real width of the line.  If the line contains an image, the size
                  :follow-link "\C-m"
                  (propertize "Libera Chat"
                              'face 'font-lock-keyword-face))
-  ;(spacemacs-buffer//center-line)
-  ;(insert "\n")
   (spacemacs-buffer//center-line)
   (insert "\n"))
 

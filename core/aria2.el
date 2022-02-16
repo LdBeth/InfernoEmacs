@@ -47,7 +47,8 @@
 
 (defcustom aria2-kill-process-on-emacs-exit nil
   "Whether aria2c should be stopped when exiting Emacs.
-If nil Emacs will reattach itself to the process on entering downloads list."
+If nil Emacs will reattach itself to the process on entering
+downloads list."
   :type 'boolean
   :group 'aria2)
 
@@ -62,7 +63,8 @@ If nil Emacs will reattach itself to the process on entering downloads list."
   :group 'aria2)
 
 (defcustom aria2-session-file (expand-file-name "aria2c.session" user-emacs-directory)
-  "Name of session file.  Will be used with \"--save-session\" and \"--input-file\" options."
+  "Name of session file.  Will be used with \"--save-session\"
+  and \"--input-file\" options."
   :type 'file
   :group 'aria2)
 
@@ -77,7 +79,8 @@ If nil Emacs will reattach itself to the process on entering downloads list."
   :group 'aria2)
 
 (defcustom aria2-custom-args nil
-  "Additional arguments for aria2c.  This should be a list of strings.  See aria2c manual for supported options."
+  "Additional arguments for aria2c.  This should be a list of
+strings.  See aria2c manual for supported options."
   :type '(repeat (string :tag "Commandline argument."))
   :group 'aria2)
 
@@ -86,7 +89,8 @@ If nil Emacs will reattach itself to the process on entering downloads list."
 
 (defconst aria2--cc-file
   (expand-file-name "aria2-controller.eieio" user-emacs-directory)
-  "File used to persist controller status between Emacs restarts.")
+  "File used to persist controller status between Emacs
+  restarts.")
 
 ;;; Faces definitions start here.
 
@@ -240,13 +244,14 @@ If nil Emacs will reattach itself to the process on entering downloads list."
 
 ;;; Internal methods start here.
 
-(defmethod get-next-id ((this aria2-controller))
-  "Return next request id json form. Resets back to 1 upon reaching `most-positive-fixnum'"
+(cl-defmethod get-next-id ((this aria2-controller))
+  "Return next request id json form. Resets back to 1 upon
+reaching `most-positive-fixnum'"
   (let ((id (1+ (oref this request-id))))
     (oset this request-id (if (equal id most-positive-fixnum) 0 id))
     id))
 
-(defmethod is-process-running ((this aria2-controller))
+(cl-defmethod is-process-running ((this aria2-controller))
   "Returns status of aria2c process."
   (with-slots (pid) this
     (when (and
@@ -254,7 +259,7 @@ If nil Emacs will reattach itself to the process on entering downloads list."
            (aria2--is-aria-process-p pid))
       t)))
 
-(defmethod run-process ((this aria2-controller))
+(cl-defmethod run-process ((this aria2-controller))
   "Starts aria2c process, if not already running."
   (unless (is-process-running this)
     (let ((options (delq nil
@@ -278,7 +283,7 @@ If nil Emacs will reattach itself to the process on entering downloads list."
       (unless (is-process-running this)
         (signal 'aria2-err-failed-to-start (concat aria2-executable " " (string-join options " ")))))))
 
-(defmethod make-request ((this aria2-controller) method &rest params)
+(cl-defmethod make-request ((this aria2-controller) method &rest params)
   "Calls a remote METHOD with PARAMS. Returns response alist."
   (run-process this)
   (let ((url-request-method "POST")
@@ -305,12 +310,12 @@ If nil Emacs will reattach itself to the process on entering downloads list."
 
 ;;; Api implementation starts here
 
-(defmethod addUri ((this aria2-controller) urls)
+(cl-defmethod addUri ((this aria2-controller) urls)
   "Add a list of http/ftp/bittorrent URLS, pointing at the same file.
 When sending magnet link, URLS must have only one element."
   (make-request this "aria2.addUri" (vconcat urls)))
 
-(defmethod addTorrent ((this aria2-controller) path)
+(cl-defmethod addTorrent ((this aria2-controller) path)
   "Add PATH pointing at a torrent file to download list."
   (unless (file-exists-p path)
     (signal 'aria2-err-file-doesnt-exist '(path)))
@@ -318,7 +323,7 @@ When sending magnet link, URLS must have only one element."
     (signal 'aria2-err-not-a-torrent-file nil))
   (make-request this "aria2.addTorrent" (aria2--base64-encode-file path)))
 
-(defmethod addMetalink ((this aria2-controller) path)
+(cl-defmethod addMetalink ((this aria2-controller) path)
   "Add local .metalink PATH to download list."
   (unless (file-exists-p path)
     (signal 'aria2-err-file-doesnt-exist '(path)))
@@ -326,43 +331,46 @@ When sending magnet link, URLS must have only one element."
     (signal 'aria2-err-not-a-metalink-file nil))
   (make-request this "aria2.addMetalink" (aria2--base64-encode-file path)))
 
-(defmethod remove-download ((this aria2-controller) gid &optional force)
-  "Remove download identified by GID. If FORCE don't unregister download at bittorrent tracker."
+(cl-defmethod remove-download ((this aria2-controller) gid &optional force)
+  "Remove download identified by GID. If FORCE don't unregister
+download at bittorrent tracker."
   (make-request this (if force "aria2.forceRemove" "aria2.remove") gid))
 
-(defmethod pause ((this aria2-controller) gid &optional force)
-  "Pause download identified by GID. If FORCE don't unregister download at bittorrent tracker."
+(cl-defmethod pause ((this aria2-controller) gid &optional force)
+  "Pause download identified by GID. If FORCE don't unregister
+download at bittorrent tracker."
   (make-request this (if force "aria2.forcePause" "aria2.pause") gid))
 
-(defmethod pauseAll ((this aria2-controller) &optional force)
-  "Pause all downloads. If FORCE don't unregister download at bittorrent tracker."
+(cl-defmethod pauseAll ((this aria2-controller) &optional force)
+  "Pause all downloads. If FORCE don't unregister download at
+bittorrent tracker."
   (make-request this (if force "aria2.forcePauseAll" "aria2.pauseAll")))
 
-(defmethod unpause ((this aria2-controller) gid)
+(cl-defmethod unpause ((this aria2-controller) gid)
   "Unpause download identified by GID."
   (make-request this "aria2.unpause" gid))
 
-(defmethod unpauseAll ((this aria2-controller))
+(cl-defmethod unpauseAll ((this aria2-controller))
   "Unpause all downloads."
   (make-request this "aria2.unpauseAll"))
 
-(defmethod tellStatus ((this aria2-controller) gid &optional keys)
+(cl-defmethod tellStatus ((this aria2-controller) gid &optional keys)
   "Return status of a download identified by GID."
   (make-request this "aria2.tellStatus" gid keys))
 
-(defmethod tellActive ((this aria2-controller) &optional keys)
+(cl-defmethod tellActive ((this aria2-controller) &optional keys)
   "Return statuses of active downloads."
   (make-request this "aria2.tellActive" keys))
 
-(defmethod tellWaiting ((this aria2-controller) &optional offset num keys)
+(cl-defmethod tellWaiting ((this aria2-controller) &optional offset num keys)
   "Return statuses of waiting downloads."
   (make-request this "aria2.tellWaiting" (or offset 0) (or num most-positive-fixnum) keys))
 
-(defmethod tellStopped ((this aria2-controller) &optional offset num keys)
+(cl-defmethod tellStopped ((this aria2-controller) &optional offset num keys)
   "Return statuses of stopped downloads."
   (make-request this "aria2.tellStopped" (or offset 0) (or num most-positive-fixnum) keys))
 
-(defmethod changePosition ((this aria2-controller) gid pos &optional how)
+(cl-defmethod changePosition ((this aria2-controller) gid pos &optional how)
   "Change position of a download denoted by GID. POS is a number. HOW is one of:
 \"POS_SET\" - sets file to POS position from the beginning of a list (first element is 0),
 \"POS_CUR\" - moves file by POS places relative to it's current position,
@@ -372,65 +380,73 @@ If nil defaults to \"POS_CUR\"."
     (signal 'aria2-err-no-such-position-type (list how)))
   (make-request this "aria2.changePosition" gid pos (or how "POS_CUR")))
 
-(defmethod changeUri ((this aria2-controller) gid file-index del-uris add-uris &optional position)
+(cl-defmethod changeUri ((this aria2-controller) gid file-index del-uris add-uris &optional position)
   "This method removes the URIs in DEL-URIS list and appends the URIs in ADD-URIS list to download denoted by GID.
 FILE-INDEX is 1-based position, identifying a file in a download.
-POSITION is a 0-based index specifying where URIs are inserted in waiting list.
-Returns a pair of numbers denoting amount of files deleted and files inserted."
+POSITION is a 0-based index specifying where URIs are inserted in
+waiting list.  Returns a pair of numbers denoting amount of files
+deleted and files inserted."
   (make-request this "aria2.changeUri" gid file-index del-uris add-uris (or position 0)))
 
-(defmethod getOption ((this aria2-controller) gid)
+(cl-defmethod getOption ((this aria2-controller) gid)
   "This method returns options of the download denoted by GID."
   (make-request this "aria2.getOption" gid))
 
-(defmethod changeOption ((this aria2-controller) gid options)
+(cl-defmethod changeOption ((this aria2-controller) gid options)
   "Set OPTIONS for file denoted by GID. OPTIONS is an alist."
   (make-request this "aria2.changeOption" gid options))
 
-(defmethod getGlobalOption ((this aria2-controller))
-  "Return an alist of global options. Global options are used as defaults for newly added files."
+(cl-defmethod getGlobalOption ((this aria2-controller))
+  "Return an alist of global options. Global options are used as
+defaults for newly added files."
   (make-request this "aria2.getGlobalOptions"))
 
-(defmethod changeGlobalOption ((this aria2-controller) options)
-  "Changes default global opts to OPTIONS. OPTIONS is an alist of opt-name and value."
+(cl-defmethod changeGlobalOption ((this aria2-controller) options)
+  "Changes default global opts to OPTIONS. OPTIONS is an alist of
+opt-name and value."
   (make-request this "aria2.changeGlobalOption" options))
 
-(defmethod getGlobalStat ((this aria2-controller))
-  "Returns global statistics such as the overall download and upload speeds."
+(cl-defmethod getGlobalStat ((this aria2-controller))
+  "Returns global statistics such as the overall download and
+upload speeds."
   (make-request this "aria2.getGlobalStat"))
 
-(defmethod purgeDownloadResult ((this aria2-controller))
-  "This method purges completed/error/removed downloads to free memory."
+(cl-defmethod purgeDownloadResult ((this aria2-controller))
+  "This method purges completed/error/removed downloads to free
+memory."
   (make-request this "aria2.purgeDownloadResult"))
 
-(defmethod removeDownloadResult ((this aria2-controller) gid)
-  "Removes a completed/error/removed download denoted by GID from memory."
+(cl-defmethod removeDownloadResult ((this aria2-controller) gid)
+  "Removes a completed/error/removed download denoted by GID from
+memory."
   (make-request this "aria2.removeDownloadResult" gid))
 
-(defmethod saveSession ((this aria2-controller))
+(cl-defmethod saveSession ((this aria2-controller))
   "Saves the current session to a `aria2-session-file' file."
   (make-request this "aria2.saveSession"))
 
-(defmethod shutdown ((this aria2-controller) &optional force)
-  "Shut down aria2c process.  If FORCE don't wait for unregistering torrents."
+(cl-defmethod shutdown ((this aria2-controller) &optional force)
+  "Shut down aria2c process.  If FORCE don't wait for
+unregistering torrents."
   (when (is-process-running this)
     (make-request this (if force "aria2.forceShutdown" "aria2.shutdown"))
     (oset this pid -1)))
 
-(defmethod getUris ((this aria2-controller) gid)
+(cl-defmethod getUris ((this aria2-controller) gid)
   "Return a list of uris used in download identified by GID."
   (make-request this "aria2.getUris" gid))
 
-(defmethod getFiles ((this aria2-controller) gid)
+(cl-defmethod getFiles ((this aria2-controller) gid)
   "Return a file list of a download identified by GID."
   (make-request this "aria2.getFiles" gid))
 
-(defmethod getPeers ((this aria2-controller) gid)
+(cl-defmethod getPeers ((this aria2-controller) gid)
   "Return a list peers of the download denoted by GID."
   (make-request this "aria2.getPeers" gid))
 
-(defmethod getServers ((this aria2-controller) gid)
-  "Return currently connected HTTP(S)/FTP servers of the download denoted by GID."
+(cl-defmethod getServers ((this aria2-controller) gid)
+  "Return currently connected HTTP(S)/FTP servers of the download
+denoted by GID."
   (make-request this "aria2.getServers" gid))
 
 ;;; Major mode settings start here
@@ -447,7 +463,9 @@ Returns a pair of numbers denoting amount of files deleted and files inserted."
   "Default list of keys for use in aria2.tell* calls.")
 
 (defvar aria2--master-timer nil
-  "Holds a timer object that dynamically manages frequency of `aria2--refresh-timer', depending on visibility and focused state.")
+  "Holds a timer object that dynamically manages frequency of
+  `aria2--refresh-timer', depending on visibility and focused
+  state.")
 
 (defvar aria2--refresh-timer nil
   "Holds a timer object that refreshes downloads list periodically.")
@@ -540,22 +558,26 @@ Returns a pair of numbers denoting amount of files deleted and files inserted."
   :type  '(integer :tag "Number of seconds"))
 
 (defcustom aria2-refresh-normal 8
-  "Timeout after list is refreshed, when it doesn't have focus, but its buffer is visible."
+  "Timeout after list is refreshed, when it doesn't have focus,
+but its buffer is visible."
   :group 'aria2
   :group 'timer
   :type  '(integer :tag "Number of seconds"))
 
 (defcustom aria2-refresh-slow 20
-  "Timeout after list is refreshed, when it doesn't have focus and it's buffer is not visible."
+  "Timeout after list is refreshed, when it doesn't have focus
+and it's buffer is not visible."
   :group 'aria2
   :group 'timer
   :type  '(integer :tag "Number of seconds"))
 
 (defvar aria2--current-buffer-refresh-speed nil
-  "One of :fast :normal :slow or nil if not refreshing. Used to manage refresh timers.")
+  "One of :fast :normal :slow or nil if not refreshing. Used to
+  manage refresh timers.")
 
 (defun aria2--manage-refresh-timer ()
-  "Restarts `aria2--refresh-timer' on different intervals, depending on focus and buffer visibility."
+  "Restarts `aria2--refresh-timer' on different intervals,
+depending on focus and buffer visibility."
   (let ((buf (get-buffer aria2-list-buffer-name)))
     (cond ((and
             (eq buf (window-buffer (selected-window))) ; when list has focus
@@ -586,7 +608,8 @@ Returns a pair of numbers denoting amount of files deleted and files inserted."
           aria2--master-timer nil)))
 
 (defun aria2--refresh ()
-  "Refreshes download list buffer. Or stops refresh timers if buffer doesn't exist."
+  "Refreshes download list buffer. Or stops refresh timers if
+buffer doesn't exist."
   (let ((buf (get-buffer aria2-list-buffer-name)))
     (if buf
         (with-current-buffer buf (revert-buffer))
@@ -594,7 +617,8 @@ Returns a pair of numbers denoting amount of files deleted and files inserted."
 
 ;; On exit hooks start here
 (defun aria2--persist-settings-on-exit ()
-  "Persist controller settings, or clear state when aria2c isn't running."
+  "Persist controller settings, or clear state when aria2c isn't
+running."
   (aria2--stop-timer)
   (if (and aria2--cc (is-process-running aria2--cc))
       (eieio-persistent-save aria2--cc aria2--cc-file)
@@ -635,12 +659,14 @@ Returns a pair of numbers denoting amount of files deleted and files inserted."
   "Regexp matching .torrent .meta4 and .metalink files.")
 
 (defun aria2--supported-file-type-p (file)
-  "Supported FILE predicate. Also allow directories to enable path navigation."
+  "Supported FILE predicate. Also allow directories to enable
+path navigation."
   (or (file-directory-p file)
       (string-match-p aria2-supported-file-extension-regexp file)))
 
 (defun aria2-add-file ()
-  "Prompt for a file and add it. Supports .torrent .meta4 and .metalink files."
+  "Prompt for a file and add it. Supports .torrent .meta4 and
+.metalink files."
   (interactive)
   (let ((chosen-file
          (expand-file-name
@@ -709,7 +735,7 @@ Returns a pair of numbers denoting amount of files deleted and files inserted."
   (use-local-map aria2-dialog-map)
   (widget-setup)
   (goto-char (point-min))
-  (widget-forward 3))
+  (widget-move 3))
 
 (defun aria2-remove-download (arg)
   "Set download status to 'removed'."
