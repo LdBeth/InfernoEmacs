@@ -57,3 +57,5 @@ end if")))
 ;; fixed in latest emacs
 (advice-add 'newsticker--cache-read
             :override #'newsticker--cache-read-version1)
+
+(add-hook 'minibuffer-setup-hook 'corfu-mode)

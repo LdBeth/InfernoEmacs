@@ -12,13 +12,15 @@
 
 (set-frame-font (font-spec :name "SF Mono" :size 13
 			   :weight 'normal
-                           :width 'normal) nil t)
+                           :width 'normal)
+                nil t)
 
 (set-fontset-font "fontset-default"
                   'unicode
                   (font-spec :name "SImPL Medium" :size 13
 			     :weight 'normal
-                             :width 'normal) nil 'prepend)
+                             :width 'normal)
+                  nil 'prepend)
 
 (set-face-attribute 'variable-pitch
                     nil
@@ -36,8 +38,9 @@
       kill-whole-line t)
 
 (setq-default indent-tabs-mode nil)
-(setq ring-bell-function 'ignore)
-(defalias 'yes-or-no-p 'y-or-n-p)
+(setq ring-bell-function 'ignore
+      use-short-answers t
+      tab-always-indent 'complete)
 
 (setq recentf-exclude '("mime-example$" ".emacs.d/\\([a-z]\\|-\\)*$"))
 
@@ -62,4 +65,5 @@
     (load (concat user-emacs-directory "pkgs"))
   (setq load-path dumped-load-path)
   (global-font-lock-mode t)
-  (transient-mark-mode t))
+  (transient-mark-mode t)
+  (corfu-global-mode t))

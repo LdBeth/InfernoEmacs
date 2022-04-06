@@ -371,8 +371,11 @@ bittorrent tracker."
   (make-request this "aria2.tellStopped" (or offset 0) (or num most-positive-fixnum) keys))
 
 (cl-defmethod changePosition ((this aria2-controller) gid pos &optional how)
-  "Change position of a download denoted by GID. POS is a number. HOW is one of:
-\"POS_SET\" - sets file to POS position from the beginning of a list (first element is 0),
+  "Change position of a download denoted by GID. POS is a
+number. HOW is one of:
+
+\"POS_SET\" - sets file to POS position from the beginning of a list
+  (first element is 0),
 \"POS_CUR\" - moves file by POS places relative to it's current position,
 \"POS_END\" - sets file to POS position relative to end of list.
 If nil defaults to \"POS_CUR\"."
@@ -380,8 +383,11 @@ If nil defaults to \"POS_CUR\"."
     (signal 'aria2-err-no-such-position-type (list how)))
   (make-request this "aria2.changePosition" gid pos (or how "POS_CUR")))
 
-(cl-defmethod changeUri ((this aria2-controller) gid file-index del-uris add-uris &optional position)
-  "This method removes the URIs in DEL-URIS list and appends the URIs in ADD-URIS list to download denoted by GID.
+(cl-defmethod changeUri ((this aria2-controller)
+                         gid file-index del-uris add-uris &optional position)
+  "This method removes the URIs in DEL-URIS list and appends the
+URIs in ADD-URIS list to download denoted by GID.
+
 FILE-INDEX is 1-based position, identifying a file in a download.
 POSITION is a 0-based index specifying where URIs are inserted in
 waiting list.  Returns a pair of numbers denoting amount of files

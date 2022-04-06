@@ -193,6 +193,8 @@ to 'auto, tags may not be properly aligned. "
      '(font-lock-warning-face ((,class (:foreground ,war :background ,bg1))))
      '(fringe ((,class (:background ,bg1 :foreground ,base))))
      '(header-line ((,class :background ,bg2)))
+     '(help-key-binding ((,class :background ,bg4 :foreground ,func
+                                 :box (:line-width (1 . -1) :color ,border))))
      '(highlight ((,class (:foreground ,base :background ,highlight))))
      '(hl-line ((,class (:background ,bg2 :extend t))))
      '(isearch ((,class (:foreground ,bg1 :background ,mat))))
@@ -226,46 +228,11 @@ to 'auto, tags may not be properly aligned. "
 ;;;;; anzu-mode
      '(anzu-mode-line ((,class (:foreground ,yellow :inherit bold))))
 
-;;;;; auto-complete
-     '(ac-completion-face ((,class (:background ,ttip-bg :foreground ,ttip))))
-
 ;;;;; avy
      '(avy-lead-face   ((,class (:background ,green-bg :foreground ,green))))
      '(avy-lead-face-0 ((,class (:background ,green-bg :foreground ,yellow))))
      '(avy-lead-face-1 ((,class (:background ,green-bg :foreground ,magenta))))
      '(avy-lead-face-2 ((,class (:background ,green-bg :foreground ,blue))))
-
-;;;;; calfw
-     '(cfw:face-title               ((,class (:foreground ,head1 :height 2.0 :weight bold :inherit variable-pitch))))
-     '(cfw:face-header              ((,class (:foreground ,base :weight bold))))
-     '(cfw:face-saturday            ((,class (:foreground ,base :weight bold))))
-     '(cfw:face-sunday              ((,class (:foreground ,base :weight bold))))
-     '(cfw:face-holiday             ((,class (:foreground ,head1 :weight bold))))
-     '(cfw:face-grid                ((,class (:foreground ,border))))
-     '(cfw:face-default-content     ((,class (:foreground ,green))))
-     '(cfw:face-periods             ((,class (:foreground ,cyan))))
-     '(cfw:face-day-title           ((,class (:background ,head1-bg))))
-     '(cfw:face-default-day         ((,class (:foreground ,base :weight bold))))
-     '(cfw:face-annotation          ((,class (:foreground ,aqua))))
-     '(cfw:face-disable             ((,class (:foreground ,base-dim))))
-     '(cfw:face-today-title         ((,class (:background ,blue :weight bold))))
-     '(cfw:face-today               ((,class (:background ,head1-bg :weight bold))))
-     '(cfw:face-select              ((,class (:background ,magenta :weight bold))))
-     '(cfw:face-toolbar             ((,class (:foreground ,base :background ,bg1))))
-     '(cfw:face-toolbar-button-off  ((,class (:foreground ,base :weight bold))))
-     '(cfw:face-toolbar-button-on   ((,class (:foreground ,base :weight bold))))
-
-;;;;; centaur-tabs
-     '(centaur-tabs-default ((,class (:background ,bg1 :foreground ,bg1))))
-     '(centaur-tabs-selected ((,class (:background ,bg1 :foreground ,base :weight bold))))
-     '(centaur-tabs-unselected ((,class (:background ,bg2 :foreground ,base-dim :weight light))))
-     '(centaur-tabs-selected-modified ((,class (:background ,bg1
-                  :foreground ,blue :weight bold))))
-     '(centaur-tabs-unselected-modified ((,class (:background ,bg2 :weight light
-                    :foreground ,blue))))
-     '(centaur-tabs-active-bar-face ((,class (:background ,keyword))))
-     '(centaur-tabs-modified-marker-selected ((,class (:inherit 'centaur-tabs-selected :foreground,keyword))))
-     '(centaur-tabs-modified-marker-unselected ((,class (:inherit 'centaur-tabs-unselected :foreground,keyword))))
 
 ;;;;; cider
      '(cider-enlightened ((,class (:background nil :box (:color ,yellow :line-width -1 :style nil) :foreground ,yellow))))
@@ -295,6 +262,7 @@ to 'auto, tags may not be properly aligned. "
 
 ;;;;; diff
      '(diff-added             ((,class :background nil :foreground ,green :extend t)))
+     '(diff-error             ((,class :background nil :foreground ,err)))
      '(diff-changed           ((,class :background nil :foreground ,blue)))
      '(diff-header            ((,class :background ,cblk-ln-bg :foreground ,func :extend t)))
      '(diff-file-header       ((,class :background ,cblk-ln-bg :foreground ,cblk :extend t)))
@@ -434,12 +402,6 @@ to 'auto, tags may not be properly aligned. "
       '(evil-goggles-undo-redo-add-face ((,class (:background ,green-bg-s :foreground ,green))))
       '(evil-goggles-undo-redo-change-face ((,class (:background ,blue-bg-s :foreground ,blue))))
       '(evil-goggles-undo-redo-remove-face ((,class (:background ,red-bg-s :foreground ,red))))
-
-;;;;; evil-mc
-      '(evil-mc-cursor-bar-face ((,class (:foreground ,aqua))))
-      '(evil-mc-cursor-default-face ((,class (:background ,aqua :foreground ,bg4))))
-      '(evil-mc-cursor-hbar-face ((,class (:foreground ,aqua))))
-      '(evil-mc-region-face ((,class (:inherit highlight))))
 
 ;;;;; flycheck
      '(flycheck-error
@@ -748,12 +710,6 @@ to 'auto, tags may not be properly aligned. "
      '(outline-6 ((,class (:inherit org-level-6))))
      '(outline-7 ((,class (:inherit org-level-7))))
      '(outline-8 ((,class (:inherit org-level-8))))
-
-;;;;; parinfer
-     '(parinfer-pretty-parens:dim-paren-face ((,class (:foreground ,base-dim))))
-
-;;;;; parinfer-rust-mode
-     '(parinfer-rust-dim-parens ((,class (:foreground ,base-dim))))
 
 ;;;;; perspective
      '(persp-selected-face ((,class (:inherit bold :foreground ,func))))

@@ -47,7 +47,8 @@
   ; :diminish ivy-mode
   :init
   (setq ivy-use-virtual-buffers t
-        ivy-use-selectable-prompt t)
+        ivy-use-selectable-prompt t
+        ivy-do-completion-in-region nil)
   :config
   (ivy-mode))
 
