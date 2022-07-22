@@ -50,6 +50,8 @@
       erc-insert-timestamp-function 'erc-insert-timestamp-left
       erc-timestamp-format "%H%M ")
 
+(setq subed-mpv-socket-dir (expand-file-name "~/.emacs.d/subed"))
+
 ;; Newsticker
 (setq newsticker-url-list
       '(("xkcd" "https://xkcd.com/rss.xml")
@@ -57,13 +59,12 @@
         ("ACG" "http://www.acgpiping.net/feed/")))
 
 ;; elpa
-(setq package-archives
-      '(("gnu" . "https://elpa.gnu.org/packages/")
-	("melpa" . "https://melpa.org/packages/")))
+(add-to-list 'package-archives
+             '("melpa" . "https://melpa.org/packages/"))
 
 (if (not (boundp 'dumped-load-path))
     (load (concat user-emacs-directory "pkgs"))
   (setq load-path dumped-load-path)
   (global-font-lock-mode t)
   (transient-mark-mode t)
-  (corfu-global-mode t))
+  (global-corfu-mode t))

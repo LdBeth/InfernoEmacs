@@ -82,13 +82,19 @@
   "From\\|Resent-From"
   "List of headers to search for senders."
   :group 'lsdb
-  :type 'list)
+  :type 'string)
 
 (defcustom lsdb-recipients-headers
   "Resent-To\\|Resent-Cc\\|Reply-To\\|To\\|Cc\\|Bcc"
   "List of headers to search for recipients."
   :group 'lsdb
-  :type 'list)
+  :type 'string)
+
+(defcustom lsdb-interesting-predicate-regexp
+  "^List-Id:[ \t]"
+  "If set, only emails with matching header would be recorded."
+  :group 'lsdb
+  :type 'string)
 
 (defcustom lsdb-interesting-header-alist
   `(("Organization" nil organization)
@@ -143,7 +149,7 @@ via\" feature from mailing lists."
   :group 'lsdb
   :type 'string)
 
-(defcustom lsdb-boring-names-list '()
+(defcustom lsdb-boring-names nil
   "List of senders that are not worth to save record."
   :group 'lsdb
   :type 'list)
@@ -549,19 +555,23 @@ Overrides `temp-buffer-show-function'.")
 
 (defun lsdb-update-records ()
   (lsdb-maybe-load-hash-tables)
-  (let ((test t) senders recipients interesting records)
+  (let ((save t) senders recipients interesting records)
     (save-restriction
       (std11-narrow-to-header)
       (setq senders (lsdb-fetch-fields lsdb-sender-headers))
-      (let ((names lsdb-boring-names-list)
-            (field (mapconcat (lambda (field)
-                                 (std11-unfold-string (cdr field)))
-                              senders " ")))
-        (while (and names test)
-          (setq test (not (string-match (car names)
-                                        field))
-                names (cdr names))))
-      (when test
+      (when lsdb-boring-names-list
+        (setq save (not (string-match lsdb-boring-names-list
+                                      (mapconcat (lambda (field)
+                                                   (std11-unfold-string (cdr field)))
+                                                 senders " ")))))
+      (when lsdb-interesting-predicate-regexp
+        (save-excursion
+          (goto-char (point-min))
+          (let ((case-fold-search t))
+            (unless (re-search-forward lsdb-interesting-predicate-regexp
+                                       nil t)
+              (setq save nil)))))
+      (when save 
         (setq recipients (lsdb-fetch-fields lsdb-recipients-headers))
         (dolist (header lsdb-interesting-header-alist)
           (let ((bodies
@@ -585,7 +595,7 @@ Overrides `temp-buffer-show-function'.")
                                 (car bodies)
                               bodies))
                       interesting)))))))
-    (when test
+    (when save
       (setq senders
             (delq nil (mapcar #'lsdb-decode-address-field
                               senders))

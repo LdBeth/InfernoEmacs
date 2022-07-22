@@ -35,9 +35,25 @@ else
   set display to \"Music.app is not running\"
 end if")))
          (nowplay (read (mac-osa-script script t nil))))
-    (if (called-interactively-p 'interactive)
-        (message nowplay)
-      nowplay)))
+    (when (called-interactively-p 'interactive)
+        (message "%s" nowplay))
+    nowplay))
+
+(defun now-browsing ()
+  (interactive)
+  (let* ((script (eval-when-compile
+                   (mac-osa-compile "if application \"Safari\" is running then
+  tell application \"Safari\"
+    set display to URL of front document
+  end tell
+else
+  set display to \"No opened document.\"
+end if")))
+         (url (read (mac-osa-script script t nil))))
+    (when (called-interactively-p 'interactive)
+      (kill-new url)
+      (message "%s" url))
+    url))
 
 (bind-keys
  :prefix "M-m"
@@ -52,6 +68,8 @@ end if")))
 (unbind-key "C-h C-h" global-map)
 (unbind-key "C-h ?" global-map)
 
+(define-key key-translation-map (kbd "￥") (kbd "\\"))
+
 (add-to-list 'auto-mode-alist '("\\.spad" . prog-mode) t)
 
 ;; fixed in latest emacs
@@ -59,3 +77,25 @@ end if")))
             :override #'newsticker--cache-read-version1)
 
 (add-hook 'minibuffer-setup-hook 'corfu-mode)
+
+(defun enable-hol ()
+  (interactive)
+  (load "/usr/local/etc/HOL/tools/hol-input")
+  (load "/usr/local/etc/HOL/tools/holscript-mode")
+  (load "/usr/local/etc/HOL/tools/hol-mode")
+  (load "/usr/local/etc/HOL/tools/hol-unicode")
+  (use-package holscript-mode
+    :custom-face
+    (hol-free-variable
+     ((t (:inherit font-lock-variable-name-face))))
+    (hol-bound-variable
+     ((t (:inherit font-lock-constant-face))))
+    (holscript-theorem-syntax
+     ((t (:inherit font-lock-keyword-face))))
+    (holscript-thmname-syntax
+     ((t (:inherit font-lock-function-name-face))))
+    (holscript-definition-syntax
+     ((t (:inherit font-lock-type-face))))
+    (holscript-quoted-material
+     ((t (:inherit font-lock-string-face))))))
+    

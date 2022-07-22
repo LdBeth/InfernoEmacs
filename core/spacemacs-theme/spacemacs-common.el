@@ -187,7 +187,6 @@ to 'auto, tags may not be properly aligned. "
      '(font-lock-keyword-face ((,class (:inherit bold :foreground ,keyword :slant ,(if spacemacs-theme-keyword-italic 'italic 'normal)))))
      '(font-lock-negation-char-face ((,class (:foreground ,const))))
      '(font-lock-preprocessor-face ((,class (:foreground ,func))))
-     '(font-lock-reference-face ((,class (:foreground ,const))))
      '(font-lock-string-face ((,class (:foreground ,str))))
      '(font-lock-type-face ((,class (:foreground ,type :inherit bold))))
      '(font-lock-variable-name-face ((,class (:foreground ,var))))
@@ -606,34 +605,6 @@ to 'auto, tags may not be properly aligned. "
      '(mode-line           ((,class (:foreground ,base :background ,act1 :box (:color ,border :line-width 1)))))
      '(mode-line-buffer-id ((,class (:inherit bold :foreground ,func))))
      '(mode-line-inactive  ((,class (:foreground ,base :background ,bg1  :box (:color ,border :line-width 1)))))
-
-;;;;; mu4e
-     '(mu4e-attach-number-face ((,class (:foreground ,var))))
-     '(mu4e-cited-1-face ((,class (:foreground ,head1))))
-     '(mu4e-cited-2-face ((,class (:foreground ,head2))))
-     '(mu4e-cited-3-face ((,class (:foreground ,head3))))
-     '(mu4e-cited-4-face ((,class (:foreground ,head4))))
-     '(mu4e-cited-5-face ((,class (:foreground ,head1))))
-     '(mu4e-cited-6-face ((,class (:foreground ,head2))))
-     '(mu4e-cited-7-face ((,class (:foreground ,head3))))
-     '(mu4e-contact-face ((,class (:foreground ,func))))
-     '(mu4e-draft-face ((,class (:foreground ,var))))
-     '(mu4e-flagged-face ((,class (:foreground ,yellow :inherit bold))))
-     '(mu4e-header-key-face ((,class (:foreground ,meta :inherit bold))))
-     '(mu4e-header-title-face ((,class (:foreground ,keyword :inherit bold))))
-     '(mu4e-header-marks-face ((,class (:foreground ,comp))))
-     '(mu4e-header-value-face ((,class (:foreground ,keyword :inherit bold))))
-     '(mu4e-header-highlight-face ((,class (:background ,highlight))))
-     '(mu4e-highlight-face ((,class (:foreground ,comp))))
-     '(mu4e-title-face ((,class (:foreground ,head2 :inherit bold))))
-     '(mu4e-replied-face ((,class (:foreground ,green))))
-     '(mu4e-modeline-face ((,class (:foreground ,yellow))))
-     '(mu4e-special-header-value-face ((,class (:foreground ,green))))
-     '(mu4e-unread-face ((,class (:foreground ,head1 :inherit bold))))
-     '(mu4e-view-url-number-face ((,class (:foreground ,comp))))
-
-;;;;; mu4e-maildirs
-     '(mu4e-maildirs-extension-maildir-hl-face ((,class (:foreground ,head1 :inherit bold))))
 
 ;;;;; notmuch
      '(notmuch-search-date ((,class (:foreground ,func))))

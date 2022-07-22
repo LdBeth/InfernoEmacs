@@ -372,7 +372,8 @@ isnert the resulting horoscope into the current buffer."
                    listname)))
     (concat (horoscope-iterate-list
              (horoscope-random-member
-              (symbol-value (intern (concat prefix suffix)))) prefix)
+              (symbol-value (intern (concat prefix suffix))))
+             prefix)
             (cond (period-p
                    (concat (char-to-string lastchar) " "))
                   (punct-char-p

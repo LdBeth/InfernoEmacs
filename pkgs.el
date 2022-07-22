@@ -141,7 +141,11 @@
 (use-package dyalog-mode
   :defer t
   :init
-  (add-to-list 'auto-mode-alist '("\\.apl[afno]" . dyalog-mode)))
+  (setq dyalog-fix-whitespace-before-save t)
+  :custom-face
+  (dyalog-apl-char ((t (:inherit font-lock-builtin-face))))
+  :mode
+  (("\\.apl[afno]" . dyalog-mode)))
 
 ;; Net
 (use-package aria2
