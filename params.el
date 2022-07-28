@@ -66,5 +66,4 @@
     (load (concat user-emacs-directory "pkgs"))
   (setq load-path dumped-load-path)
   (global-font-lock-mode t)
-  (transient-mark-mode t)
-  (global-corfu-mode t))
+  (transient-mark-mode t))

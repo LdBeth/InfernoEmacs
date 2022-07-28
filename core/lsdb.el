@@ -371,7 +371,7 @@ Overrides `temp-buffer-show-function'.")
                  (if (symbolp lsdb-file-coding-system)
                      (symbol-name lsdb-file-coding-system))))
             (if coding-system-name
-                (insert ";;; -*- mode: emacs-lisp; coding: "
+                (insert ";;; -*- mode: lisp-data; coding: "
                         coding-system-name " -*-\n"))))
       (lsdb-insert-hash-table lsdb-hash-table)
       ;; Save entry names.
