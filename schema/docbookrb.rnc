@@ -1,0 +1,15 @@
+# DocBook 5 with ruby tag
+namespace db = "http://docbook.org/ns/docbook"
+namespace h = "http://www.w3.org/1999/xhtml"
+default namespace = "http://docbook.org/ns/docbook"
+    
+include "docbook5.rnc" {
+       db.extension.inlines = h.ruby
+}
+
+h.ruby = element h:ruby {
+    db._any.attribute*,
+    (text, (h.ruby.rt | (h.ruby.rp, h.ruby.rt, h.ruby.rp))?)+
+}
+h.ruby.rp = element h:rp { (db._any.attribute | text)* }
+h.ruby.rt = element h:rt { (db._any.attribute | text)* }

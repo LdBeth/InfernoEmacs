@@ -20,23 +20,11 @@ if prefix argument ARG is given, switch to it in an other, possibly new window."
 
 (defun now-playing ()
   (interactive)
-  (let* ((script (eval-when-compile
-                   (mac-osa-compile "if application \"Music\" is running then
-  tell application \"Music\"
-    if player state is stopped then
-      set display to \"No Track Playing\"
-    else
-      set track_artist to artist of current track
-      set track_name to name of current track
-      set display to track_artist & \" - \" & track_name
-    end if
-  end tell
-else
-  set display to \"Music.app is not running\"
-end if")))
-         (nowplay (read (mac-osa-script script t nil))))
+  (let ((nowplay (read (mac-osa-script
+                        (expand-file-name "core/nowplay.scpt" user-emacs-directory)
+                        "AppleScript" t))))
     (when (called-interactively-p 'interactive)
-        (message "%s" nowplay))
+      (message "%s" nowplay))
     nowplay))
 
 (defun now-browsing ()
