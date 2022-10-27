@@ -25,6 +25,7 @@ along with GNU Emacs.  If not, see <https://www.gnu.org/licenses/>. -->
 
   <namespace ns="http://www.w3.org/1999/XSL/Transform" typeId="XSLT"/>
   <namespace ns="http://docbook.org/ns/docbook" typeId="DocBook"/>
+  <namespace ns="http://www.w3.org/1998/Math/MathML" typeId="MathML"/>
 
   <documentElement localName="stylesheet" typeId="XSLT"/>
   <documentElement prefix="xsl" localName="transform" typeId="XSLT"/>
@@ -39,6 +40,6 @@ along with GNU Emacs.  If not, see <https://www.gnu.org/licenses/>. -->
 
   <typeId id="XSLT" uri="xslt.rnc"/>
   <typeId id="DocBook" uri="docbookrb.rnc"/>
-  <typeId id="RDF" uri="rdfxml.rnc"/>
+  <typeId id="MathML" uri="mathml3.rnc"/>
 
 </locatingRules>

@@ -147,6 +147,14 @@
   :mode
   (("\\.apl[afno]" . dyalog-mode)))
 
+;; nXML
+(use-package nxml-mode
+  :defer t
+  :config
+  (add-to-list 'rng-schema-locating-files
+               (expand-file-name "~/.emacs.d/schema/schemas.xml")))
+
+
 ;; Net
 (use-package aria2
   :defer t)

@@ -44,10 +44,6 @@
 
 (setq recentf-exclude '("mime-example$" ".emacs.d/\\([a-z]\\|-\\)*$"))
 
-;; nXML
-(add-to-list 'rng-schema-locating-files
-             (expand-file-name "~/.emacs.d/schema/schemas.xml")
-
 ;; ERC
 (setq erc-server "irc.libera.chat"
       erc-nick "ldb"
