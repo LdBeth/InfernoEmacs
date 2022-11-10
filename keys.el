@@ -60,9 +60,16 @@ end if")))
 
 (add-to-list 'auto-mode-alist '("\\.spad" . prog-mode) t)
 
-;; fixed in latest emacs
+;; fixed in emacs 29
 (advice-add 'newsticker--cache-read
             :override #'newsticker--cache-read-version1)
+
+;; ksh
+(setq window-adjust-process-window-size-function
+      (lambda (proc win)
+        (if (string-match "shell" (process-name proc))
+            nil
+          (window-adjust-process-window-size-smallest proc win))))
 
 (add-hook 'minibuffer-setup-hook 'corfu-mode)
 

@@ -56,6 +56,8 @@
         ("williamlong" "http://feed.williamlong.info/")
         ("ACG" "http://www.acgpiping.net/feed/")))
 
+(setq corfu-auto t)
+
 ;; elpa
 (add-to-list 'package-archives
              '("melpa" . "https://melpa.org/packages/"))
