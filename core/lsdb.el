@@ -559,8 +559,8 @@ Overrides `temp-buffer-show-function'.")
     (save-restriction
       (std11-narrow-to-header)
       (setq senders (lsdb-fetch-fields lsdb-sender-headers))
-      (when lsdb-boring-names-list
-        (setq save (not (string-match lsdb-boring-names-list
+      (when lsdb-boring-names
+        (setq save (not (string-match lsdb-boring-names
                                       (mapconcat (lambda (field)
                                                    (std11-unfold-string (cdr field)))
                                                  senders " ")))))
@@ -1304,7 +1304,8 @@ performed against the entry field."
       (let ((records (lsdb-lookup-records
                       (if (get-text-property 0 'entry regexp)
                           (concat "^" (regexp-quote regexp) "$")
-                        regexp) entry-name)))
+                        regexp)
+                      entry-name)))
         (if records
             (lsdb-display-records records))))))
 

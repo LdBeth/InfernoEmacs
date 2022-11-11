@@ -129,9 +129,6 @@
         '((light :ascent 80 :foreground "#655370")
           (dark :ascent 80 :foreground "#292b2e" :background "#b2b2b2"))))
 
-(use-package lsdb
-  :defer t)
-
 ;; Programming
 (use-package sly
   :defer t
@@ -154,11 +151,29 @@
   (add-to-list 'rng-schema-locating-files
                (expand-file-name "~/.emacs.d/schema/schemas.xml")))
 
+;; TeX
+(use-package tex-mode
+  :defer t
+  :config
+  (setq tex-compile-commands
+        `(,@(mapcar (lambda (prefix)
+                      `((concat ,prefix tex-command
+                                " " tex-start-options
+                                " " (if (< 0 (length tex-start-commands))
+                                        (shell-quote-argument tex-start-commands))
+                                " %f")
+                        t "%r.pdf"))
+                    '("pdf" "ams" "lua"))
+    ((concat tex-command
+	     " " (if (< 0 (length tex-start-commands))
+		     (shell-quote-argument tex-start-commands))
+             " %f")
+     t "%r.dvi")
+    ("open %r.pdf" "%r.pdf")
+    ("bibtex %r" "%r.aux" "%r.bbl")
+    ("dvipdfmx %r" "%r.dvi" "%r.pdf"))))
 
 ;; Net
-(use-package aria2
-  :defer t)
-
 (use-package newst-plainview
   :defer t
   :init
