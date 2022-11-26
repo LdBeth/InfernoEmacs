@@ -9,15 +9,25 @@
           (decoded-time-hour time) 0)
     (time-to-days (encode-time time))))
 
-(let ((database (split-string
-                 (with-temp-buffer
-                   (call-process-region
-                    "" 0 "notmuch" nil t nil "address"
-                    "--output=address"
-                    "--output=recipients" "--output=sender"
-                    "--deduplicate=address"
-                    "*")
-                   (buffer-string))))
+(defun database-notmuch ()
+  (split-string
+   (with-temp-buffer
+     (call-process-region
+      "" 0 "notmuch" nil t nil "address"
+      "--output=address"
+      "--output=recipients" "--output=sender"
+      "--deduplicate=address"
+      "*")
+     (buffer-string))))
+
+(defun database-mu ()
+  (split-string
+   (with-temp-buffer
+     (call-process-region
+      "" 0 "mu" nil t nil "cfind")
+     (buffer-string))))
+
+(let ((database (database-mu))
       pending
       (current-day (time-to-days (current-time))))
   (maphash

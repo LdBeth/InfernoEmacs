@@ -56,8 +56,11 @@
         ("williamlong" "http://feed.williamlong.info/")
         ("ACG" "http://www.acgpiping.net/feed/")))
 
-(setq corfu-auto t)
-
+(setq corfu-auto t
+      completion-styles '(flex partial-completion))
+;; lisp
+(setq inferior-lisp-program "ccl"
+      common-lisp-hyperspec-root "file:///usr/local/share/doc/HyperSpec/")
 ;; elpa
 (add-to-list 'package-archives
              '("melpa" . "https://melpa.org/packages/"))

@@ -43,6 +43,10 @@ end if")))
       (message "%s" url))
     url))
 
+(defun gopher-club ()
+  (interactive)
+  (elpher-go "gopher://gopher.club/1/phlogs/"))
+
 (bind-keys
  :prefix "M-m"
  :prefix-map launchpad-key-map
@@ -51,7 +55,8 @@ end if")))
  ("i" . ibuffer)
  ("w" . wl)
  ("f" . make-frame)
- ("n" . newsticker-show-news))
+ ("n" . newsticker-show-news)
+ ("g" . gopher-club))
 
 (unbind-key "C-h C-h" global-map)
 (unbind-key "C-h ?" global-map)

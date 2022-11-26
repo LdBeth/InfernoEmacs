@@ -130,11 +130,6 @@
           (dark :ascent 80 :foreground "#292b2e" :background "#b2b2b2"))))
 
 ;; Programming
-(use-package sly
-  :defer t
-  :init
-  (setq inferior-lisp-program "ccl"))
-
 (use-package dyalog-mode
   :defer t
   :init
