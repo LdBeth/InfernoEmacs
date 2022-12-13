@@ -130,6 +130,16 @@
           (dark :ascent 80 :foreground "#292b2e" :background "#b2b2b2"))))
 
 ;; Programming
+(use-package lsp-mode
+  :custom
+  (lsp-completion-provider :none) ;; we use Corfu!
+  :init
+  (defun my/lsp-mode-setup-completion ()
+    (setf (alist-get 'styles (alist-get 'lsp-capf completion-category-defaults))
+          '(flex))) ;; Configure flex
+  :hook
+  (lsp-completion-mode . my/lsp-mode-setup-completion))
+
 (use-package dyalog-mode
   :defer t
   :init

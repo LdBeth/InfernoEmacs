@@ -280,13 +280,10 @@ by pressing its number key."
     (insert list-display-name)
     (mapc (lambda (el)
             (insert "\n    ")
-            (let* ((button-text-prefix
-                    (format "%2s" (number-to-string
-                                   spacemacs-buffer--startup-list-nr)))
-                   (button-text
-                    (concat
-                     (concat button-text-prefix " ")
-                     (abbreviate-file-name el))))
+            (let ((button-text
+                   (format "%2s %s" (number-to-string
+                                     spacemacs-buffer--startup-list-nr)
+                           (abbreviate-file-name el))))
               (widget-create 'push-button
                              :action (lambda (&rest _)
                                        (find-file-existing el))
@@ -308,13 +305,10 @@ GROUPED-LIST: a list of string pathnames made interactive in this function."
     (insert list-display-name)
     (mapc (lambda (group)
             (insert "\n    ")
-            (let* ((button-text-prefix
-                    (format "%2s" (number-to-string
-                                   spacemacs-buffer--startup-list-nr)))
-                   (button-text-project
-                    (concat
-                     (concat button-text-prefix " ")
-                     (abbreviate-file-name (car group)))))
+            (let ((button-text-project
+                   (format "%2s %s" (number-to-string
+                                   spacemacs-buffer--startup-list-nr)
+                           (abbreviate-file-name (car group)))))
               (widget-create 'push-button
                              :action (let ((f (car group)))
                                        (lambda (&rest _)
@@ -327,13 +321,10 @@ GROUPED-LIST: a list of string pathnames made interactive in this function."
               (setq spacemacs-buffer--startup-list-nr
                     (1+ spacemacs-buffer--startup-list-nr))
               (mapc (lambda (el)
-                      (let* ((button-text-prefix
-                              (format "%2s" (number-to-string
-                                             spacemacs-buffer--startup-list-nr)))
-                             (button-text-filename
-                              (concat
-                               (concat button-text-prefix " ")
-                               (abbreviate-file-name el))))
+                      (let ((button-text-filename
+                             (format "%2s %s" (number-to-string
+                                               spacemacs-buffer--startup-list-nr)
+                                     (abbreviate-file-name el))))
                         (insert "\n        ")
                         (widget-create 'push-button
                                        :action (let ((f (concat (car group) el)))

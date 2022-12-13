@@ -2,5 +2,16 @@
 *-autoloads.el
 *~
 *.css
+.lsp-session*
 elpa/
 .DS_Store
+/aria2*
+eshell/
+games/
+newsticker/
+recentf
+bookmarks
+smex-items
+tramp
+url/
+local/

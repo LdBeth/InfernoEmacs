@@ -57,6 +57,12 @@ end if")))
  ("f" . make-frame)
  ("n" . newsticker-show-news)
  ("g" . gopher-club))
+(bind-keys
+ :prefix "M-m p"
+ :prefix-map prover-loader-map
+ ("h" . enable-hol)
+ ("l" . enable-lean4)
+ ("a" . enable-acl2))
 
 (unbind-key "C-h C-h" global-map)
 (unbind-key "C-h ?" global-map)
@@ -99,3 +105,13 @@ end if")))
     (holscript-quoted-material
      ((t (:inherit font-lock-string-face))))))
     
+(defun enable-lean4 ()
+  (interactive)
+  (add-to-list 'exec-path "/usr/local/etc/lean/bin")
+  (add-to-list 'load-path "/Users/ldbeth/.emacs.d/local/lean4-mode")
+  (require 'lean4-mode))
+
+(defun enable-acl2 ()
+  (interactive)
+  (add-to-list 'load-path "/usr/local/etc/acl2-8.5/books/interface/emacs")
+  (require 'acl2-interface))
