@@ -84,6 +84,12 @@ end if")))
 
 (add-hook 'minibuffer-setup-hook 'corfu-mode)
 
+
+(defun insert-current-time ()
+  (interactive)
+  (let ((time-stamp-format "%3a, %02d %3b %Y %02H:%02M:%02S %Z"))
+    (insert (time-stamp-string))))
+
 (defun enable-hol ()
   (interactive)
   (load "/usr/local/etc/HOL/tools/hol-input")

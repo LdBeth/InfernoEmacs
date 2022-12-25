@@ -1,0 +1,121 @@
+default namespace rss = "http://purl.org/rss/1.0/"
+
+start = rss.element
+rss.element =
+    element rss {
+        (attribute version { "2.0" } &
+         extension.atts),
+        channel.element
+    }
+
+extension.atts = attribute * { text }*
+
+channel.element =
+    element channel {
+        title.element &
+        link.element &
+        description.element &
+        language.element? &
+        copyright.element? &
+        managing-editor.element? &
+        pubdate.element? &
+        category.element? &
+        last-build-date.element? &
+        docs.element? &
+        cloud.element? &
+        ttl.element? &
+        image.element? &
+        rating.element? &
+        textInput.element? &
+        skipHours.element? &
+        skipDays.element? &
+        item.element*
+    }
+
+email.string = xsd:string { minLength = "6" maxLength = "127" }
+rfc822.date =
+    xsd:string { pattern =
+  "(((Mon)|(Tue)|(Wed)|(Thu)|(Fri)|(Sat)|(Sun)), )?\d{1,2} ((Jan)|(Feb)|(Mar)|(Apr)|(May)|(Jun)|(Jul)|(Aug)|(Sep)|(Oct)|(Nov)|(Dec)) \d{4} \d{2}:\d{2}(:\d{2})? ((UT)|(GMT)|(EST)|(EDT)|(CST)|(CDT)|(MST)|(MDT)|(PST)|(PDT)|([\+\-]\d{4}))"
+}
+
+title.element = element title { text }
+link.element = element link { xsd:anyURI }
+description.element = element description { text }
+language.element = element language { xsd:language }
+copyright.element = element copyright { text }
+managing-editor.element = element managingEditor { email.string }
+pubdate.element = element pubDate { rfc822.date }
+last-build-date.element = element lastBuildDate { rfc822.date }
+category.element =
+    element category {
+        attribute domain { xsd:anyURI }?,
+        xsd:token
+    }
+generator.element = element generator { text }
+docs.element = element docs { xsd:anyURI }
+cloud.element =
+    element cloud {
+        attribute domain { text } &
+        attribute port { xsd:unsignedShort } &
+        attribute path { text } &
+        attribute registerProcedure { text } &
+        attribute protocol { "xml-rpc" | "soap" | "http-post" }
+    }
+ttl.element = element ttl { xsd:unsignedInt }
+image.element =
+    element image {
+        element url { xsd:anyURI } &
+        title.element &
+        link.element &
+        element width { xsd:unsignedInt { maxInclusive = "144" } }? &
+        element height { xsd:unsignedInt { maxInclusive = "400" } }?
+    }
+rating.element = element rating { text }
+textInput.element =
+    element textInput {
+        title.element &
+        description.element &
+        element name { text } &
+        link.element
+        }
+skipHours.element =
+    element skipHours {
+        xsd:integer { maxInclusive = "24" minInclusive = "0" }
+    }
+skipDays.element =
+    element skipDays {
+        "Monday" | "Tuesday" | "Wednesday" |
+        "Thursday" | "Friday" | "Saturday" | "Sunday"
+    }
+
+item.element =
+    element item {
+        (title.element | description.element)+ &
+        link.element? &
+        author.element? &
+        category.element? &
+        comments.element? &
+        enclosure.element? &
+        guid.element? &
+        pubdate.element? &
+        source.element?
+    }
+
+author.element = element author { email.string }
+comments.element = element comments { xsd:anyURI }
+enclosure.element =
+    element enclosure {
+        attribute url { xsd:anyURI } &
+        attribute length { xsd:unsignedInt } &
+        attribute type { xsd:string { pattern = "\w+/[\+\-\.\w]+" } }
+    }
+guid.element =
+    element guid {
+        attribute isPermaLink { "true" | "false" }?,
+        text
+    }
+source.element =
+    element source {
+        attribute url { xsd:anyURI },
+        text
+    }

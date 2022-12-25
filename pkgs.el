@@ -118,9 +118,10 @@
   :defer t
   :init
   (setq mu-cite-prefix-format '(lsdb-prefix-register "> "))
-  (add-hook 'mail-citation-hook 'mu-cite-original)
   :config
-  (lsdb-mu-insinuate))
+  (lsdb-mu-insinuate)
+  :hook
+  (mail-citation . mu-cite-original))
 
 (use-package x-face-e21
   :defer t
@@ -131,14 +132,13 @@
 
 ;; Programming
 (use-package lsp-mode
-  :custom
-  (lsp-completion-provider :none) ;; we use Corfu!
+  :defer t
   :init
+  (setq lsp-completion-provider :none) ;; we use Corfu!
   (defun my/lsp-mode-setup-completion ()
     (setf (alist-get 'styles (alist-get 'lsp-capf completion-category-defaults))
           '(flex))) ;; Configure flex
-  :hook
-  (lsp-completion-mode . my/lsp-mode-setup-completion))
+  (add-hook 'lsp-completion-mode-hook #'my/lsp-mode-setup-completion))
 
 (use-package dyalog-mode
   :defer t

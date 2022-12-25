@@ -53,8 +53,10 @@
 ;; Newsticker
 (setq newsticker-url-list
       '(("xkcd" "https://xkcd.com/rss.xml")
-        ("williamlong" "http://feed.williamlong.info/")
-        ("ACG" "http://www.acgpiping.net/feed/")))
+        ("williamlong" "http://feed.williamlong.info/rss.xml")
+        ("ldbeth" "https://ldbeth.sdf.org/rss.xml")
+        ;;("ACG" "http://www.acgpiping.net/feed/")
+        ))
 
 (setq corfu-auto t
       completion-styles '(flex partial-completion))
