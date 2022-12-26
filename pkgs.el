@@ -135,10 +135,10 @@
   :defer t
   :init
   (setq lsp-completion-provider :none) ;; we use Corfu!
-  (defun my/lsp-mode-setup-completion ()
+  (defun lsp-mode-setup-completion ()
     (setf (alist-get 'styles (alist-get 'lsp-capf completion-category-defaults))
           '(flex))) ;; Configure flex
-  (add-hook 'lsp-completion-mode-hook #'my/lsp-mode-setup-completion))
+  (add-hook 'lsp-completion-mode-hook #'lsp-mode-setup-completion))
 
 (use-package dyalog-mode
   :defer t
@@ -153,8 +153,26 @@
 (use-package nxml-mode
   :defer t
   :config
+  (setq nxml-section-element-name-regexp
+        "article\\|sect\\([1-5]\\|ion\\)\\|chapter\\|appendix\\|part\\|preface\\|reference\\|simplesect\\|bibliography\\|bibliodiv\\|glossary\\|glossdiv")
   (add-to-list 'rng-schema-locating-files
-               (expand-file-name "~/.emacs.d/schema/schemas.xml")))
+               (expand-file-name "~/.emacs.d/schema/schemas.xml"))
+  (eval-and-compile (require 'time-stamp))
+  (defun nxml-insert-current-time ()
+    (interactive)
+    (if rng-current-schema-file-name
+        (let ((time-stamp-format
+               (cond ((string-match-p "rss" rng-current-schema-file-name)
+                      "%3a, %02d %3b %Y %02H:%02M:%02S %Z")
+                     ((string-match-p "atom" rng-current-schema-file-name)
+                      ;; fixme hard coded timezone
+                      "%Y-%02m-%02dT%02H:%02M:%02S-06:00")
+                     (t time-stamp-format))))
+          (save-excursion
+            (let ((end (nxml-token-after)))
+              (goto-char xmltok-start)
+              (delete-char (- end xmltok-start))
+              (insert (time-stamp-string))))))))
 
 ;; TeX
 (use-package tex-mode
