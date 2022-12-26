@@ -75,6 +75,84 @@ end if")))
 (advice-add 'newsticker--cache-read
             :override #'newsticker--cache-read-version1)
 
+;; Will fix in emacs 30
+(defun newsticker--decode-rfc822-date-revision (rfc822-string)
+  (if (and rfc822-string (stringp rfc822-string))
+      (when (string-match
+             (concat
+              "\\s-*"
+              ;; week day
+              "\\(\\(Mon\\|Tue\\|Wed\\|Thu\\|Fri\\|Sat\\|Sun\\)\\s-*,?\\)?\\s-*"
+              ;; day
+              "\\([0-9]\\{1,2\\}\\)\\s-+"
+              ;; month
+              "\\(Jan\\|Feb\\|Mar\\|Apr\\|May\\|Jun\\|"
+              "Jul\\|Aug\\|Sep\\|Oct\\|Nov\\|Dec\\).*?\\s-+"
+              ;; year
+              "\\([0-9]\\{2,4\\}\\)"
+              ;; time may be missing
+              "\\(\\s-+"
+              ;; hour
+              "\\([0-9]\\{2\\}\\)"
+              ;; minute
+              ":\\([0-9]\\{2\\}\\)"
+              ;; second
+              "\\(:\\([0-9]\\{2\\}\\)\\)?"
+              ;; zone
+              "\\(\\s-+\\("
+              "UT\\|GMT\\|EST\\|EDT\\|CST\\|CDT\\|MST\\|MDT\\|PST\\|PDT"
+              "\\|\\([-+]\\)\\([0-9]\\{2\\}\\)\\([0-9]\\{2\\}\\)"
+              "\\)\\)?"
+              "\\)?")
+             rfc822-string)
+        (let ((day (read (match-string 3 rfc822-string)))
+              (month-name (match-string 4 rfc822-string))
+              (month 0)
+              (year (read (match-string 5 rfc822-string)))
+              (hour (read (or (match-string 7 rfc822-string) "0")))
+              (minute (read (or (match-string 8 rfc822-string) "0")))
+              (second (read (or (match-string 10 rfc822-string) "0")))
+              (zone (match-string 12 rfc822-string))
+              (sign (match-string 13 rfc822-string))
+              (offset-hour (read (or (match-string 14 rfc822-string)
+                                     "0")))
+              (offset-minute (read (or (match-string 15 rfc822-string)
+                                       "0"))))
+          (when zone
+            (cond ((string= sign "+")
+                   (setq hour (- hour offset-hour))
+                   (setq minute (- minute offset-minute)))
+                  ((string= sign "-")
+                   (setq hour (+ hour offset-hour))
+                   (setq minute (+ minute offset-minute)))
+                  ((or (string= zone "UT") (string= zone "GMT"))
+                   nil)
+                  ((string= zone "EDT")
+                   (setq hour (+ hour 4)))
+                  ((or (string= zone "EST") (string= zone "CDT"))
+                   (setq hour (+ hour 5)))
+                  ((or (string= zone "CST") (string= zone "MDT"))
+                   (setq hour (+ hour 6)))
+                  ((or (string= zone "MST") (string= zone "PDT"))
+                   (setq hour (+ hour 7)))
+                  ((string= zone "PST")
+                   (setq hour (+ hour 8)))))
+          (condition-case error-data
+              (let ((i 1))
+                (dolist (m '("Jan" "Feb" "Mar" "Apr" "May" "Jun" "Jul" "Aug"
+                             "Sep" "Oct" "Nov" "Dec"))
+                  (if (string= month-name m)
+                      (setq month i))
+                  (setq i (1+ i)))
+                (encode-time second minute hour day month year t))
+            (error
+             (message "Cannot decode \"%s\": %s %s" rfc822-string
+                      (car error-data) (cdr error-data))
+             nil))))
+    nil))
+(advice-add 'newsticker--decode-rfc822-date
+            :override #'newsticker--decode-rfc822-date-revision)
+
 ;; ksh
 (setq window-adjust-process-window-size-function
       (lambda (proc win)
@@ -89,6 +167,10 @@ end if")))
   (interactive)
   (let ((time-stamp-format "%3a, %02d %3b %Y %02H:%02M:%02S %Z"))
     (insert (time-stamp-string))))
+
+(eval-when-compile
+  (require 'use-package)
+  (setq use-package-expand-minimally t))
 
 (defun enable-hol ()
   (interactive)

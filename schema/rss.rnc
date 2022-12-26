@@ -1,4 +1,9 @@
-default namespace rss = "http://purl.org/rss/1.0/"
+# RSS 2.0
+# Copyright (c) LdBeth 2022.
+# Link to latest version of specification:
+# https://www.rssboard.org/rss-specification
+
+namespace atom = "http://www.w3.org/2005/Atom"
 
 start = rss.element
 rss.element =
@@ -9,15 +14,17 @@ rss.element =
     }
 
 extension.atts = attribute * { text }*
-
+extension.elements = element * { extension.atts, (text | extension.elements)* }*
 channel.element =
     element channel {
         title.element &
         link.element &
         description.element &
+        atom.link.element+ &
         language.element? &
         copyright.element? &
         managing-editor.element? &
+        webmaster.element? &
         pubdate.element? &
         category.element? &
         last-build-date.element? &
@@ -26,24 +33,44 @@ channel.element =
         ttl.element? &
         image.element? &
         rating.element? &
-        textInput.element? &
+        text-input.element? &
         skipHours.element? &
         skipDays.element? &
+        extension.elements &
         item.element*
     }
 
-email.string = xsd:string { minLength = "6" maxLength = "127" }
+email.string =
+    xsd:string { minLength = "6" maxLength = "127" pattern = "[^\s@]+@[^\s@]+\.[^\s@]{2,} \(([^\s]\s)*[^\s]+\)" }
 rfc822.date =
     xsd:string { pattern =
   "(((Mon)|(Tue)|(Wed)|(Thu)|(Fri)|(Sat)|(Sun)), )?\d{1,2} ((Jan)|(Feb)|(Mar)|(Apr)|(May)|(Jun)|(Jul)|(Aug)|(Sep)|(Oct)|(Nov)|(Dec)) \d{4} \d{2}:\d{2}(:\d{2})? ((UT)|(GMT)|(EST)|(EDT)|(CST)|(CDT)|(MST)|(MDT)|(PST)|(PDT)|([\+\-]\d{4}))"
 }
-
+domain.name = xsd:string { pattern = "(\w\.)+\w" }
+path.name = xsd:string { pattern = "/?(\w/?)+" }
+method.name = xsd:string { pattern = "([a-zA-Z]+\.)+[a-zA-Z]+" }
+mime.type = attribute type { xsd:string { pattern = "\w+/[\+\-\.\w]+" } }
 title.element = element title { text }
 link.element = element link { xsd:anyURI }
+atom.link.element =
+    element atom:link {
+        attribute href { xsd:anyURI } &
+        atom.link.rel? &
+        mime.type? &
+        attribute hreflang { xsd:language }? &
+        attribute title { text }? &
+        attribute length { xsd:byte }?
+    }
+atom.link.rel =
+    attribute rel {
+        "alternate" | "enclosure" | "related" | "self" | "via" |
+        xsd:anyURI
+    }
 description.element = element description { text }
 language.element = element language { xsd:language }
 copyright.element = element copyright { text }
 managing-editor.element = element managingEditor { email.string }
+webmaster.element = element webMaster { email.string }
 pubdate.element = element pubDate { rfc822.date }
 last-build-date.element = element lastBuildDate { rfc822.date }
 category.element =
@@ -55,10 +82,10 @@ generator.element = element generator { text }
 docs.element = element docs { xsd:anyURI }
 cloud.element =
     element cloud {
-        attribute domain { text } &
+        attribute domain { domain.name } &
         attribute port { xsd:unsignedShort } &
-        attribute path { text } &
-        attribute registerProcedure { text } &
+        attribute path { path.name } &
+        attribute registerProcedure { method.name } &
         attribute protocol { "xml-rpc" | "soap" | "http-post" }
     }
 ttl.element = element ttl { xsd:unsignedInt }
@@ -71,7 +98,7 @@ image.element =
         element height { xsd:unsignedInt { maxInclusive = "400" } }?
     }
 rating.element = element rating { text }
-textInput.element =
+text-input.element =
     element textInput {
         title.element &
         description.element &
@@ -93,12 +120,13 @@ item.element =
         (title.element | description.element)+ &
         link.element? &
         author.element? &
-        category.element? &
+        category.element* &
         comments.element? &
         enclosure.element? &
         guid.element? &
         pubdate.element? &
-        source.element?
+        source.element? &
+        extension.elements
     }
 
 author.element = element author { email.string }
@@ -107,7 +135,7 @@ enclosure.element =
     element enclosure {
         attribute url { xsd:anyURI } &
         attribute length { xsd:unsignedInt } &
-        attribute type { xsd:string { pattern = "\w+/[\+\-\.\w]+" } }
+        mime.type
     }
 guid.element =
     element guid {

@@ -26,7 +26,11 @@ along with GNU Emacs.  If not, see <https://www.gnu.org/licenses/>. -->
   <namespace ns="http://www.w3.org/1999/XSL/Transform" typeId="XSLT"/>
   <namespace ns="http://docbook.org/ns/docbook" typeId="DocBook"/>
   <namespace ns="http://www.w3.org/1998/Math/MathML" typeId="MathML"/>
-  <namespace ns="http://purl.org/rss/1.0/" typeId="RSS"/>
+  <namespace ns="http://www.w3.org/2005/Atom" typeId="Atom"/>
+
+  <documentElement localName="rss" typeId="RSS"/>
+  <documentElement localName="feed" typeId="Atom"/>
+  <documentElement prefix="atom" localName="entry" typeId="Atom"/>
 
   <documentElement localName="stylesheet" typeId="XSLT"/>
   <documentElement prefix="xsl" localName="transform" typeId="XSLT"/>
@@ -43,5 +47,6 @@ along with GNU Emacs.  If not, see <https://www.gnu.org/licenses/>. -->
   <typeId id="DocBook" uri="docbookrb.rnc"/>
   <typeId id="MathML" uri="mathml3.rnc"/>
   <typeId id="RSS" uri="rss.rnc"/>
+  <typeId id="Atom" uri="atom.rnc"/>
 
 </locatingRules>
