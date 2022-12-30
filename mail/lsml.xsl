@@ -26,7 +26,7 @@
     </head>
     <body>
       <xsl:if test="/*/lsml:head/lsml:preview">
-        <div style="$preview-style">
+        <div style="{$preview-style}">
         <xsl:value-of select="/*/lsml:head/lsml:preview"/></div>
       </xsl:if>
       <div>
@@ -85,13 +85,13 @@
 </xsl:template>
 
 <xsl:template match="lsml:quote" mode="body-text">
-  <blockquote style="$blockquote-style">
+  <blockquote style="{$blockquote-style}">
     <xsl:apply-templates mode="body-text"/>
   </blockquote>
 </xsl:template>
 
 <xsl:template match="lsml:quote[@from]" mode="body-text">
-  <blockquote style="$blockquote-style">
+  <blockquote style="{$blockquote-style}">
     <p class="attribution">
       <xsl:value-of select="string(@from)"/>
       <xsl:text> wrote:</xsl:text>
@@ -100,7 +100,7 @@
 </xsl:template>
 
 <xsl:template match="lsml:quote[@from and @date]" mode="body-text">
-  <blockquote style="$blockquote-style">
+  <blockquote style="{$blockquote-style}">
     <p class="attribution">
       <xsl:text>On </xsl:text>
       <xsl:value-of select="string(@date)"/>
