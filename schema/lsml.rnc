@@ -95,15 +95,14 @@ lsmlSecTitle =
 lsmlText = (lsmlInline | lsmlDiff | text)
 lsmlPara = element p { lsmlText* }
 
-lsmlInline = (lsmlBold | lsmlIt |
-              lsmlUl | lsmlVerb)
+lsmlInline = (lsmlBold | lsmlIt | lsmlVerb | lsmURL)
 lsmlDiff = (lsmlIns | lsmlDel)
 
 lsmlBold = element b { text }
 lsmlIt = element i { text }
-lsmlUl = element u { text }
 lsmlVerb = element tt { text }
 lsmlIns = element ins { (lsmlInline | text)+ }
 lsmlDel = element del { (lsmlInline | text)+ }
+lsmURL = element url { xsd:URi }
 
-lsmlSignature = element sig { lsmlText* }
+lsmlSignature = element sig { lsmlPara* }

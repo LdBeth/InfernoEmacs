@@ -24,7 +24,7 @@
 
 (set-face-attribute 'variable-pitch
                     nil
-                    :font "IBM Plex Sans Text")
+                    :family "IBM Plex Sans")
 
 (setq scroll-preserve-screen-position t
       scroll-margin 0

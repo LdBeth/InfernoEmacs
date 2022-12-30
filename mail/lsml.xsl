@@ -32,6 +32,12 @@
       <div>
         <xsl:apply-templates select="/*/lsml:body" mode="body-text"/>
       </div>
+      <xsl:if test="/*/lsml:sig">
+        <hr/>
+        <div class="signature">
+          <xsl:apply-templates select="/*/lsml:sig" mode="body-text"/>
+        </div>
+      </xsl:if>
     </body>
   </html>
 </xsl:template>
@@ -82,6 +88,10 @@
 
 <xsl:template match="lsml:o" mode="body-text">
   <li><xsl:apply-templates mode="body-text"/></li>
+</xsl:template>
+
+<xsl:template match="lsml:url" mode="body-text">
+  <a href="{text()}"><xsl:value-of select="text()"/></a>
 </xsl:template>
 
 <xsl:template match="lsml:quote" mode="body-text">
