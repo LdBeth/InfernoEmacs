@@ -27,6 +27,7 @@ along with GNU Emacs.  If not, see <https://www.gnu.org/licenses/>. -->
   <namespace ns="http://docbook.org/ns/docbook" typeId="DocBook"/>
   <namespace ns="http://www.w3.org/1998/Math/MathML" typeId="MathML"/>
   <namespace ns="http://www.w3.org/2005/Atom" typeId="Atom"/>
+  <namespace ns="https://ldbeth.sdf.org/lsml" typeId="LsML"/>
 
   <documentElement localName="rss" typeId="RSS"/>
   <documentElement localName="feed" typeId="Atom"/>
@@ -48,5 +49,6 @@ along with GNU Emacs.  If not, see <https://www.gnu.org/licenses/>. -->
   <typeId id="MathML" uri="mathml3.rnc"/>
   <typeId id="RSS" uri="rss.rnc"/>
   <typeId id="Atom" uri="atom.rnc"/>
+  <typeId id="LsML" uri="lsml.rnc"/>
 
 </locatingRules>

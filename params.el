@@ -48,7 +48,8 @@
 (setq erc-server "irc.libera.chat"
       erc-nick "ldb"
       erc-insert-timestamp-function 'erc-insert-timestamp-left
-      erc-timestamp-format "%H%M ")
+      erc-timestamp-format "%H%M "
+      erc-autojoin-timing 'ident)
 
 ;; Newsticker
 (setq newsticker-url-list

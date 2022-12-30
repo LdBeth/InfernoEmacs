@@ -1,0 +1,109 @@
+# lsml 0.1.0 Copyright (c) LdBeth 2022.
+
+# The goal is to provide an easy to extend, semantic based, highly
+# unified markup that can be converted to plain text and HTML
+# recognized by EWW via XSLT 1.0, suitable for email communication.
+default namespace lsml = "https://ldbeth.sdf.org/lsml"
+namespace html = "http://www.w3.org/1999/xhtml"
+
+start = lsmlElement
+
+lsmlElement =
+    element lsml {
+        (attribute version { "0.1" } &
+         attribute lang { xsd:language }?),
+        lsmlHeader?,
+        lsmlBody,
+        lsmlSignature?
+    }
+
+lsmlHeader =
+    element head {
+        lsmlSubject,
+        lsmlEmailHds,
+        lsmlPrev?,
+        (lsmlStyle* &
+         lsmlRaw*)
+    }
+
+lsmlPrev = element preview { text }
+lsmlSubject = element subject { text }
+lsmlEmailHds =
+    element to { text }? &
+    element headers { attribute * { xsd:string }+ }?
+
+lsmlStyle =
+    element style { attribute path { xsd:anyURI } }
+lsmlImage =
+    element img { attribute path { xsd:anyURI } }
+lsmlAnyAttribute = attribute * { text }
+lsmlAnyHTML =
+    element html:* {
+      (lsmlAnyAttribute | text | lsmlAnyHTML)*
+    }
+
+lsmlBody = element body { lsmlTopElements+ }
+
+lsmlTopElements =
+    (lsmlCodeBlk | lsmlQuote |
+     lsmlList | lsmlRule |
+     lsmlPara | lsmlImage | lsmlSection | lsmlRaw)
+
+lsmlCodeBlk =
+    element code {
+        attribute lang { text }?,
+        (text | lsmlDiff)*
+    }
+
+lsmlQuote =
+    element quote {
+        lsmlQuoteAttrs,
+        (lsmlTopElements+ | lsmlVerbBlk)
+    }
+
+lsmlVerbBlk = element verbatim { text }
+
+lsmlQuoteAttrs =
+    attribute from { text }? &
+    attribute date { text }?
+lsmlList =
+    element l {
+        lsmlListAttrs,
+        lsmlListEl+
+    }
+lsmlListEl = element o { lsmlText | lsmlList }
+lsmlListAttrs = attribute type { "ord" | "unord" }? 
+
+lsmlRaw =
+    element raw {
+        (attribute alt { text } | element alt { text } )?,
+        (lsmlAnyHTML | text)*
+    }
+lsmlRule = element hr { empty }
+lsmlSection =
+    element section {
+        lsmlSecTitle?,
+        lsmlTopElements+
+    }
+
+lsmlSecTitle =
+    element title {
+        attribute level { "h1" | "h2" | "h3" | "h4" | "h5" | "h6" }?,
+        lsmlText
+    }
+
+lsmlText = (lsmlInline | lsmlDiff | text)
+lsmlPara = element p { lsmlText* }
+
+lsmlInline = (lsmlBold | lsmlIt |
+              lsmlUl | lsmlVerb)
+lsmlDiff = (lsmlIns | lsmlDel)
+
+lsmlBold = element b { text }
+lsmlIt = element i { text }
+lsmlUl = element u { text }
+lsmlVerb = element tt { text }
+lsmlIns = element ins { (lsmlInline | text)+ }
+lsmlDel = element del { (lsmlInline | text)+ }
+
+lsmlSignature = element sig { lsmlText* }

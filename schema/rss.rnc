@@ -14,7 +14,6 @@ rss.element =
     }
 
 extension.atts = attribute * { text }*
-extension.elements = element * { extension.atts, (text | extension.elements)* }*
 channel.element =
     element channel {
         title.element &
@@ -36,7 +35,6 @@ channel.element =
         text-input.element? &
         skipHours.element? &
         skipDays.element? &
-        extension.elements &
         item.element*
     }
 
@@ -125,8 +123,7 @@ item.element =
         enclosure.element? &
         guid.element? &
         pubdate.element? &
-        source.element? &
-        extension.elements
+        source.element?
     }
 
 author.element = element author { email.string }
