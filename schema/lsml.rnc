@@ -12,30 +12,55 @@ lsmlElement =
     element lsml {
         (attribute version { "0.1" } &
          attribute lang { xsd:language }?),
-        lsmlHeader?,
+        lsmlClient,
+        lsmlHeader,
         lsmlBody,
         lsmlSignature?
     }
 
+lsmlClient =
+    element headers { attribute * { text }* }?,
+    element mime {
+        element item {
+            attribute cid { text },
+            attribute src { xsd:anyURI }
+        }*
+    }?
+
 lsmlHeader =
     element head {
-        lsmlSubject,
         lsmlEmailHds,
         lsmlPrev?,
-        (lsmlStyle* &
-         lsmlRaw*)
+        lsmlRaw*
     }
 
 lsmlPrev = element preview { text }
-lsmlSubject = element subject { text }
 lsmlEmailHds =
-    element to { text }? &
-    element headers { attribute * { xsd:string }+ }?
+    element Subject { text } &
+    element To { lsmlEmail+ }? &
+    element From { lsmlEmail }? &
+    element Cc { lsmlEmail+ }? &
+    element Bcc { lsmlEmail+ }? &
+    element headers {
+        (element * { text })+
+    }?
 
-lsmlStyle =
-    element style { attribute path { xsd:anyURI } }
+email.string =
+    xsd:string { pattern = ".+@.+" }
+
+lsmlEmail =
+    element name { text }?, element email { email.string }
+
+src.cid =
+    xsd:string { pattern = "cid:.+" }
+
 lsmlImage =
-    element img { attribute path { xsd:anyURI } }
+    element img {
+        attribute alt { text } &
+        attribute src { xsd:anyURI | src.cid } &
+        attribute width { xsd:unsignedInt }? &
+        attribute height { xsd:unsignedInt }? 
+    }
 lsmlAnyAttribute = attribute * { text }
 lsmlAnyHTML =
     element html:* {
@@ -58,14 +83,17 @@ lsmlCodeBlk =
 lsmlQuote =
     element quote {
         lsmlQuoteAttrs,
-        (lsmlTopElements+ | lsmlVerbBlk)
-    }
+        lsmlTopElements+
+    } |
+    element vquote { text }
 
-lsmlVerbBlk = element verbatim { text }
-
+rfc822.date =
+    xsd:string { pattern =
+  "(((Mon)|(Tue)|(Wed)|(Thu)|(Fri)|(Sat)|(Sun)), )?\d{1,2} ((Jan)|(Feb)|(Mar)|(Apr)|(May)|(Jun)|(Jul)|(Aug)|(Sep)|(Oct)|(Nov)|(Dec)) \d{4} \d{2}:\d{2}(:\d{2})? ((UT)|(GMT)|(EST)|(EDT)|(CST)|(CDT)|(MST)|(MDT)|(PST)|(PDT)|([\+\-]\d{4}))"
+}
 lsmlQuoteAttrs =
     attribute from { text }? &
-    attribute date { text }?
+    attribute date { rfc822.date }?
 lsmlList =
     element l {
         lsmlListAttrs,
@@ -95,7 +123,7 @@ lsmlSecTitle =
 lsmlText = (lsmlInline | lsmlDiff | text)
 lsmlPara = element p { lsmlText* }
 
-lsmlInline = (lsmlBold | lsmlIt | lsmlVerb | lsmURL)
+lsmlInline = (lsmlBold | lsmlIt | lsmlVerb | lsmURL | lsmlCite)
 lsmlDiff = (lsmlIns | lsmlDel)
 
 lsmlBold = element b { text }
@@ -103,6 +131,7 @@ lsmlIt = element i { text }
 lsmlVerb = element tt { text }
 lsmlIns = element ins { (lsmlInline | text)+ }
 lsmlDel = element del { (lsmlInline | text)+ }
-lsmURL = element url { xsd:URi }
+lsmlCite = element c { text }
+lsmURL = element url { xsd:anyURI }
 
 lsmlSignature = element sig { lsmlPara* }

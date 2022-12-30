@@ -8,36 +8,42 @@
 <xsl:output method="xml" encoding="utf-8" indent="no" html-version="5"
             omit-xml-declaration="yes"/>
 <xsl:strip-space elements="*"/>
-<xsl:preserve-space elements="html:pre lsml:code" />
+<xsl:preserve-space elements="html:pre lsml:code lsml:vquote" />
 
 <xsl:param name="preview-style"
            select="'display:none;font-size:1px;color:#ffffff;line-height:1px;max-height:0px;max-width:0px;opacity:0;overflow:hidden;'"/>
 <xsl:param name="blockquote-style"
-           select="'margin:0 0 0 .8ex;border-left:1px #ccc solid;padding-left:1ex'"/>
+           select="'margin:0 0 0 .8ex;border-left:4px #ccc solid;padding-left:1ex;color:#333;'"/>
+
+<xsl:param name="attribution-style"
+           select="'font-family:monospace;'"/>
+
 <xsl:template match="/">
+  <xsl:text disable-output-escaping="yes">&lt;!DOCTYPE html&gt;</xsl:text>
   <html>
     <xsl:if test="/*/@lang">
-      <xsl:attribute name="xml:lang">
+      <xsl:attribute name="lang">
         <xsl:value-of select="string(/*/@lang)"/>
       </xsl:attribute>
     </xsl:if>
     <head>
-      <title><xsl:value-of select="/*/lsml:head/lsml:subject"/></title>
+      <title><xsl:value-of select="/*/lsml:head/lsml:Subject"/></title>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
     </head>
-    <body>
+    <body style="margin:0;padding:0;">
       <xsl:if test="/*/lsml:head/lsml:preview">
         <div style="{$preview-style}">
         <xsl:value-of select="/*/lsml:head/lsml:preview"/></div>
       </xsl:if>
-      <div>
+      <div style="margin:70px;font-family: Arial, Helvetica, sans-serif;">
         <xsl:apply-templates select="/*/lsml:body" mode="body-text"/>
+        <xsl:if test="/*/lsml:sig">
+          <hr/>
+          <div class="signature">
+            <xsl:apply-templates select="/*/lsml:sig" mode="body-text"/>
+          </div>
+        </xsl:if>
       </div>
-      <xsl:if test="/*/lsml:sig">
-        <hr/>
-        <div class="signature">
-          <xsl:apply-templates select="/*/lsml:sig" mode="body-text"/>
-        </div>
-      </xsl:if>
     </body>
   </html>
 </xsl:template>
@@ -52,10 +58,6 @@
 
 <xsl:template match="lsml:i" mode="body-text">
   <em><xsl:apply-templates mode="body-text"/></em>
-</xsl:template>
-
-<xsl:template match="lsml:u" mode="body-text">
-  <span style="text-decoration: underline;"><xsl:apply-templates mode="body-text"/></span>
 </xsl:template>
 
 <xsl:template match="lsml:ins" mode="body-text">
@@ -90,8 +92,16 @@
   <li><xsl:apply-templates mode="body-text"/></li>
 </xsl:template>
 
+<xsl:template match="lsml:c" mode="body-text">
+  <cite><xsl:apply-templates mode="body-text"/></cite>
+</xsl:template>
+
 <xsl:template match="lsml:url" mode="body-text">
   <a href="{text()}"><xsl:value-of select="text()"/></a>
+</xsl:template>
+
+<xsl:template match="lsml:img" mode="body-text">
+  <img><xsl:copy-of select="@*"/></img>
 </xsl:template>
 
 <xsl:template match="lsml:quote" mode="body-text">
@@ -102,7 +112,7 @@
 
 <xsl:template match="lsml:quote[@from]" mode="body-text">
   <blockquote style="{$blockquote-style}">
-    <p class="attribution">
+    <p class="attribution" style="{$attribution-style}">
       <xsl:value-of select="string(@from)"/>
       <xsl:text> wrote:</xsl:text>
     </p>
@@ -111,7 +121,7 @@
 
 <xsl:template match="lsml:quote[@from and @date]" mode="body-text">
   <blockquote style="{$blockquote-style}">
-    <p class="attribution">
+    <p class="attribution" style="{$attribution-style}">
       <xsl:text>On </xsl:text>
       <xsl:value-of select="string(@date)"/>
       <xsl:text>, </xsl:text>
@@ -121,8 +131,8 @@
   <xsl:apply-templates mode="body-text"/></blockquote>
 </xsl:template>
 
-<xsl:template match="lsml:verbatim" mode="body-text">
-  <pre><xsl:value-of select="text()"/></pre>
+<xsl:template match="lsml:vquote" mode="body-text">
+  <pre style="{$blockquote-style}"><xsl:value-of select="text()"/></pre>
 </xsl:template>
 
 <xsl:template match="lsml:section" mode="body-text">
@@ -139,6 +149,9 @@
   </xsl:variable>
   <xsl:variable name="label" select="concat('h',$normlevel)"/>
   <xsl:element name="{$label}">
+    <xsl:attribute name="style">
+      <xsl:value-of select="'color:#660000;'"/>
+    </xsl:attribute>
     <xsl:value-of select="lsml:title"/>
   </xsl:element>
   <xsl:apply-templates mode="section-content"/>
@@ -154,7 +167,7 @@
   <xsl:apply-templates select="html:*" mode="copy"/>
 </xsl:template>
 
-<xsl:template match="/ | @* | node()" mode="copy">
+<xsl:template match="@* | node()" mode="copy">
   <xsl:copy>
     <xsl:apply-templates select="@* | node()" mode="copy"/>
   </xsl:copy>
