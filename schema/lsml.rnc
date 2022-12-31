@@ -120,10 +120,11 @@ lsmlSecTitle =
         lsmlText
     }
 
-lsmlText = (lsmlInline | lsmlDiff | text)
+lsmlText = (lsmlInline | lsmlDiff | lsmlBr | lsmlRaw | text)
+lsmlBr = element br { empty }
 lsmlPara = element p { lsmlText* }
 
-lsmlInline = (lsmlBold | lsmlIt | lsmlVerb | lsmURL | lsmlCite)
+lsmlInline = (lsmlBold | lsmlIt | lsmlVerb | lsmURL | lsmlKbd | lsmlCite)
 lsmlDiff = (lsmlIns | lsmlDel)
 
 lsmlBold = element b { text }
@@ -131,6 +132,7 @@ lsmlIt = element i { text }
 lsmlVerb = element tt { text }
 lsmlIns = element ins { (lsmlInline | text)+ }
 lsmlDel = element del { (lsmlInline | text)+ }
+lsmlKbd = element kbd { text }
 lsmlCite = element c { text }
 lsmURL = element url { xsd:anyURI }
 

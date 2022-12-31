@@ -18,6 +18,9 @@
 <xsl:param name="attribution-style"
            select="'font-family:monospace;'"/>
 
+<xsl:param name="kbd-style"
+           select="'font-family:monospace;border-radius:.25rem;background:#000033;color:#ddd;'"/>
+
 <xsl:template match="/">
   <xsl:text disable-output-escaping="yes">&lt;!DOCTYPE html&gt;</xsl:text>
   <html>
@@ -76,6 +79,10 @@
   <hr/>
 </xsl:template>
 
+<xsl:template match="lsml:br" mode="body-text">
+  <br/>
+</xsl:template>
+
 <xsl:template match="lsml:code" mode="body-text">
   <pre><xsl:apply-templates mode="body-text"/></pre>
 </xsl:template>
@@ -102,6 +109,10 @@
 
 <xsl:template match="lsml:img" mode="body-text">
   <img><xsl:copy-of select="@*"/></img>
+</xsl:template>
+
+<xsl:template match="lsml:kbd" mode="body-text">
+  <kbd style="{$kbd-style}"><xsl:value-of select="text()"/></kbd>
 </xsl:template>
 
 <xsl:template match="lsml:quote" mode="body-text">
