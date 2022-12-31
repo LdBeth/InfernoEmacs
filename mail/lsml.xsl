@@ -117,33 +117,31 @@
 
 <xsl:template match="lsml:quote" mode="body-text">
   <blockquote style="{$blockquote-style}">
+    <xsl:if test="@from or @date or @cite">
+      <p>
+        <xsl:if test="@date">
+           <xsl:text>On </xsl:text>
+           <xsl:value-of select="string(@date)"/>
+           <xsl:text>, </xsl:text>
+        </xsl:if>
+        <xsl:if test="@from">
+          <xsl:value-of select="string(@from)"/>
+          <xsl:text> wrote:</xsl:text>
+        </xsl:if>
+         <xsl:if test="@cite">
+           <xsl:text> (</xsl:text><a
+           href="{@cite}">original message</a><xsl:text>)</xsl:text>
+        </xsl:if>
+      </p>
+    </xsl:if>
     <xsl:apply-templates mode="body-text"/>
   </blockquote>
 </xsl:template>
 
-<xsl:template match="lsml:quote[@from]" mode="body-text">
-  <blockquote style="{$blockquote-style}">
-    <p class="attribution" style="{$attribution-style}">
-      <xsl:value-of select="string(@from)"/>
-      <xsl:text> wrote:</xsl:text>
-    </p>
-  <xsl:apply-templates mode="body-text"/></blockquote>
-</xsl:template>
-
-<xsl:template match="lsml:quote[@from and @date]" mode="body-text">
-  <blockquote style="{$blockquote-style}">
-    <p class="attribution" style="{$attribution-style}">
-      <xsl:text>On </xsl:text>
-      <xsl:value-of select="string(@date)"/>
-      <xsl:text>, </xsl:text>
-      <xsl:value-of select="string(@from)"/>
-      <xsl:text> wrote:</xsl:text>
-    </p>
-  <xsl:apply-templates mode="body-text"/></blockquote>
-</xsl:template>
-
 <xsl:template match="lsml:vquote" mode="body-text">
-  <pre style="{$blockquote-style}"><xsl:value-of select="text()"/></pre>
+  <blockquote style="{$blockquote-style}">
+    <pre><xsl:value-of select="text()"/></pre>
+  </blockquote>
 </xsl:template>
 
 <xsl:template match="lsml:section" mode="body-text">

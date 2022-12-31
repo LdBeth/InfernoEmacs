@@ -44,6 +44,8 @@ along with GNU Emacs.  If not, see <https://www.gnu.org/licenses/>. -->
   <documentElement prefix="" localName="refentry" typeId="DocBook"/>
   <documentElement prefix="" localName="section" typeId="DocBook"/>
 
+  <documentElement prefix="" localName="lsml" typeId="LsML"/>
+
   <typeId id="XSLT" uri="xslt.rnc"/>
   <typeId id="DocBook" uri="docbookrb.rnc"/>
   <typeId id="MathML" uri="mathml3.rnc"/>

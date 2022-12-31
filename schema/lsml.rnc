@@ -11,7 +11,8 @@ start = lsmlElement
 lsmlElement =
     element lsml {
         (attribute version { "0.1" } &
-         attribute lang { xsd:language }?),
+         attribute lang { xsd:language }? &
+         attribute format { "htmlonly" | "usetext" }?),
         lsmlClient,
         lsmlHeader,
         lsmlBody,
@@ -19,12 +20,15 @@ lsmlElement =
     }
 
 lsmlClient =
-    element headers { attribute * { text }* }?,
-    element mime {
-        element item {
-            attribute cid { text },
-            attribute src { xsd:anyURI }
-        }*
+    element config {
+        element usetext { empty }?,
+        element headers { attribute * { text }* },
+        element mime {
+            element item {
+                attribute cid { text },
+                attribute src { xsd:anyURI }
+            }*
+        }
     }?
 
 lsmlHeader =
@@ -51,13 +55,13 @@ email.string =
 lsmlEmail =
     element name { text }?, element email { email.string }
 
-src.cid =
+rfc2392.cid =
     xsd:string { pattern = "cid:.+" }
 
 lsmlImage =
     element img {
         attribute alt { text } &
-        attribute src { xsd:anyURI | src.cid } &
+        attribute src { xsd:anyURI | rfc2392.cid } &
         attribute width { xsd:unsignedInt }? &
         attribute height { xsd:unsignedInt }? 
     }
@@ -84,16 +88,19 @@ lsmlQuote =
     element quote {
         lsmlQuoteAttrs,
         lsmlTopElements+
-    } |
-    element vquote { text }
+    } | element vquote { text }
 
 rfc822.date =
     xsd:string { pattern =
   "(((Mon)|(Tue)|(Wed)|(Thu)|(Fri)|(Sat)|(Sun)), )?\d{1,2} ((Jan)|(Feb)|(Mar)|(Apr)|(May)|(Jun)|(Jul)|(Aug)|(Sep)|(Oct)|(Nov)|(Dec)) \d{4} \d{2}:\d{2}(:\d{2})? ((UT)|(GMT)|(EST)|(EDT)|(CST)|(CDT)|(MST)|(MDT)|(PST)|(PDT)|([\+\-]\d{4}))"
 }
+
+rfc2392.mid = xsd:string { pattern = "mid:.+" }
 lsmlQuoteAttrs =
     attribute from { text }? &
-    attribute date { rfc822.date }?
+    attribute date { rfc822.date }? &
+    attribute cite { rfc2392.mid }?
+
 lsmlList =
     element l {
         lsmlListAttrs,

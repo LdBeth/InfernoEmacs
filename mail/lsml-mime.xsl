@@ -13,29 +13,34 @@
 <xsl:template match="/lsml:lsml">
   <xsl:copy>
     <xsl:copy-of select="@*"/>
-    <headers>
-      <xsl:attribute name="Subject">
-        <xsl:value-of select="/*/lsml:head/lsml:Subject"/>
-      </xsl:attribute>
-      <xsl:for-each select="/*/lsml:head/lsml:From |
-                            /*/lsml:head/lsml:To |
-                            /*/lsml:head/lsml:Cc |
-                            /*/lsml:head/lsml:Bcc">
-        <xsl:attribute name="{local-name(.)}">
-          <xsl:apply-templates select="." mode="email"/>
+    <config>
+      <xsl:if test="/*/@format='usetext'">
+        <usetext/>
+      </xsl:if>
+      <headers>
+        <xsl:attribute name="Subject">
+          <xsl:value-of select="/*/lsml:head/lsml:Subject"/>
         </xsl:attribute>
-      </xsl:for-each>
-      <xsl:if test="/*/lsml:head/lsml:headers">
-        <xsl:for-each select="/*/lsml:head/lsml:headers/*">
+        <xsl:for-each select="/*/lsml:head/lsml:From |
+                              /*/lsml:head/lsml:To |
+                              /*/lsml:head/lsml:Cc |
+                              /*/lsml:head/lsml:Bcc">
           <xsl:attribute name="{local-name(.)}">
-            <xsl:value-of select="."/>
+            <xsl:apply-templates select="." mode="email"/>
           </xsl:attribute>
         </xsl:for-each>
-      </xsl:if>
-    </headers>
-    <mime>
-      <xsl:apply-templates select="/*/lsml:body" mode="mime"/>
-    </mime>
+        <xsl:if test="/*/lsml:head/lsml:headers">
+          <xsl:for-each select="/*/lsml:head/lsml:headers/*">
+            <xsl:attribute name="{local-name(.)}">
+              <xsl:value-of select="."/>
+            </xsl:attribute>
+          </xsl:for-each>
+        </xsl:if>
+      </headers>
+      <mime>
+        <xsl:apply-templates select="/*/lsml:body" mode="mime"/>
+      </mime>
+    </config>
     <xsl:apply-templates select="node()" mode="copy"/>
   </xsl:copy>
 </xsl:template>
