@@ -45,6 +45,7 @@ along with GNU Emacs.  If not, see <https://www.gnu.org/licenses/>. -->
   <documentElement prefix="" localName="section" typeId="DocBook"/>
 
   <documentElement prefix="" localName="lsml" typeId="LsML"/>
+  <documentElement prefix="" localName="TeXML" typeId="TeX"/>
 
   <typeId id="XSLT" uri="xslt.rnc"/>
   <typeId id="DocBook" uri="docbookrb.rnc"/>
@@ -52,5 +53,6 @@ along with GNU Emacs.  If not, see <https://www.gnu.org/licenses/>. -->
   <typeId id="RSS" uri="rss.rnc"/>
   <typeId id="Atom" uri="atom.rnc"/>
   <typeId id="LsML" uri="lsml.rnc"/>
+  <typeId id="TeX" uri="texml.rnc"/>
 
 </locatingRules>

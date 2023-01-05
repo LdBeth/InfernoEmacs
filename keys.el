@@ -21,7 +21,7 @@ if prefix argument ARG is given, switch to it in an other, possibly new window."
 (defun now-playing ()
   (interactive)
   (let ((nowplay (read (mac-osa-script
-                        (expand-file-name "core/nowplay.scpt" user-emacs-directory)
+                        (expand-file-name "script/nowplay.scpt" user-emacs-directory)
                         "AppleScript" t))))
     (when (called-interactively-p 'interactive)
       (message "%s" nowplay))

@@ -1,6 +1,6 @@
 #!/usr/bin/env crm
 {
-    isolate (:es:) /\/Users\/ldbeth\/.emacs.d\/mail\/emacs-devel\//
+    isolate (:es:) /\/Users\/ldbeth\/.emacs.d\/script\/emacs-devel\//
     isolate (:application:) /(MS|QQ|BQ|OQ|Microsoft|YMail|Google|Crm)/
     {
         match (:: :current_headers:) /(([^\n]+\n)+)\n/

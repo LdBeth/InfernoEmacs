@@ -6,7 +6,7 @@
   (require 'wl-draft)
   (require 'mime-edit))
 
-(defvar lsml-xsl-directory "~/.emacs.d/mail/")
+(defvar lsml-xsl-directory "~/.emacs.d/script/")
 
 (defun lsml--call-xsl (file)
   (call-process-region

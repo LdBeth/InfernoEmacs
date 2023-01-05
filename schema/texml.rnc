@@ -1,0 +1,59 @@
+# TeXML
+# Copyright (c) LdBeth 2023.
+
+start = tex.ml
+
+tex.pcdata = text
+tex.content =
+    (tex.pcdata |
+     tex.cmd |
+     tex.env |
+     tex.ctrl |
+     tex.spec)
+
+tex.ml =
+    element TeXML {
+        tex.content*
+    }
+
+tex.cmd.name = xsd:string { pattern = "[A-Za-z]+\*?|." }
+
+tex.cmd =
+    element cmd {
+        attribute name { tex.cmd.name },
+        (tex.opt | tex.parm)* 
+    }
+
+tex.avaliable-options = (tex.pcdata | tex.cmd | tex.ctrl | tex.spec)
+
+tex.opt =
+    element opt {
+        tex.avaliable-options*
+    }
+
+tex.parm =
+    element parm {
+        tex.avaliable-options*
+    }
+
+tex.env =
+    element env {
+        tex.env.attrlist,
+        tex.content*
+    }
+
+tex.env.attrlist =
+    attribute name { text } &
+    attribute begin { text }? &
+    attribute end { text }?
+
+tex.ctrl = element ctrl { attribute ch { text } }
+
+tex.group = element group { tex.content* }
+
+tex.spec =
+    element spec {
+        attribute cat {
+            "esc" | "bg" | "eg" | "mshift" | "align" | "parm" |
+            "sup" | "sub" | "comment" | "tilde " }
+      }
