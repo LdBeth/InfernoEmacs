@@ -71,10 +71,19 @@
     (lsml--insert-html mime content))
   nil)
 
+(defun lsml--is-valid ()
+  (if (and rng-current-schema-file-name
+           (string-match-p "lsml.rnc" rng-current-schema-file-name))
+      (progn (rng-do-some-validation)
+             (or (and rng-error-count (= rng-error-count 0))
+                 (error "There are unsolved errors in markup.")))
+    (error "Current buffer content is not LsML.")))
+
 ;;;###autoload
 (defun lsml-compose ()
   "Compose mail from current lsml file."
   (interactive)
+  (lsml--is-valid)
   (let ((b (current-buffer))
         headers mime content text
         subject to)
@@ -115,6 +124,7 @@
   "Export the messaged to opened draft buffer. Usefully when
 constructing a reply."
   (interactive)
+  (lsml--is-valid)
   (let ((b (current-buffer))
         (draft (car (wl-collect-draft)))
         mime content text)

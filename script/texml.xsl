@@ -11,6 +11,18 @@
   <xsl:template match="TeXML" mode="tex">
     <xsl:apply-templates mode="tex"/>
   </xsl:template>
+
+  <xsl:template match="math" mode="tex">
+    <xsl:text>$</xsl:text>
+    <xsl:apply-templates mode="math"/>
+    <xsl:text>$</xsl:text>
+  </xsl:template>
+
+  <xsl:template match="dmath" mode="tex">
+    <xsl:text>$$</xsl:text>
+    <xsl:apply-templates mode="math"/>
+    <xsl:text>$$</xsl:text>
+  </xsl:template>
   
   <xsl:template match="cmd" mode="tex">
     <xsl:text>\</xsl:text><xsl:value-of select="@name"/>
@@ -28,8 +40,15 @@
       <xsl:text>}</xsl:text>
     </xsl:if>
     <xsl:variable name="next" select="following::node()[1][self::text()]"/>
-    <xsl:if test="$next and not(parm) and not(matches($next, '^\s'))">
-     <xsl:text> </xsl:text>
+    <xsl:if test="$next and not(parm)">
+      <xsl:choose>
+        <xsl:when test="matches($next, '^\s')">
+          <xsl:text>{}</xsl:text>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:text> </xsl:text>
+        </xsl:otherwise>
+      </xsl:choose>
     </xsl:if>
   </xsl:template>
 
@@ -100,4 +119,23 @@
                           replace('&lt;','\$&lt;\$') =>
                           replace('&gt;','\$&gt;\$')"/>
   </xsl:template>
+
+  <xsl:template match="*" mode="math">
+    <xsl:apply-templates select="." mode="tex"/>
+  </xsl:template>
+  <xsl:template match="text()" mode="math">
+    <xsl:value-of disable-output-escaping="yes"
+                  select=". =>
+                          replace('\$','\\\${}') =>
+                          replace('\\','\\backslash') =>
+                          replace('\{','\\{') =>
+                          replace('\}','\\}') =>
+                          replace('%','\\%{}') =>
+                          replace('&amp;','\\&amp;{}') =>
+                          replace('#','\\#{}') =>
+                          replace('_','\\_{}') =>
+                          replace('\^','\\char`\\^{}') =>
+                          replace('~','\\char`\\~{}')"/>
+  </xsl:template>
+
 </xsl:stylesheet>

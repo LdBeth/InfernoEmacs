@@ -49,7 +49,7 @@ end if")))
 
 (bind-keys
  :prefix "M-m"
- :prefix-map launchpad-key-map
+ :prefix-map launchpad-keys
  ("h" . spacemacs/home)
  ("s" . switch-to-scratch-buffer)
  ("i" . ibuffer)
@@ -59,7 +59,7 @@ end if")))
  ("g" . gopher-club))
 (bind-keys
  :prefix "M-m p"
- :prefix-map prover-loader-map
+ :prefix-map prover-loader
  ("h" . enable-hol)
  ("l" . enable-lean4)
  ("a" . enable-acl2))

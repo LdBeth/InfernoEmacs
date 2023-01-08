@@ -45,7 +45,9 @@ Refresh `wl-address-list', `wl-address-completion-list', and
                      (push (list (copy-sequence (cadr (assq 'net value)))
                                  (copy-sequence (or (cdr (assq 'attribution value))
                                                     key))
-                                 (copy-sequence key)) tmp)) lsdb-hash-table)
+                                 (copy-sequence key))
+                           tmp))
+                   lsdb-hash-table)
           tmp))
   (setq wl-address-completion-list
         (wl-address-make-completion-list wl-address-list))

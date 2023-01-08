@@ -28,6 +28,7 @@ along with GNU Emacs.  If not, see <https://www.gnu.org/licenses/>. -->
   <namespace ns="http://www.w3.org/1998/Math/MathML" typeId="MathML"/>
   <namespace ns="http://www.w3.org/2005/Atom" typeId="Atom"/>
   <namespace ns="https://ldbeth.sdf.org/lsml" typeId="LsML"/>
+  <namespace ns="urn:speedata.de:2009/publisher/en" typeId="Layout"/>
 
   <documentElement localName="rss" typeId="RSS"/>
   <documentElement localName="feed" typeId="Atom"/>
@@ -47,6 +48,8 @@ along with GNU Emacs.  If not, see <https://www.gnu.org/licenses/>. -->
   <documentElement prefix="" localName="lsml" typeId="LsML"/>
   <documentElement prefix="" localName="TeXML" typeId="TeX"/>
 
+  <documentElement prefix="" localName="Layout" typeId="Layout"/>
+
   <typeId id="XSLT" uri="xslt.rnc"/>
   <typeId id="DocBook" uri="docbookrb.rnc"/>
   <typeId id="MathML" uri="mathml3.rnc"/>
@@ -54,5 +57,6 @@ along with GNU Emacs.  If not, see <https://www.gnu.org/licenses/>. -->
   <typeId id="Atom" uri="atom.rnc"/>
   <typeId id="LsML" uri="lsml.rnc"/>
   <typeId id="TeX" uri="texml.rnc"/>
+  <typeId id="Layout" uri="layoutschema.rnc"/>
 
 </locatingRules>

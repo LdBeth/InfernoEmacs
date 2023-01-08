@@ -9,11 +9,17 @@ tex.content =
      tex.cmd |
      tex.env |
      tex.ctrl |
-     tex.spec)
+     tex.spec |
+     tex.math )
 
 tex.ml =
     element TeXML {
         tex.content*
+    }
+
+tex.math =
+    element (math | dmath) {
+        tex.content+
     }
 
 tex.cmd.name = xsd:string { pattern = "[A-Za-z]+\*?|." }

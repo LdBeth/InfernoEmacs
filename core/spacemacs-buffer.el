@@ -29,9 +29,6 @@
 (defconst spacemacs-buffer-name "*LaunchPad*"
   "The name of the spacemacs buffer.")
 
-(defconst spacemacs-buffer-logo-title "[T E C O M A C S]"
-  "The title displayed beneath the logo.")
-
 (defconst spacemacs-buffer-buttons-startup-lists-offset 25
   "Relative position between the home buffer buttons and startup lists.")
 
@@ -120,7 +117,7 @@ Cate special text banner can de reachable via `998', `cat' or `random*'.
   "Display an image banner.
 BANNER: the path to an ascii banner file."
   (when banner
-    (let* ((title spacemacs-buffer-logo-title)
+    (let* ((title "[T E C O M A C S]")
            (size (image-size banner))
            (width (car size))
            (left-margin (max 0 (floor (- spacemacs-buffer--window-width width) 2))))
@@ -133,7 +130,9 @@ BANNER: the path to an ascii banner file."
                    rear-nonsticky t)))
       (insert "\n\n")
       (insert (make-string (max 0 (floor (/ (- spacemacs-buffer--window-width
-                                               (+ (length title) 1)) 2))) ?\s))
+                                               (+ (length title) 1))
+                                            2)))
+                           ?\s))
       (insert (format "%s\n" title)))))
 
 (defun spacemacs-buffer/insert-page-break ()
