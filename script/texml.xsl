@@ -31,14 +31,14 @@
         <xsl:apply-templates select="opt" mode="tex"/>
       </xsl:variable>
       <xsl:text>[</xsl:text>
-      <xsl:value-of select="options" separator=","/>
+      <xsl:value-of select="$options" separator=","/>
       <xsl:text>]</xsl:text>
     </xsl:if>
-    <xsl:if test="parm">
+    <xsl:for-each select="parm">
       <xsl:text>{</xsl:text>
-      <xsl:apply-templates select="parm" mode="tex"/>
+      <xsl:apply-templates select="." mode="tex"/>
       <xsl:text>}</xsl:text>
-    </xsl:if>
+    </xsl:for-each>
     <xsl:variable name="next" select="following::node()[1][self::text()]"/>
     <xsl:if test="$next and not(parm)">
       <xsl:choose>
