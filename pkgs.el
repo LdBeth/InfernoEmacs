@@ -130,6 +130,10 @@
         '((light :ascent 80 :foreground "#655370")
           (dark :ascent 80 :foreground "#292b2e" :background "#b2b2b2"))))
 
+(use-package mime-diff
+  :defer t
+  :after mime-view)
+
 ;; Programming
 (use-package lsp-mode
   :defer t
@@ -152,6 +156,7 @@
 ;; nXML
 (use-package nxml-mode
   :defer t
+  :functions nxml-token-after
   :config
   (setq nxml-section-element-name-regexp
         "article\\|sect\\([1-5]\\|ion\\)\\|chapter\\|appendix\\|part\\|preface\\|reference\\|simplesect\\|bibliography\\|bibliodiv\\|glossary\\|glossdiv")

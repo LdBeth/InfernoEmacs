@@ -3,7 +3,7 @@ namespace db = "http://docbook.org/ns/docbook"
 namespace h = "http://www.w3.org/1999/xhtml"
 default namespace = "http://docbook.org/ns/docbook"
 
-include "docbook.rnc" {
+include "docbookxi.rnc" {
        db.extension.inlines = h.ruby
 }
 
