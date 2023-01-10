@@ -7,9 +7,6 @@
 
 <xsl:output method="xml" encoding="utf-8" indent="no"
             omit-xml-declaration="yes"/>
-<xsl:strip-space elements="*"/>
-<xsl:preserve-space elements="html:pre lsml:code lsml:vquote"/>
-
 <xsl:template match="/lsml:lsml">
   <xsl:copy>
     <xsl:copy-of select="@*"/>

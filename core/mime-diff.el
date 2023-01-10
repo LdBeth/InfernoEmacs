@@ -1,9 +1,11 @@
 ;; -*- lexical-binding:t -*-
+;;; Add diff patch highlighting to mime-view
 (require 'diff-mode)
 (eval-when-compile (require 'mime-view))
 
 (defun mime-display-font-lock-diff ()
-  (let ((font-lock-defaults diff-font-lock-defaults))
+  (let ((font-lock-defaults diff-font-lock-defaults)
+        (diff-buffer-type 'git))
     (font-lock-ensure)))
 
 (defun mime-display-conditional-enable-diff ()

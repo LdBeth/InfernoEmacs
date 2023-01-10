@@ -7,9 +7,6 @@
 
 <xsl:output method="xml" encoding="utf-8" indent="no" html-version="5"
             omit-xml-declaration="yes"/>
-<xsl:strip-space elements="*"/>
-<xsl:preserve-space elements="html:pre lsml:code lsml:vquote" />
-
 <xsl:param name="preview-style"
            select="'display:none;font-size:1px;color:#ffffff;line-height:1px;max-height:0px;max-width:0px;opacity:0;overflow:hidden;'"/>
 <xsl:param name="blockquote-style"
