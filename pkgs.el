@@ -21,11 +21,12 @@
 
 (use-package spacemacs-buffer
   :init
-  (defvar dotspacemacs-banner
+  (defconst tecomacs-banner
     (eval-when-compile
       (create-image (concat user-emacs-directory "banner.xpm")
                     'xpm nil)))
-  (defvar dotspacemacs-startup-lists
+  (defconst tecomacs-title "[T E C O M A C S]")
+  (defconst tecomacs-startup-lists
     '((bookmarks . 3) (recents  . 5))))
 
 (use-package tecoline
@@ -34,7 +35,7 @@
                 '(:propertize "%12b" face nano-modeline-name)
                 mode-line-format (nano-modeline-default-mode)))
 
-(use-package paren-face
+(use-package dim-paren
   :config
   (global-paren-face-mode 1))
 
@@ -136,6 +137,7 @@
 
 ;; Programming
 (use-package lsp-mode
+  :disabled t
   :defer t
   :init
   (setq lsp-completion-provider :none) ;; we use Corfu!
@@ -156,13 +158,13 @@
 ;; nXML
 (use-package nxml-mode
   :defer t
-  :functions nxml-token-after
   :config
   (setq nxml-section-element-name-regexp
         "article\\|sect\\([1-5]\\|ion\\)\\|chapter\\|appendix\\|part\\|preface\\|reference\\|simplesect\\|bibliography\\|bibliodiv\\|glossary\\|glossdiv")
   (add-to-list 'rng-schema-locating-files
                (expand-file-name "~/.emacs.d/schema/schemas.xml"))
-  (eval-and-compile (require 'time-stamp))
+  (require 'time-stamp)
+  (require 'nxml-mode)
   (defun nxml-insert-current-time ()
     (interactive)
     (if rng-current-schema-file-name

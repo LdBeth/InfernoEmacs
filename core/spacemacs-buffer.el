@@ -91,7 +91,7 @@ Internal use, do not set this variable.")
         truncate-lines t))
 
 (defun spacemacs-buffer/insert-banner-and-buttons ()
-  "Choose a banner according to `dotspacemacs-startup-banner'and insert it.
+  "Choose a banner according to `tecomacs-startup-lists' and insert it.
 in spacemacs buffer along with quick buttons underneath.
 Easter egg:
 Doge special text banner can be reachable via `999', `doge' or `random*'.
@@ -99,11 +99,9 @@ Doge special text banner for dark themes can be reachable via `997',
 `doge-inverted' or `random*'.
 Cate special text banner can de reachable via `998', `cat' or `random*'.
 `random' ignore special banners whereas `random*' does not."
-  (let ((banner dotspacemacs-banner)
-        (buffer-read-only nil))
+  (let ((buffer-read-only nil))
     (progn
-      (when banner
-        (spacemacs-buffer//insert-image-banner banner))
+      (spacemacs-buffer//insert-image-banner)
       (spacemacs-buffer//insert-buttons)
       (let ((len (- (line-end-position)
                 (line-beginning-position))))
@@ -113,27 +111,25 @@ Cate special text banner can de reachable via `998', `cat' or `random*'.
 						    len)))
       (spacemacs//redisplay))))
 
-(defun spacemacs-buffer//insert-image-banner (banner)
+(defun spacemacs-buffer//insert-image-banner ()
   "Display an image banner.
 BANNER: the path to an ascii banner file."
-  (when banner
-    (let* ((title "[T E C O M A C S]")
-           (size (image-size banner))
-           (width (car size))
-           (left-margin (max 0 (floor (- spacemacs-buffer--window-width width) 2))))
-      (insert (make-string left-margin ?\s))
-      (let ((start (point)))
-        (insert " ")
-        (add-text-properties
-         start (point)
-	 `(display ,banner
-                   rear-nonsticky t)))
-      (insert "\n\n")
-      (insert (make-string (max 0 (floor (/ (- spacemacs-buffer--window-width
-                                               (+ (length title) 1))
-                                            2)))
-                           ?\s))
-      (insert (format "%s\n" title)))))
+  (let* ((size (image-size tecomacs-banner))
+         (width (car size))
+         (left-margin (max 0 (floor (- spacemacs-buffer--window-width width) 2))))
+    (insert (make-string left-margin ?\s))
+    (let ((start (point)))
+      (insert " ")
+      (add-text-properties
+       start (point)
+       `(display ,tecomacs-banner
+                 rear-nonsticky t)))
+    (insert "\n\n")
+    (insert (make-string (max 0 (floor (/ (- spacemacs-buffer--window-width
+                                             (+ (length tecomacs-title) 1))
+                                          2)))
+                         ?\s))
+    (insert (format "%s\n" tecomacs-title))))
 
 (defun spacemacs-buffer/insert-page-break ()
   "Insert a page break line in spacemacs buffer."
@@ -411,7 +407,7 @@ LIST: a list of string bookmark names made interactive in this function."
 (defun spacemacs-buffer//do-insert-startupify-lists ()
   "Insert the startup lists in the current buffer."
   (setq spacemacs-buffer--startup-list-nr 1)
-  (dolist (els dotspacemacs-startup-lists)
+  (dolist (els tecomacs-startup-lists)
     (let ((el (or (car-safe els) els))
           (list-size (or (cdr-safe els)
                          spacemacs-buffer-startup-lists-length)))
@@ -560,8 +556,7 @@ If a prefix argument is given, switch to it in an other, possibly new window."
             (insert "\n"))
           (spacemacs-buffer/insert-banner-and-buttons)
           (when (bound-and-true-p spacemacs-initialized)
-	    (when dotspacemacs-startup-lists
-              (spacemacs-buffer/insert-startup-lists))
+	    (spacemacs-buffer/insert-startup-lists)
             (force-mode-line-update)
             (spacemacs-buffer-mode)))
         (if save-line

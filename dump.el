@@ -2,8 +2,7 @@
 (load (concat user-emacs-directory "pkgs"))
 (dolist (package
          '(mwim unfill smex swiper
-                which-key paren-face
-                bind-key))
+                which-key bind-key))
   (require package))
 (defconst dumped-load-path load-path)
 (garbage-collect)
