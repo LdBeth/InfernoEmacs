@@ -57,6 +57,7 @@
         ("williamlong" "http://feed.williamlong.info/rss.xml")
         ("ldbeth" "https://ldbeth.sdf.org/rss.xml")
         ;;("ACG" "http://www.acgpiping.net/feed/")
+        ("XML" "https://www.xml.com/feed/all/")
         ))
 
 (setq corfu-auto t

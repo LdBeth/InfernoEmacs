@@ -9,8 +9,13 @@
     (font-lock-ensure)))
 
 (defun mime-display-conditional-enable-diff ()
-  (when (re-search-forward "^diff --git" nil t)
-    (mime-display-font-lock-diff)))
+  (goto-char (point-min))
+  (while (re-search-forward
+          "^--- .*\n\\+\\+\\+ .*\n\\([-+ ].*\n\\|@@ .* @@.*\n\\)+" nil t)
+    (save-restriction
+      (narrow-to-region (match-beginning 0) (match-end 0))
+      (mime-display-font-lock-diff)
+      (goto-char (point-max)))))
 
 (add-hook 'mime-display-text/plain-hook #'mime-display-conditional-enable-diff)
 

@@ -149,7 +149,8 @@ via\" feature from mailing lists."
   :group 'lsdb
   :type 'string)
 
-(defcustom lsdb-boring-names "no.?reply\\|news\\|support\\|sale\\|\\+"
+(defcustom lsdb-boring-names
+  "no.?reply\\|news\\|support\\|sale\\|\\+\\|notifi"
   "Match senders that are not worth to save record."
   :group 'lsdb
   :type 'list)

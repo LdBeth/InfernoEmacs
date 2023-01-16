@@ -181,6 +181,12 @@
               (delete-char (- end xmltok-start))
               (insert (time-stamp-string))))))))
 
+(use-package emmet-mode
+  :defer t
+  :init
+  (add-hook 'nxml-mode-hook #'emmet-mode)
+  (add-hook 'html-mode-hook #'emmet-mode))
+
 ;; TeX
 (use-package tex-mode
   :defer t
