@@ -67,9 +67,10 @@ lsmlImage =
     }
 lsmlAnyAttribute = attribute * { text }
 lsmlAnyHTML =
-    element html:* {
-      (lsmlAnyAttribute | text | lsmlAnyHTML)*
-    }
+    (text |
+     element html:* {
+         (lsmlAnyAttribute | text | lsmlAnyHTML)*
+     })+
 
 lsmlBody = element body { lsmlTopElements+ }
 
@@ -87,7 +88,7 @@ lsmlCodeBlk =
 lsmlQuote =
     element quote {
         lsmlQuoteAttrs,
-        lsmlTopElements+
+        (lsmlTopElements+ | lsmlAnyHTML)
     } | element vquote { text }
 
 rfc822.date =
@@ -112,7 +113,7 @@ lsmlListAttrs = attribute type { "ord" | "unord" }?
 lsmlRaw =
     element raw {
         (attribute alt { text } | element alt { text } )?,
-        (lsmlAnyHTML | text)*
+        lsmlAnyHTML
     }
 lsmlRule = element hr { empty }
 lsmlSection =

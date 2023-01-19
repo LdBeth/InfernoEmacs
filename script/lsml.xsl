@@ -131,7 +131,14 @@
         </xsl:if>
       </p>
     </xsl:if>
-    <xsl:apply-templates mode="body-text"/>
+    <xsl:choose>
+      <xsl:when test="html:*">
+        <xsl:apply-templates select="html:*" mode="copy"/>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:apply-templates mode="body-text"/>
+      </xsl:otherwise>
+    </xsl:choose>
   </blockquote>
 </xsl:template>
 

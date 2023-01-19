@@ -146,6 +146,12 @@
           '(flex))) ;; Configure flex
   (add-hook 'lsp-completion-mode-hook #'lsp-mode-setup-completion))
 
+(use-package lsp-sourcekit
+  :disabled t
+  :after lsp-mode
+  :config
+  (setq lsp-sourcekit-executable "/usr/bin/sourcekit-lsp"))
+
 (use-package dyalog-mode
   :defer t
   :init
