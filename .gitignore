@@ -6,6 +6,8 @@
 elpa/
 .DS_Store
 /aria2*
+todo/
+diary
 eshell/
 games/
 newsticker/

@@ -98,6 +98,16 @@
   :bind (:map flyspell-mode-map
               ("C-;" . flyspell-correct-wrapper)))
 
+;; Calender
+(use-package diary-lib
+  :defer t
+  :init
+  (setq diary-display-function #'diary-fancy-display
+        diary-number-of-entries 7
+        calendar-view-diary-initially-flag t)
+  (add-hook 'diary-list-entries-hook #'diary-include-other-diary-files)
+  (add-hook 'diary-mark-entries-hook #'diary-mark-included-diary-files))
+
 ;; Mail
 (use-package wl
   :defer t
