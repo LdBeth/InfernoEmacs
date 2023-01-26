@@ -42,7 +42,8 @@
       use-short-answers t
       tab-always-indent 'complete)
 
-(setq recentf-exclude '("mime-example$" ".emacs.d/\\([a-z]\\|-\\)*$"))
+(setq recentf-exclude '("mime-example$" ".emacs.d/\\([a-z]\\|-\\)*$")
+      dired-use-ls-dired nil)
 
 ;; ERC
 (setq erc-server "irc.libera.chat"
