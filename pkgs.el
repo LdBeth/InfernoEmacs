@@ -7,12 +7,6 @@
 (use-package core-autoloads
   :load-path "core/")
 
-(use-package diminish
-  :disabled
-  :config
-  (diminish 'eldoc-mode)
-  (diminish 'visual-line-mode))
-
 (use-package spacemacs-theme-autoloads
   :load-path "core/spacemacs-theme/"
   :config
@@ -117,7 +111,8 @@
           mail-user-agent 'wl-user-agent
           mail-envelope-from 'header
           mail-specify-envelope-from t
-          mime-header-accept-quoted-encoded-words t)
+          mime-header-accept-quoted-encoded-words t
+          epa-pinentry-mode 'loopback)
     (define-mail-user-agent
         'wl-user-agent
         'wl-user-agent-compose
@@ -147,7 +142,7 @@
 
 ;; Programming
 (use-package lsp-mode
-  :disabled t
+  :disabled
   :defer t
   :init
   (setq lsp-completion-provider :none) ;; we use Corfu!
@@ -157,7 +152,7 @@
   (add-hook 'lsp-completion-mode-hook #'lsp-mode-setup-completion))
 
 (use-package lsp-sourcekit
-  :disabled t
+  :disabled
   :after lsp-mode
   :config
   (setq lsp-sourcekit-executable "/usr/bin/sourcekit-lsp"))
@@ -174,13 +169,13 @@
 ;; nXML
 (use-package nxml-mode
   :defer t
+  :functions nxml-token-after
   :config
   (setq nxml-section-element-name-regexp
         "article\\|sect\\([1-5]\\|ion\\)\\|chapter\\|appendix\\|part\\|preface\\|reference\\|simplesect\\|bibliography\\|bibliodiv\\|glossary\\|glossdiv")
   (add-to-list 'rng-schema-locating-files
                (expand-file-name "~/.emacs.d/schema/schemas.xml"))
   (require 'time-stamp)
-  (require 'nxml-mode)
   (defun nxml-insert-current-time ()
     (interactive)
     (if rng-current-schema-file-name

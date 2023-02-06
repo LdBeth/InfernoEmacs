@@ -59,6 +59,7 @@
         ("ldbeth" "https://ldbeth.sdf.org/rss.xml")
         ;;("ACG" "http://www.acgpiping.net/feed/")
         ("XML" "https://www.xml.com/feed/all/")
+        ("ndw" "https://so.nwalsh.com/feed/whatsnew.xml")
         ))
 
 (setq corfu-auto t

@@ -112,8 +112,7 @@ Cate special text banner can de reachable via `998', `cat' or `random*'.
       (spacemacs//redisplay))))
 
 (defun spacemacs-buffer//insert-image-banner ()
-  "Display an image banner.
-BANNER: the path to an ascii banner file."
+  "Display an image banner."
   (let* ((size (image-size tecomacs-banner))
          (width (car size))
          (left-margin (max 0 (floor (- spacemacs-buffer--window-width width) 2))))
@@ -124,12 +123,12 @@ BANNER: the path to an ascii banner file."
        start (point)
        `(display ,tecomacs-banner
                  rear-nonsticky t)))
-    (insert "\n\n")
-    (insert (make-string (max 0 (floor (/ (- spacemacs-buffer--window-width
-                                             (+ (length tecomacs-title) 1))
-                                          2)))
-                         ?\s))
-    (insert (format "%s\n" tecomacs-title))))
+    (insert "\n\n"))
+  (insert (make-string (max 0 (floor (/ (- spacemacs-buffer--window-width
+                                           (+ (length tecomacs-title) 1))
+                                        2)))
+                       ?\s))
+  (insert (format "%s\n" tecomacs-title)))
 
 (defun spacemacs-buffer/insert-page-break ()
   "Insert a page break line in spacemacs buffer."
