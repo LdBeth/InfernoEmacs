@@ -150,7 +150,7 @@ via\" feature from mailing lists."
   :type 'string)
 
 (defcustom lsdb-boring-names
-  "no.?reply\\|news\\|support\\|sale\\|\\+\\|notifi"
+  "no.?reply\\|news\\|support\\|sale\\|\\+\\|notifi\\|info"
   "Match senders that are not worth to save record."
   :group 'lsdb
   :type 'list)

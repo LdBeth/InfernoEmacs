@@ -64,7 +64,7 @@
 (use-package which-key
   :config
   (setq which-key-show-early-on-C-h t
-	which-key-idle-secondary-delay 0.05)
+    which-key-idle-secondary-delay 0.05)
   (which-key-mode 1))
 
 (use-package page-break-lines
@@ -75,7 +75,7 @@
 (use-package mwim
   :defer t
   :bind (("C-a" . mwim-beginning-of-code-or-line)
-	 ("C-e" . mwim-end-of-code-or-line)))
+     ("C-e" . mwim-end-of-code-or-line)))
 
 (use-package unfill
   :defer t
@@ -106,19 +106,18 @@
 (use-package wl
   :defer t
   :init
-  (progn
-    (setq read-mail-command 'wl
-          mail-user-agent 'wl-user-agent
-          mail-envelope-from 'header
-          mail-specify-envelope-from t
-          mime-header-accept-quoted-encoded-words t
-          epa-pinentry-mode 'loopback)
-    (define-mail-user-agent
-        'wl-user-agent
-        'wl-user-agent-compose
-        'wl-draft-send
-        'wl-draft-kill
-        'mail-send-hook)))
+  (setq read-mail-command 'wl
+        mail-user-agent 'wl-user-agent
+        mail-envelope-from 'header
+        mail-specify-envelope-from t
+        mime-header-accept-quoted-encoded-words t
+        epg-pinentry-mode 'loopback)
+  (define-mail-user-agent
+    'wl-user-agent
+    'wl-user-agent-compose
+    'wl-draft-send
+    'wl-draft-kill
+    'mail-send-hook))
 
 (use-package mu-cite
   :defer t
@@ -160,11 +159,17 @@
 (use-package dyalog-mode
   :defer t
   :init
-  (setq dyalog-fix-whitespace-before-save t)
+  (setq dyalog-fix-whitespace-before-save t
+        dyalog-leading-spaces 0)
   :custom-face
   (dyalog-apl-char ((t (:inherit font-lock-builtin-face))))
+  :interpreter
+  ("dyalogscript\\(\\.bash\\)?" . dyalog-mode)
   :mode
-  (("\\.apl[afno]" . dyalog-mode)))
+  (("\\.apl[afno]" . dyalog-mode))
+  :config
+  (modify-syntax-entry ?# " 1" dyalog-mode-syntax-table)
+  (modify-syntax-entry ?! "@ 2<" dyalog-mode-syntax-table))
 
 ;; nXML
 (use-package nxml-mode
@@ -175,6 +180,12 @@
         "article\\|sect\\([1-5]\\|ion\\)\\|chapter\\|appendix\\|part\\|preface\\|reference\\|simplesect\\|bibliography\\|bibliodiv\\|glossary\\|glossdiv")
   (add-to-list 'rng-schema-locating-files
                (expand-file-name "~/.emacs.d/schema/schemas.xml"))
+  (define-derived-mode docbook-pretty-mode
+    prettify-symbols-mode "Δ"
+    "Minor mode for DocBook viewing."
+    (setq-local prettify-symbols-alist
+                '(("inlineequation" . ?ε))))
+
   (require 'time-stamp)
   (defun nxml-insert-current-time ()
     (interactive)
@@ -194,9 +205,7 @@
 
 (use-package emmet-mode
   :defer t
-  :init
-  (add-hook 'nxml-mode-hook #'emmet-mode)
-  (add-hook 'html-mode-hook #'emmet-mode))
+  :hook nxml-mode html-mode)
 
 ;; TeX
 (use-package tex-mode
@@ -212,8 +221,8 @@
                         t "%r.pdf"))
                     '("pdf" "ams" "lua"))
     ((concat tex-command
-	     " " (if (< 0 (length tex-start-commands))
-		     (shell-quote-argument tex-start-commands))
+         " " (if (< 0 (length tex-start-commands))
+             (shell-quote-argument tex-start-commands))
              " %f")
      t "%r.dvi")
     ("open %r.pdf" "%r.pdf")
