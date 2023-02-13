@@ -161,15 +161,17 @@
   :init
   (setq dyalog-fix-whitespace-before-save t
         dyalog-leading-spaces 0)
-  :custom-face
-  (dyalog-apl-char ((t (:inherit font-lock-builtin-face))))
+  (defun dyalog-buffer-set-font ()
+    (buffer-face-set '(:family "APL385 Unicode" :height 140))
+    (buffer-face-mode))
+  (add-hook 'dyalog-mode-hook #'dyalog-buffer-set-font)
   :interpreter
   ("dyalogscript\\(\\.bash\\)?" . dyalog-mode)
   :mode
   (("\\.apl[afno]" . dyalog-mode))
   :config
-  (modify-syntax-entry ?# " 1" dyalog-mode-syntax-table)
-  (modify-syntax-entry ?! "@ 2<" dyalog-mode-syntax-table))
+  (modify-syntax-entry ?# ". 1" dyalog-mode-syntax-table)
+  (modify-syntax-entry ?! ". 2<" dyalog-mode-syntax-table))
 
 ;; nXML
 (use-package nxml-mode
@@ -180,11 +182,6 @@
         "article\\|sect\\([1-5]\\|ion\\)\\|chapter\\|appendix\\|part\\|preface\\|reference\\|simplesect\\|bibliography\\|bibliodiv\\|glossary\\|glossdiv")
   (add-to-list 'rng-schema-locating-files
                (expand-file-name "~/.emacs.d/schema/schemas.xml"))
-  (define-derived-mode docbook-pretty-mode
-    prettify-symbols-mode "Δ"
-    "Minor mode for DocBook viewing."
-    (setq-local prettify-symbols-alist
-                '(("inlineequation" . ?ε))))
 
   (require 'time-stamp)
   (defun nxml-insert-current-time ()
