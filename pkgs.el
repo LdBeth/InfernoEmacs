@@ -162,7 +162,7 @@
   (setq dyalog-fix-whitespace-before-save t
         dyalog-leading-spaces 0)
   (defun dyalog-buffer-set-font ()
-    (buffer-face-set '(:family "APL385 Unicode" :height 140))
+    (buffer-face-set '(:family "Fairfax HD" :height 159))
     (buffer-face-mode))
   (add-hook 'dyalog-mode-hook #'dyalog-buffer-set-font)
   :interpreter
