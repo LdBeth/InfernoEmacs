@@ -1,7 +1,7 @@
 #!/usr/bin/env crm
 {
     isolate (:es:) /\/Users\/ldbeth\/.emacs.d\/script\/emacs-devel\//
-    isolate (:application:) /(MS|QQ|BQ|OQ|Microsoft|YMail|Google|Crm)/
+    isolate (:application:) /(MS|QQ|BQ|OQ|Microsoft|YMail|Google|ME|Crm)/
     {
         match (:: :current_headers:) /(([^\n]+\n)+)\n/
         # remove application headers

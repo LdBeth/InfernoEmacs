@@ -34,6 +34,7 @@
       gamegrid-glyph-height-mm 3.0)
 
 (setq mac-emulate-three-button-mouse t
+      auth-sources '(macos-keychain-internet macos-keychain-generic)
       track-eol t
       kill-whole-line t)
 

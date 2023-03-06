@@ -143,10 +143,10 @@ strings.  See aria2c manual for supported options."
   :group 'face)
 
 ;;; Utils start here.
-
-(defsubst aria2--url ()
-  "Format URL."
-  (format "http://localhost:%d/jsonrpc" aria2-rcp-listen-port))
+(eval-and-compile
+  (defsubst aria2--url ()
+    "Format URL."
+    (format "http://localhost:%d/jsonrpc" aria2-rcp-listen-port)))
 
 (defun aria2--base64-encode-file (path)
   "Return base64-encoded string with contents of file on PATH."

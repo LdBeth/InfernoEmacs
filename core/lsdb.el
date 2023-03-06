@@ -1262,10 +1262,10 @@ performed against the entry field."
                  (setq entry (list entry)))
                (mapc
                 (lambda (e)
-                  (if (and e
-                           (not (member e entries))
-                           (string-match regexp e))
-                      (push (propertize e 'entry t) entries)))
+                  (when (and e
+                             (not (member e entries))
+                             (string-match regexp e))
+                    (push (propertize e 'entry t) entries)))
                 entry)))
            lsdb-hash-table)
           entries))
@@ -1273,9 +1273,10 @@ performed against the entry field."
       (let (results)
         (maphash
          (lambda (key value)
-           (if (string-match regexp key)
-               (push (propertize key 'record
-                                 (cons key value)) results)))
+           (when (string-match regexp key)
+             (push (propertize key 'record
+                               (cons key value))
+                   results)))
          lsdb-hash-table)
         results))))
 
@@ -1647,8 +1648,7 @@ the user wants it."
        (point)
        (progn
          (insert delimiter)
-         (while x-face
-           (funcall lsdb-insert-x-face-function (pop x-face)))
+         (mapc lsdb-insert-x-face-function x-face)
          (point))
        'lsdb-record record))))
 
@@ -1666,8 +1666,7 @@ the user wants it."
        (point)
        (progn
          (insert delimiter)
-         (while face
-           (funcall lsdb-insert-face-function (pop face)))
+         (mapc lsdb-insert-face-function face)
          (point))
        'lsdb-record record))))
 
