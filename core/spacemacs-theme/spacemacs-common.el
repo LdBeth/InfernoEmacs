@@ -901,7 +901,7 @@ to 'auto, tags may not be properly aligned. "
      '(org-fontify-todo-headline nil)
 
 ;;;;; pdf-tools
-    '(pdf-view-midnight-colors '(,base . ,bg1))))
+     '(pdf-view-midnight-colors '(,base . ,bg1))))
   ))
 
 

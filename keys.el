@@ -56,7 +56,8 @@ end if")))
  ("w" . wl)
  ("f" . make-frame)
  ("n" . newsticker-show-news)
- ("g" . gopher-club))
+ ("g" . gopher-club)
+ ("t" . todo-show))
 (bind-keys
  :prefix "M-m p"
  :prefix-map prover-loader
