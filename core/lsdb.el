@@ -1250,6 +1250,7 @@ performed against the entry field."
     (if records
         (lsdb-display-records records))))
 
+(static-when (featurep 'ivy)
 (defun counsel-lsdb-candidates (entry-name)
   "Build `counsel-lsdb' candidate list."
   (if entry-name
@@ -1281,7 +1282,7 @@ performed against the entry field."
         results))))
 
 (defun counsel-lsdb (&optional entry-name)
-  "Search LSDB with `ivy'."
+  "Search LSDB with `completing-read'."
   (interactive)
   (lsdb-maybe-load-hash-tables)
   (let* ((completion-ignore-case t)
@@ -1310,14 +1311,15 @@ performed against the entry field."
                       entry-name)))
         (if records
             (lsdb-display-records records))))))
+)
 
 ;;;###autoload
 (defun lsdb ()
   (interactive)
   (call-interactively
    (static-if (featurep 'ivy)
-       'counsel-lsdb
-     lsdb-mode-lookup)))
+       #'counsel-lsdb
+     #'lsdb-mode-lookup)))
 
 (defun lsdb-mode-next-record (&optional arg)
   "Go to the next record."

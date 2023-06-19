@@ -2,7 +2,8 @@
 (load (concat user-emacs-directory "pkgs"))
 (dolist (package
          '(mwim unfill ctrlf
-                which-key bind-key))
+                which-key bind-key
+                emacs-gc-stats))
   (require package))
 (defconst dumped-load-path load-path)
 (garbage-collect)

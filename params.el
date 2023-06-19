@@ -62,19 +62,21 @@
         ("ldbeth" "https://ldbeth.sdf.org/rss.xml")
         ;;("ACG" "http://www.acgpiping.net/feed/")
         ("XML" "https://www.xml.com/feed/all/")
-        ("ndw" "https://so.nwalsh.com/feed/whatsnew.xml")
+        ;;("ndw" "https://so.nwalsh.com/feed/whatsnew.xml")
         ))
 
 (setq corfu-auto t
-      completion-styles '(flex partial-completion))
+      orderless-matching-styles '(orderless-flex orderless-prefixes)
+      completion-styles '(flex orderless basic)
+      completion-category-defaults nil
+      completion-category-overrides '((file (styles basic partial-completion))))
+
 ;; lisp
 (setq inferior-lisp-program "ccl"
       common-lisp-hyperspec-root "file:///usr/local/share/doc/HyperSpec/")
 ;; elpa
 (add-to-list 'package-archives
              '("melpa" . "https://melpa.org/packages/"))
-
-(add-hook 'prog-mode-hook 'corfu-mode)
 
 (if (not (boundp 'dumped-load-path))
     (load (concat user-emacs-directory "pkgs"))
@@ -84,3 +86,4 @@
   (set-face-foreground 'homoglyph "#686868"))
 
 (vertico-mode 1)
+(emacs-gc-stats-mode 1)

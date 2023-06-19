@@ -198,6 +198,7 @@
 (use-package nxml-mode
   :defer t
   :functions nxml-token-after
+  :hook (nxml-mode . corfu-mode)
   :config
   (setq nxml-section-element-name-regexp
         "article\\|sect\\([1-5]\\|ion\\)\\|chapter\\|appendix\\|part\\|preface\\|reference\\|simplesect\\|bibliography\\|bibliodiv\\|glossary\\|glossdiv")
