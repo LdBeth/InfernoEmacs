@@ -782,6 +782,10 @@ to 'auto, tags may not be properly aligned. "
      '(todo-time ((,class (:foreground ,str))))
      '(todo-nondiary ((,class (:foreground ,meta))))
 
+;;;;; vertico
+     '(vertico-current ((,class (:background ,highlight :extend t))))
+     '(completions-common-part ((,class (:foreground ,head1 :underline t))))
+
 ;;;;; vterm
      '(vterm-color-default ((,class (:foreground ,base :background ,bg1))))
      ;; vterm-color-black used to render black color code.

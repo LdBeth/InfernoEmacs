@@ -40,6 +40,7 @@
 
 (use-package ivy
   ; :diminish ivy-mode
+  :disabled
   :init
   (setq ivy-use-virtual-buffers t
         ivy-use-selectable-prompt t
@@ -47,16 +48,34 @@
   :config
   (ivy-mode))
 
+(use-package vertico-directory
+  :after vertico
+  :ensure nil
+  ;; More convenient directory navigation commands
+  :bind (:map vertico-map
+              ("RET" . vertico-directory-enter)
+              ("DEL" . vertico-directory-delete-char)
+              ("M-DEL" . vertico-directory-delete-word))
+  ;; Tidy shadowed file names
+  :hook (rfn-eshadow-update-overlay . vertico-directory-tidy))
+
 (use-package smex
+  :disabled
   :defer t
   :init (setq smex-history-length 32))
 
 (use-package counsel
   ; :diminish counsel-mode
+  :disabled
   :config
   (counsel-mode))
 
+(use-package ctrlf
+  :init
+  (ctrlf-mode 1))
+
 (use-package swiper
+  :disabled
   :defer t
   :bind
   ([remap isearch-forward] . swiper-isearch))

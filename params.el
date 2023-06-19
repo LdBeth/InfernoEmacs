@@ -42,7 +42,8 @@
               tab-width 4)
 (setq ring-bell-function 'ignore
       use-short-answers t
-      tab-always-indent 'complete)
+      tab-always-indent 'complete
+      enable-recursive-minibuffers t)
 
 (setq recentf-exclude '("mime-example$" ".emacs.d/\\([a-z]\\|-\\)*$")
       dired-use-ls-dired nil)
@@ -73,9 +74,13 @@
 (add-to-list 'package-archives
              '("melpa" . "https://melpa.org/packages/"))
 
+(add-hook 'prog-mode-hook 'corfu-mode)
+
 (if (not (boundp 'dumped-load-path))
     (load (concat user-emacs-directory "pkgs"))
   (setq load-path dumped-load-path)
   (global-font-lock-mode t)
   (transient-mark-mode t)
   (set-face-foreground 'homoglyph "#686868"))
+
+(vertico-mode 1)
