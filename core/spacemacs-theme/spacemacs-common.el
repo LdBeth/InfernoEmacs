@@ -784,7 +784,7 @@ to 'auto, tags may not be properly aligned. "
 
 ;;;;; vertico
      '(vertico-current ((,class (:background ,highlight :extend t))))
-     '(completions-common-part ((,class (:foreground ,head1 :underline t))))
+     '(completions-common-part ((,class (:foreground ,var))))
 
 ;;;;; vterm
      '(vterm-color-default ((,class (:foreground ,base :background ,bg1))))
