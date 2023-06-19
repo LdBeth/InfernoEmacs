@@ -66,10 +66,12 @@
         ))
 
 (setq corfu-auto t
-      orderless-matching-styles '(orderless-flex orderless-prefixes)
+      orderless-matching-styles '(orderless-prefixes
+                                  orderless-regexp)
       completion-styles '(flex orderless basic)
       completion-category-defaults nil
-      completion-category-overrides '((file (styles basic partial-completion))))
+      completion-category-overrides
+      '((file (styles basic partial-completion))))
 
 ;; lisp
 (setq inferior-lisp-program "ccl"
