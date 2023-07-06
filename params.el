@@ -80,6 +80,9 @@
 (add-to-list 'package-archives
              '("melpa" . "https://melpa.org/packages/"))
 
+(setq tramp-auto-save-directory (concat temporary-file-directory
+                                        "tramp/"))
+
 (if (not (boundp 'dumped-load-path))
     (load (concat user-emacs-directory "pkgs"))
   (setq load-path dumped-load-path)
@@ -88,4 +91,3 @@
   (set-face-foreground 'homoglyph "#686868"))
 
 (vertico-mode 1)
-(emacs-gc-stats-mode 1)

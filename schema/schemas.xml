@@ -12,6 +12,7 @@
   <namespace ns="http://www.w3.org/2005/Atom" typeId="Atom"/>
   <namespace ns="https://ldbeth.sdf.org/lsml" typeId="LsML"/>
   <namespace ns="urn:speedata.de:2009/publisher/en" typeId="Layout"/>
+  <namespace ns="http://symbulator.com/sydoc" typeId="SyDoc"/>
 
   <documentElement localName="rss" typeId="RSS"/>
   <documentElement localName="feed" typeId="Atom"/>
@@ -41,5 +42,6 @@
   <typeId id="LsML" uri="lsml.rnc"/>
   <typeId id="TeX" uri="texml.rnc"/>
   <typeId id="Layout" uri="layoutschema.rnc"/>
+  <typeId id="SyDoc" uri="symbulatordoc.rnc"/>
 
 </locatingRules>

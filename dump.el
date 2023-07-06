@@ -1,7 +1,7 @@
 (package-initialize)
 (load (concat user-emacs-directory "pkgs"))
 (dolist (package
-         '(mwim unfill ctrlf orderless
+         '(mwim unfill ctrlf ;orderless
                 which-key bind-key
                 emacs-gc-stats))
   (require package))

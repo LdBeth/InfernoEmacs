@@ -22,7 +22,8 @@
  '(custom-safe-themes
    '("512fe37090a702098710d2a33ab1aad365d7f7e0063fe6afb75b20df25f16903" "4f87934838378e5bdd9a85a8ef46eb75e55a68b0a400a44ea45a3fd3c9167562" default))
  '(package-selected-packages
-   '(orderless emacs-gc-stats vertico ctrlf sudo-edit z3-mode xquery-mode emmet-mode elpher rnc-mode maude-mode corfu dyalog-mode filladapt gnu-elpa-keyring-update pinentry wanderlust mwim unfill sly which-key use-package)))
+   '(flyspell-correct frimacs orderless emacs-gc-stats vertico ctrlf sudo-edit z3-mode xquery-mode emmet-mode elpher rnc-mode maude-mode corfu dyalog-mode filladapt gnu-elpa-keyring-update pinentry wanderlust mwim unfill sly which-key use-package))
+ '(warning-suppress-types '((auto-save))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.

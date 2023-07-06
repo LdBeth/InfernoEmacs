@@ -108,6 +108,7 @@
 ;; Spell
 (use-package flyspell
   :defer t
+  :hook (text-mode . flyspell-mode)
   :bind (:map flyspell-mode-map
               ("C-;" . flyspell-correct-wrapper)))
 
@@ -117,6 +118,7 @@
   :init
   (setq diary-display-function #'diary-fancy-display
         diary-number-of-entries 7)
+  :config
   (add-hook 'diary-list-entries-hook #'diary-sort-entries t)
   (add-hook 'diary-list-entries-hook #'diary-include-other-diary-files)
   (add-hook 'diary-mark-entries-hook #'diary-mark-included-diary-files))
@@ -225,6 +227,12 @@
 (use-package emmet-mode
   :defer t
   :hook nxml-mode html-mode)
+
+;; FriCAS
+(use-package frimacs
+  :defer t
+  :init
+  (setq frimacs-process-program "fricas -noht -noclef"))
 
 ;; TeX
 (use-package tex-mode

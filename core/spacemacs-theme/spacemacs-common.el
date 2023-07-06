@@ -785,6 +785,10 @@ to 'auto, tags may not be properly aligned. "
 ;;;;; vertico
      '(vertico-current ((,class (:background ,highlight :extend t))))
      '(completions-common-part ((,class (:foreground ,var))))
+     '(orderless-match-face-0 ((,class (:foreground ,blue))))
+     '(orderless-match-face-1 ((,class (:foreground ,magenta))))
+     '(orderless-match-face-2 ((,class (:foreground ,green))))
+     '(orderless-match-face-3 ((,class (:foreground ,yellow))))
 
 ;;;;; vterm
      '(vterm-color-default ((,class (:foreground ,base :background ,bg1))))

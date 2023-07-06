@@ -185,7 +185,7 @@ end if")))
             nil
           (window-adjust-process-window-size-smallest proc win))))
 
-(add-hook 'minibuffer-setup-hook 'corfu-mode)
+;; (add-hook 'minibuffer-setup-hook 'corfu-mode)
 
 (eval-when-compile
   (require 'use-package)

@@ -128,9 +128,9 @@ lsmlSecTitle =
         lsmlText
     }
 
-lsmlText = (lsmlInline | lsmlDiff | lsmlBr | lsmlRaw | text)
+lsmlText = mixed { (lsmlInline | lsmlDiff | lsmlBr | lsmlRaw)* }
 lsmlBr = element br { empty }
-lsmlPara = element p { lsmlText* }
+lsmlPara = element p { lsmlText }
 
 lsmlInline = (lsmlBold | lsmlIt | lsmlVerb | lsmURL | lsmlKbd | lsmlCite)
 lsmlDiff = (lsmlIns | lsmlDel)
