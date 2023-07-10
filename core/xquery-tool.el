@@ -120,6 +120,12 @@ Makes `xquery-tool-parse-to-shadow' parse included files."
   :group 'xquery-tool
   :type '(boolean))
 
+(defcustom xquery-tool-xml-catalog-file nil
+  "The catalog file provided to the processor."
+  :group 'xquery-tool
+  :type '(choice (const :tag "Off" nil)
+                 (string :tag "XML Catalog")))
+
 (defcustom xquery-tool-index-xml t
   "Whether to index XML documents in querying."
   :group 'xquery-tool
@@ -130,6 +136,9 @@ Makes `xquery-tool-parse-to-shadow' parse included files."
 
 (defvar xquery-tool-file-mappings nil
   "An assoc list of files used and their replacements.")
+
+(make-variable-buffer-local 'xquery-tool-resolve-xincludes)
+(make-variable-buffer-local 'xquery-tool-xml-catalog-file)
 
 ;; (defvar xquery-tool-last-xquery-on-full-file nil
 ;;   "If non-nil, the last xquery was run on a full xml document.
@@ -287,17 +296,18 @@ The function returns the buffer that the results are in."
       (erase-buffer))
     (setq process-status
 	  (apply 'call-process
-		 (list
 		  xquery-tool-query-binary ;; program
 		  nil			  ;; infile
 		  target-buffer		  ;; destination
 		  nil			  ;; update display
 		  ;; args
-		  (format "-s:%s" (or xml-shadow-file "-"))
-		  (format "-q:%s" xquery-file)
-		  ;; (format "-qversion:%s" "3.0")
-		  (format "-ext:on")
-		  (if xquery-tool-resolve-xincludes "-xi:on" "-xi:off"))))
+          `(,@(if xquery-tool-xml-catalog-file
+                  (list (format "-catalog:%s" xquery-tool-xml-catalog-file)))
+		    ,(format "-s:%s" (or xml-shadow-file "-"))
+		    ,(format "-q:%s" xquery-file)
+		    ;; ,(format "-qversion:%s" "3.0")
+		    ,(format "-ext:on")
+		    ,(if xquery-tool-resolve-xincludes "-xi:on" "-xi:off"))))
     (if (= 0 process-status)
 	(message "Called saxonb, setting up results ...")
       (when show-results (pop-to-buffer target-buffer))
@@ -324,7 +334,8 @@ The function returns the buffer that the results are in."
       (goto-char (point-min)))
     (when show-results
       (with-current-buffer target-buffer
-	(normal-mode))
+	    (normal-mode)
+        (rng-validate-mode -1))
       (display-buffer target-buffer
 		      `((display-buffer-reuse-window
 			 display-buffer-in-previous-window
@@ -511,11 +522,11 @@ If XML-BUFFER-OR-FILE is specified, look at that for namespace declarations."
 	(insert "declare namespace output = \"http://www.w3.org/2010/xslt-xquery-serialization\";\n")
 	(when xquery-tool-omit-xml-declaration
 	  ;; fix for saxon (does not respect standard output option?)
-	  (unless (assoc "saxon" namespaces)
-	    (insert "declare namespace saxon=\"http://saxon.sf.net/\";\n"))
+	  ;;(unless (assoc "saxon" namespaces)
+	  ;;  (insert "declare namespace saxon=\"http://saxon.sf.net/\";\n"))
 	  (insert "declare option saxon:output \"omit-xml-declaration=yes\";\n")
 	  (insert "declare option output:omit-xml-declaration \"yes\";\n"))
-	;; (insert "declare option output:indent \"yes\";\n")
+	(insert "declare option output:indent \"yes\";\n")
 	;; (insert "declare option output:item-separator \"&#xa;\";")
 	(insert xquery)
 	(save-buffer)
