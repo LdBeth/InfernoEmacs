@@ -40,11 +40,10 @@
 
 (require 'xmltok)
 (require 'url-parse)
-;; Try to load cl-lib, or cl.  Probably this is not a good idea.
-;; (unless (require 'cl-lib nil t)
-;;   (require 'cl))
-(require 'cl-lib)
-(require 'ob-core)
+(eval-when-compile
+  (require 'static)
+  (require 'rng-nxml))
+;;(require 'ob-core)
 
 ;;;###autoload
 (defgroup xquery-tool nil
@@ -334,8 +333,8 @@ The function returns the buffer that the results are in."
       (goto-char (point-min)))
     (when show-results
       (with-current-buffer target-buffer
-	    (normal-mode)
-        (rng-validate-mode -1))
+	    (let (rng-nxml-auto-validate-flag)
+          (normal-mode)))
       (display-buffer target-buffer
 		      `((display-buffer-reuse-window
 			 display-buffer-in-previous-window
@@ -351,17 +350,14 @@ The function returns the buffer that the results are in."
 For the other options, WRAP-IN-ROOT, SAVE-NAMESPACE,
 SHOW-RESULTS, and NO-INDEX-XML, see the documentation of
 ‘xquery-tool’."
-  (let ((buff (get-buffer-create "*xquery-temp-buff*"))
-	result)
-    (with-current-buffer buff
-      (erase-buffer)
-      (insert xml-string)
-      (setq result
-	    (with-current-buffer (xquery-tool-query xquery (current-buffer) wrap-in-root save-namespace show-results no-index-xml)
-	      (buffer-substring-no-properties (point-min) (point-max)))))
-    (kill-buffer buff)
-    result))
-
+  (let ((buff (get-buffer-create "*xquery-temp-buff*")))
+    (prog1
+        (with-current-buffer buff
+          (erase-buffer)
+          (insert xml-string)
+	      (with-current-buffer (xquery-tool-query xquery (current-buffer) wrap-in-root save-namespace show-results no-index-xml)
+	        (buffer-substring-no-properties (point-min) (point-max))))
+      (kill-buffer buff))))
 
 (defun xquery-tool-setup-xquery-results (&optional target-buffer save-namespaces)
   "Try to construct links for the results in TARGET-BUFFER.
@@ -383,7 +379,7 @@ used for constructing the links are removed."
 	  (when (and (member xmltok-type '(start-tag empty-element)) (or xmltok-namespace-attributes xmltok-attributes))
 	    (set-marker current-pos (point))
 	    (let* ((atts (xquery-tool-get-namespace-candidates))
-		   (start-att (cl-remove-if 'null
+		   (start-att (cl-remove-if #'null
 					    (mapcar (lambda (x) (if (string= (xmltok-attribute-local-name x) "start") x)) atts)))
 		   target)
 	      (when (= 1 (length start-att))
@@ -445,8 +441,8 @@ sure xmltok is up to date."
   (when (member xmltok-type '(start-tag empty-element))
       (let ((namespace (or namespace xquery-tool-link-namespace)))
 	(sort ;; better sort this explicitly
-	 (mapcar 'cdr;; get all attribute values if they're in the namespace we added
-		 (cl-remove-if 'null
+	 (mapcar #'cdr;; get all attribute values if they're in the namespace we added
+		 (cl-remove-if #'null
 			       (append
 				(mapcar  (lambda (x) (when (string= (xmltok-attribute-prefix x) namespace)
 						       (cons (xmltok-attribute-prefix x) x))) xmltok-attributes)
@@ -458,17 +454,15 @@ sure xmltok is up to date."
   "Remove all attributes in CANDIDATES.
 
 CANDIDATES is a list of `xmltok-attribute' vectors."
-  (let ()
-    (when candidates
-      (dolist (delete-me candidates)
+  (dolist (delete-me candidates)
 	;; (setq delete-me (pop candidates))
 	(goto-char (xmltok-attribute-name-start delete-me))
 	;; delete space before attribute, attribute, and closing quote
 	(delete-region (1- (xmltok-attribute-name-start delete-me)) (1+ (xmltok-attribute-value-end delete-me))))
-      (save-excursion
+  (save-excursion
 	(goto-char xmltok-start)
 	(xmltok-forward)
-	xmltok-attributes))))
+	xmltok-attributes))
 
 (defun xquery-tool-relink-xml-base ()
   "Make the @xml:base attribute point at the original file.
@@ -853,7 +847,8 @@ If FORCE is non-nil, don't ask for affirmation.  Essentially, all
      (get-buffer-create buffer-or-string)))
    (t (error "Failed to get a buffer for %s" buffer-or-string))))
 
-;;;###autoload
+(static-when nil
+
 (defun xquery-tool-query-ob-execute (body params)
   "A function for org-babel to execute BODY as an xquery with org-babel PARAMS.
 
@@ -911,7 +906,7 @@ The PARAMS specific to this function are:
       (when (bufferp xquery) (kill-buffer xquery))
       (buffer-substring-no-properties (point-min) (point-max)))))
 
-(defalias 'org-babel-execute:xquery 'xquery-tool-query-ob-execute)
+(defalias 'org-babel-execute:xquery 'xquery-tool-query-ob-execute))
 
 (provide 'xquery-tool)
 ;;; xquery-tool.el ends here
