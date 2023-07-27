@@ -147,7 +147,7 @@ to 'auto, tags may not be properly aligned. "
         (ttip          (color-variant "#9a9aba" "#888888" "#8c799f" "#5f5f87"))
         (ttip-sl       (color-variant "#5e5079" "#333333" "#c8c6dd" "#afafff"))
         (ttip-bg       (color-variant "#34323e" "#444444" "#e2e0ea" "#dfdfff"))
-        (type          (color-variant "#ce537a" "#df005f" "#ba2f59" "#af005f"))
+        (type          (color-variant "#dc267f" "#df005f" "#ba2f59" "#af005f"))
         (var           (color-variant "#7590db" "#8787d7" "#715ab1" "#af5fd7"))
         (war           (color-variant "#dc752f" "#dc752f" "#dc752f" "#dc752f"))
 
@@ -218,6 +218,14 @@ to 'auto, tags may not be properly aligned. "
      '(vertical-border ((,class (:foreground ,border))))
      '(warning ((,class (:foreground ,war))))
      '(widget-button-pressed ((,class (:foreground ,green))))
+
+;;;;; Basic Colors
+     '(red ((,class (:foreground ,red))))
+     '(blue ((,class (:foreground ,blue))))
+     '(yellow ((,class (:foreground ,yellow))))
+     '(green ((,class (:foreground ,green))))
+     '(cyan ((,class (:foreground ,cyan))))
+     '(magenta ((,class (:foreground ,magenta))))
 
 ;;;;; ace-window
      '(aw-leading-char-face ((,class (:foreground ,func :weight bold :height 2.0 :box (:line-width 1 :color ,keyword :style released-button)))))
@@ -512,6 +520,12 @@ to 'auto, tags may not be properly aligned. "
 
 ;;;;; ivy-posframe
      '(ivy-posframe ((,class (:background ,bg3))))
+
+;;;;; j-mode
+     '(j-verb-face ((,class (:foreground ,type))))
+     '(j-adverb-face ((,class (:foreground ,keyword))))
+     '(j-conjunction-face ((,class (:foreground ,yellow))))
+     '(j-other-face ((,class (:foreground ,const))))
 
 ;;;;; latex
      '(font-latex-bold-face ((,class (:foreground ,comp))))

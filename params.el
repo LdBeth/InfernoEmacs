@@ -53,7 +53,9 @@
       erc-nick "ldb"
       erc-insert-timestamp-function 'erc-insert-timestamp-left
       erc-timestamp-format "%H%M "
-      erc-autojoin-timing 'ident)
+      erc-autojoin-timing 'ident
+      ;; erc-autojoin-channels-alist '(("libera.chat" "#commonlisp" "#emacs"))
+      )
 
 ;; Newsticker
 (setq newsticker-url-list
