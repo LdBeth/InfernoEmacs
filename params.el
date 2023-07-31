@@ -1,3 +1,10 @@
+(let ((paths
+       (with-temp-buffer
+         (call-process-shell-command "cat /etc/paths /etc/paths.d/*" nil t)
+         (split-string (buffer-string)))))
+  (setenv "PATH" (mapconcat #'identity paths ":"))
+  (setq exec-path (add-to-list 'paths exec-directory t)))
+
 (setq ad-redefinition-action 'accept)
 ;; Visuals
 (scroll-bar-mode -1)
@@ -85,6 +92,7 @@
 (setq tramp-auto-save-directory (concat temporary-file-directory
                                         "tramp/"))
 
+(defvar dumped-load-path)
 (if (not (boundp 'dumped-load-path))
     (load (concat user-emacs-directory "pkgs"))
   (setq load-path dumped-load-path)

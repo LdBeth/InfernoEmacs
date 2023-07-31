@@ -99,18 +99,18 @@
   (setq mode-name "J"
         major-mode 'j-mode)
   (set-syntax-table j-font-lock-syntax-table)
-  (set (make-local-variable 'comment-start)
-       "NB. ")
-  (set (make-local-variable 'comment-start-skip)
-       "\\(\\(^\\|[^\\\\\n]\\)\\(\\\\\\\\\\)*\\)NB. *")
-  (set (make-local-variable 'font-lock-comment-start-skip)
-       "NB. *")
-  (set (make-local-variable 'font-lock-defaults)
-       '(j-font-lock-keywords
-         nil nil nil nil
-         ;;(font-lock-mark-block-function . mark-defun)
-         (font-lock-syntactic-face-function
-          . j-font-lock-syntactic-face-function)))
+  (setq comment-start
+        "NB. "
+        comment-start-skip
+        "\\(\\(^\\|[^\\\\\n]\\)\\(\\\\\\\\\\)*\\)NB. *"
+        font-lock-comment-start-skip
+        "NB. *"
+        font-lock-defaults
+        '(j-font-lock-keywords
+          nil nil nil nil
+          ;;(font-lock-mark-block-function . mark-defun)
+          (font-lock-syntactic-face-function
+           . j-font-lock-syntactic-face-function)))
   (run-mode-hooks 'j-mode-hook))
 
 

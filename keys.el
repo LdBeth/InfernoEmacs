@@ -43,6 +43,20 @@ if prefix argument ARG is given, switch to it in an other, possibly new window."
 
 (defun now-playing ()
   (interactive)
+  (let ((nowplay (with-temp-buffer
+                   (call-process
+                    "osascript"
+                    nil t nil
+                    (expand-file-name "script/nowplay.scpt" user-emacs-directory))
+                   (string-trim-right (buffer-string)))))
+    (when (called-interactively-p 'interactive)
+      (message "%s" nowplay))
+    nowplay))
+
+(eval-when-compile (require 'static))
+(static-when (functionp 'mac-osa-script)
+(defun now-playing ()
+  (interactive)
   (let ((nowplay (read (mac-osa-script
                         (expand-file-name "script/nowplay.scpt" user-emacs-directory)
                         "AppleScript" t))))
@@ -64,7 +78,7 @@ end if")))
     (when (called-interactively-p 'interactive)
       (kill-new url)
       (message "%s" url))
-    url))
+    url)))
 
 (defun gopher-club ()
   (interactive)
@@ -96,9 +110,10 @@ end if")))
 
 (add-to-list 'auto-mode-alist '("\\.spad" . prog-mode) t)
 
-;; fixed in emacs 29
-(advice-add 'newsticker--cache-read
-            :override #'newsticker--cache-read-version1)
+(pixel-scroll-precision-mode 1)
+(setq pixel-scroll-precision-interpolate-page t)
+(defalias 'scroll-up-command 'pixel-scroll-interpolate-up)
+(defalias 'scroll-down-command 'pixel-scroll-interpolate-down)
 
 ;; Will fix in emacs 30
 (defun newsticker--decode-rfc822-date-revision (rfc822-string)
