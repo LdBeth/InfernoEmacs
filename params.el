@@ -1,10 +1,10 @@
-(let ((paths
-       (eval-when-compile
-         (with-temp-buffer
-           (call-process-shell-command "cat /etc/paths /etc/paths.d/*" nil t)
-           (split-string (buffer-string))))))
-  (setenv "PATH" (mapconcat #'identity paths ":"))
-  (setq exec-path (add-to-list 'paths exec-directory t)))
+;; (let ((paths
+;;        (eval-when-compile
+;;          (with-temp-buffer
+;;            (call-process-shell-command "cat /etc/paths /etc/paths.d/*" nil t)
+;;            (split-string (buffer-string))))))
+;;   (setenv "PATH" (mapconcat #'identity paths ":"))
+;;   (setq exec-path (add-to-list 'paths exec-directory t)))
 
 (setq ad-redefinition-action 'accept)
 ;; Visuals

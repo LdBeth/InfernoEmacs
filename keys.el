@@ -41,6 +41,9 @@ if prefix argument ARG is given, switch to it in an other, possibly new window."
 
 (setq disabled-command-function #'logging-disabled-command)
 
+(eval-when-compile (require 'static))
+
+(static-when (functionp 'ns-do-applescript)
 (defun now-playing ()
   (interactive)
   (let ((nowplay (with-temp-buffer
@@ -65,9 +68,8 @@ end if")))
     (when (called-interactively-p 'interactive)
       (kill-new url)
       (message "%s" url))
-    url))
+    url)))
 
-(eval-when-compile (require 'static))
 (static-when (functionp 'mac-osa-script)
 (defun now-playing ()
   (interactive)
@@ -110,7 +112,7 @@ end if")))
                   (setf (car last-input-event) newname)
                   (vector last-input-event)))))
 
-(setq mac-right-command-modifier 'meta)
+;; (setq mac-right-command-modifier 'meta)
 
 (defun gopher-club ()
   (interactive)
@@ -142,10 +144,10 @@ end if")))
 
 (add-to-list 'auto-mode-alist '("\\.spad" . prog-mode) t)
 
-(pixel-scroll-precision-mode 1)
-(setq pixel-scroll-precision-interpolate-page t)
-(defalias 'scroll-up-command 'pixel-scroll-interpolate-down)
-(defalias 'scroll-down-command 'pixel-scroll-interpolate-up)
+;(pixel-scroll-precision-mode 1)
+;(setq pixel-scroll-precision-interpolate-page t)
+;(defalias 'scroll-up-command 'pixel-scroll-interpolate-down)
+;(defalias 'scroll-down-command 'pixel-scroll-interpolate-up)
 
 ;; Will fix in emacs 30
 (defun newsticker--decode-rfc822-date-revision (rfc822-string)
