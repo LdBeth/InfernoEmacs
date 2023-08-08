@@ -53,6 +53,20 @@ if prefix argument ARG is given, switch to it in an other, possibly new window."
       (message "%s" nowplay))
     nowplay))
 
+(defun now-browsing ()
+  (interactive)
+  (let ((url (ns-do-applescript "if application \"Safari\" is running then
+  tell application \"Safari\"
+    set display to URL of front document
+  end tell
+else
+  set display to \"No opened document.\"
+end if")))
+    (when (called-interactively-p 'interactive)
+      (kill-new url)
+      (message "%s" url))
+    url))
+
 (eval-when-compile (require 'static))
 (static-when (functionp 'mac-osa-script)
 (defun now-playing ()
@@ -79,6 +93,24 @@ end if")))
       (kill-new url)
       (message "%s" url))
     url)))
+
+(static-if (boundp 'mac-emulate-three-button-mouse)
+    (setq mac-emulate-three-button-mouse t)
+  (define-key key-translation-map [s-mouse-1]
+              (lambda (&optional _prompt)
+                (let ((newname 'mouse-2))
+                  ;; Copy the `event-kind` at the first occasion.
+                  (unless (get newname 'event-kind)
+                    (put newname 'event-kind
+                         (get (car last-input-event) 'event-kind)))
+                  ;; Modify the event in-place, otherwise we can get a prefix
+                  ;; added again, so a click on the header-line turns
+                  ;; into a [header-line header-line <newname>] :-(.
+                  ;; See fake_prefixed_keys in src/keyboard.c's.
+                  (setf (car last-input-event) newname)
+                  (vector last-input-event)))))
+
+(setq mac-right-command-modifier 'meta)
 
 (defun gopher-club ()
   (interactive)
@@ -112,8 +144,8 @@ end if")))
 
 (pixel-scroll-precision-mode 1)
 (setq pixel-scroll-precision-interpolate-page t)
-(defalias 'scroll-up-command 'pixel-scroll-interpolate-up)
-(defalias 'scroll-down-command 'pixel-scroll-interpolate-down)
+(defalias 'scroll-up-command 'pixel-scroll-interpolate-down)
+(defalias 'scroll-down-command 'pixel-scroll-interpolate-up)
 
 ;; Will fix in emacs 30
 (defun newsticker--decode-rfc822-date-revision (rfc822-string)

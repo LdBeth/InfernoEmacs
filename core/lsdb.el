@@ -151,7 +151,7 @@ via\" feature from mailing lists."
 
 (defcustom lsdb-boring-names
   "no.?reply\\|news\\|support\\|sale\\|\\+\\|notifi\\|info"
-  "Match senders that are not worth to save record."
+  "Match senders that are not worth to save the record."
   :group 'lsdb
   :type 'list)
 
@@ -806,7 +806,7 @@ Overrides `temp-buffer-show-function'.")
                              lsdb-last-candidates))))
          lsdb-hash-table))
       (setq lsdb-last-candidates
-            (delq nil (apply 'nconc (nreverse lsdb-last-candidates))))
+            (delq nil (apply #'nconc (nreverse lsdb-last-candidates))))
       (let ((tmp lsdb-last-candidates))
         (while tmp
           (setq tmp (setcdr tmp (delete (car tmp) (cdr tmp))))))
@@ -1313,13 +1313,11 @@ performed against the entry field."
             (lsdb-display-records records))))))
 )
 
-;;;###autoload
-(defun lsdb ()
-  (interactive)
-  (call-interactively
+;;;###autoload (autoload 'lsdb "lsdb")
+(defalias 'lsdb
    (static-if (featurep 'ivy)
        #'counsel-lsdb
-     #'lsdb-mode-lookup)))
+     #'lsdb-mode-lookup))
 
 (defun lsdb-mode-next-record (&optional arg)
   "Go to the next record."

@@ -1,7 +1,8 @@
 (let ((paths
-       (with-temp-buffer
-         (call-process-shell-command "cat /etc/paths /etc/paths.d/*" nil t)
-         (split-string (buffer-string)))))
+       (eval-when-compile
+         (with-temp-buffer
+           (call-process-shell-command "cat /etc/paths /etc/paths.d/*" nil t)
+           (split-string (buffer-string))))))
   (setenv "PATH" (mapconcat #'identity paths ":"))
   (setq exec-path (add-to-list 'paths exec-directory t)))
 
@@ -40,8 +41,7 @@
       shr-width 72
       gamegrid-glyph-height-mm 3.0)
 
-(setq mac-emulate-three-button-mouse t
-      auth-sources '(macos-keychain-internet macos-keychain-generic)
+(setq ;; auth-sources '(macos-keychain-internet macos-keychain-generic)
       track-eol t
       kill-whole-line t)
 
