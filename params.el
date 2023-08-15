@@ -41,7 +41,7 @@
       shr-width 72
       gamegrid-glyph-height-mm 3.0)
 
-(setq ;; auth-sources '(macos-keychain-internet macos-keychain-generic)
+(setq auth-sources '(macos-keychain-internet macos-keychain-generic)
       track-eol t
       kill-whole-line t)
 

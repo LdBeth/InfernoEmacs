@@ -419,9 +419,9 @@ when the `x-face-insert' function is performed."
   :group 'x-face)
 
 (defcustom x-face-auto-image nil
-  "If it is non-nil, show X-Face images when `x-face-insert'is performed.
-It can also be a function, for example, `called-interactively-p 'interactive',
-`(lambda nil (memq major-mode '(message-mode wl-draft-mode)))', etc."
+  "If it is non-nil, show X-Face images when `x-face-insert' is performed.
+It can also be a function, for example, `called-interactively-p \\='interactive',
+`(lambda () (memq major-mode \\='(message-mode wl-draft-mode)))', etc."
   :version "21.1"
   :type '(radio (const :format "%t " :tag "OFF" nil)
 		(const :format "%t\n" :tag "ON" t)
@@ -493,68 +493,67 @@ non-nil, assign the value of `x-face-image-attributes-for-bbdb' to an
 image instead of `x-face-image-attributes'.  If REMOVE-CACHE is non-
 nil, reset the value of `x-face-ring' to nil."
        (when (and (display-images-p)
-		  (image-type-available-p 'pbm)
-		  (eq 'custom-mode major-mode))
-	 (save-excursion
-	   (let ((inhibit-point-motion-hooks t))
-	     (goto-char (point-min))
-	     (when (re-search-forward "^<?X Face Image Attributes" nil t)
-	       (forward-line 1)
-	       (let ((inhibit-read-only t))
-		 (delete-region (point)
-				(progn
-				  (when (looking-at "From:")
-				    (forward-line 1)
-				    (when (search-forward "X-Face:" nil t)
-				      (while (progn
-					       (forward-line 1)
-					       (memq (char-after)
-						     '(?\t ?\ ))))))
-				  (skip-chars-forward "\n")
-				  (point)))
-		 (save-restriction
-		   (narrow-to-region (point) (point))
-		   (unless
-		       (and x-face-default-xbm-file
-			    (prog2
-				(insert "From: "
-					(if user-mail-address
-					    (if user-full-name
-						(concat
-						 user-full-name " <"
-						 user-mail-address ">")
-					      user-mail-address)
-					  "X-Face")
-					"\n")
-				(condition-case nil
-				    (let (x-face-auto-image
-					  x-face-hidden-properties)
-				      (x-face-insert x-face-default-xbm-file)
-				      t)
-				  (error
-				   (delete-region (point-min) (point-max))
-				   nil))
-			      (dolist (var '(x-face-use-overlay
-					     x-face-hide-related-headers
-					     x-face-hidden-properties))
-				(kill-local-variable var))))
-		     (insert "\
+		          (image-type-available-p 'pbm)
+		          (eq 'custom-mode major-mode))
+	     (save-excursion
+	       (goto-char (point-min))
+	       (when (re-search-forward "^<?X Face Image Attributes" nil t)
+	         (forward-line 1)
+	         (let ((inhibit-read-only t))
+		       (delete-region (point)
+				              (progn
+				                (when (looking-at "From:")
+				                  (forward-line 1)
+				                  (when (search-forward "X-Face:" nil t)
+				                    (while (progn
+					                         (forward-line 1)
+					                         (memq (char-after)
+						                           '(?\t ?\ ))))))
+				                (skip-chars-forward "\n")
+				                (point)))
+		       (save-restriction
+		         (narrow-to-region (point) (point))
+		         (unless
+		             (and x-face-default-xbm-file
+			              (prog2
+				              (insert "From: "
+					                  (if user-mail-address
+					                      (if user-full-name
+						                      (concat
+						                       user-full-name " <"
+						                       user-mail-address ">")
+					                        user-mail-address)
+					                    "X-Face")
+					                  "\n")
+				              (condition-case nil
+				                  (let (x-face-auto-image
+					                    x-face-hidden-properties)
+				                    (x-face-insert x-face-default-xbm-file)
+				                    t)
+				                (error
+				                 (delete-region (point-min) (point-max))
+				                 nil))
+			                (dolist (var '(x-face-use-overlay
+					                       x-face-hide-related-headers
+					                       x-face-hidden-properties))
+				              (kill-local-variable var))))
+		           (insert "\
 From: X-Face
 X-Face: 2i'm.M0UyETCme?'R/?fE}i)R-aY$t;].MSLwmUfB\"^3H+so!vO79{mzviSR4#DM+}\"\"
  ZwMOJ~e&Rr*qL'CrQZo-@jdTL=w{o3Pxu2PY]_qB=w%GLU1S_Pk8HX>4C}W2YTc=V=(~QH[vcm2!]O
  pq&CB^,K:NO/lVI-m&kP;pa&K.Xo)<V4=l<eRW]>X\n"))
-		   (when remove-cache
-		     (setq x-face-ring nil))
-		   (if bbdb
-		       (let ((x-face-image-attributes
-			      (x-face-image-attributes-for-bbdb))
-			     x-face-ring)
-			 (x-face-decode-message-header))
-		     (let (x-face-ring)
-		       (x-face-decode-message-header)))
-		   (goto-char (point-min))
-		   (forward-line 1)
-		   (delete-region (point) (point-max))))))))))
+		         (when remove-cache
+		           (setq x-face-ring nil))
+		         (if bbdb
+		             (let ((x-face-image-attributes
+			                (x-face-image-attributes-for-bbdb))
+			               x-face-ring)
+			           (x-face-decode-message-header))
+		           (let (x-face-ring)
+		             (x-face-decode-message-header)))
+		         (goto-char (point-min))
+		         (forward-line 1)
+		         (delete-region (point) (point-max)))))))))
 
 (put 'x-face-internal-function 'image-attributes
      (lambda ()
@@ -739,21 +738,21 @@ A value is a buffer in which images will be displayed.")
 (defvar x-face-working-buffer " *x-face-working*"
   "Temporary buffer for the internal use.")
 
-(eval-when-compile
-  ;; Avoid byte-compile warnings.
-  (autoload 'cmail-folder-buffer "cmail-misc")
-  (autoload 'cmail-get-page-number-from-summary "cmail-misc")
-  (autoload 'cmail-n-page "cmail-misc")
-  (autoload 'cmail-show-contents "cmail")
-  (autoload 'gnus-summary-select-article "gnus-sum")
-  (autoload 'mew-buffer-message "mew")
-  (autoload 'mew-summary-display "mew-summary")
-  (autoload 'mh-get-msg-num "mh-utils")
-  (autoload 'mh-show-msg "mh-utils")
-  (autoload 'vm-follow-summary-cursor "vm-motion")
-  (autoload 'wl-message-get-original-buffer "wl-message")
-  (autoload 'wl-summary-set-message-buffer-or-redisplay "wl-summary")
+;; Avoid byte-compile warnings.
+(autoload 'cmail-folder-buffer "cmail-misc")
+(autoload 'cmail-get-page-number-from-summary "cmail-misc")
+(autoload 'cmail-n-page "cmail-misc")
+(autoload 'cmail-show-contents "cmail")
+(autoload 'gnus-summary-select-article "gnus-sum")
+(autoload 'mew-buffer-message "mew")
+(autoload 'mew-summary-display "mew-summary")
+(autoload 'mh-get-msg-num "mh-utils")
+(autoload 'mh-show-msg "mh-utils")
+(autoload 'vm-follow-summary-cursor "vm-motion")
+(autoload 'wl-message-get-original-buffer "wl-message")
+(autoload 'wl-summary-set-message-buffer-or-redisplay "wl-summary")
 
+(eval-when-compile
   (defsubst x-face-buffer-live-p (buffer)
     "Say whether BUFFER is alive or not."
     (and buffer
@@ -817,9 +816,8 @@ just the header of the message."
     (dolist (overlay (overlays-in (point-min) (point-max)))
       (when (overlay-get overlay 'x-face-image)
 	(delete-overlay overlay)))
-    (let ((inhibit-point-motion-hooks t)
-	  (end (point-min))
-	  start regions)
+    (let ((end (point-min))
+	      start regions)
       (while (and end
 		  (setq start (text-property-any end (point-max)
 						 'x-face-image t)))
@@ -842,7 +840,6 @@ be narrowed to just the header of the message."
     (let ((props (append x-face-hidden-properties '(x-face-invisible t)))
 	  (mod (buffer-modified-p))
 	  (inhibit-read-only t)
-	  (inhibit-point-motion-hooks t)
 	  (end (point-min))
 	  start)
       (while (and end
@@ -922,9 +919,9 @@ header in each X-FACE."
 				    k 0
 				    l 8)
 			      (while (> l 0)
-				(setq k (lsh k -1)
+				(setq k (ash k -1)
 				      l (1- l))
-				(if (>= (setq j (lsh j 1)) 256)
+				(if (>= (setq j (ash j 1)) 256)
 				    (setq j (logand 255 j)
 					  k (logior 128 k))))
 			      (aset table i k)
@@ -1122,7 +1119,7 @@ PBM format."
 	      (insert (if (zerop (logand byte iy))
 			  "0"
 			"1"))
-	      (setq iy (lsh iy -1)))
+	      (setq iy (ash iy -1)))
 	    (when (zerop (setq iz (1- iz)))
 	      (insert "\n")
 	      (setq iz 6)))
@@ -1318,8 +1315,8 @@ Here are some examples of how to use this function:
 ;; Insert an image as an overlay.
 \(let ((overlay (make-overlay (point) (1+ (point))))
       (image (x-face-create-image X-Face)))
-  (overlay-put overlay 'evaporate t)
-  (overlay-put overlay 'before-string (propertize \" \" 'display image)))
+  (overlay-put overlay \\='evaporate t)
+  (overlay-put overlay \\='before-string (propertize \" \" \\='display image)))
 "
   (if (stringp x-face)
       (setq x-face (x-face-cleanup-x-face x-face))
@@ -1463,8 +1460,7 @@ This requires a support for images in your Emacs and the external
 `uncompface' program."
   (when (and (display-images-p)
 	     (image-type-available-p 'pbm))
-    (let ((inhibit-point-motion-hooks t)
-	  start images)
+    (let (start images)
       (save-excursion
 	;; FIXME: non-nil value of `ignore' means it is called in the
 	;; Gnus article buffer.  That is kludge, should be fixed.
@@ -1628,6 +1624,8 @@ This requires a support for images in your Emacs and the external
     ;; (set 'last t))
     ))
 
+(defvar message-strip-special-text-properties)
+
 ;;;###autoload
 (defun x-face-show (&optional arg)
   "Toggle showing X-Face images.  With ARG, turn showing on if and only
@@ -1653,10 +1651,8 @@ if ARG is positive."
       ;; The non-nil value for `message-strip-special-text-properties'
       ;; (by default) prevents hiding raw X-Face headers (some users
       ;; likely show her/his own face in the message buffer :-).
-      (let (_)
-        (defvar message-strip-special-text-properties)
-        (let (message-strip-special-text-properties)
-	  (x-face-decode-message-header)))
+      (let (message-strip-special-text-properties)
+	    (x-face-decode-message-header))
     (x-face-remove-x-face-images)
     (x-face-expose-hidden-text)))
 
@@ -1916,7 +1912,6 @@ buffer-locally."
 		   ))))
     (save-excursion
       (save-restriction
-	(let ((inhibit-point-motion-hooks t))
 	  (x-face-narrow-to-head)
 	  (let (x-faces)
 	    (let ((case-fold-search t))
@@ -1964,7 +1959,7 @@ buffer-locally."
 			     (forward-line 1)))))
 		(unless keep-existing-headers
 		  (while (setq x-face (pop x-faces))
-		    (delete-region (car x-face) (cdr x-face)))))))))))
+		    (delete-region (car x-face) (cdr x-face))))))))))
   (when (if (functionp x-face-auto-image)
 	    (funcall x-face-auto-image)
 	  x-face-auto-image)
@@ -1984,8 +1979,7 @@ uniquely and saved into the directory specified by the
       (x-face-possibly-change-buffer)
       (save-restriction
 	(x-face-narrow-to-head)
-	(let ((inhibit-point-motion-hooks t)
-	      start)
+	(let (start)
 	  (while (progn
 		   (while (not (or (eobp)
 				   (looking-at
@@ -2099,7 +2093,7 @@ forwarded MIME parts, except for Mew.  If you are a Gnus user, you can
 use this function as the main X-Face viewer as follows. :-p
 
 \(setq gnus-article-x-face-command
-      (lambda (&rest args) (x-face-ascii-view 'ignore)))
+      (lambda (&rest args) (x-face-ascii-view \\='ignore)))
 
 Note that this example can only be used with Gnus v 5.10.3 and later
 or T-gnus 6.16.3 and later."

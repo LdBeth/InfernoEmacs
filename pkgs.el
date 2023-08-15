@@ -83,7 +83,17 @@
 (use-package which-key
   :config
   (setq which-key-show-early-on-C-h t
-    which-key-idle-secondary-delay 0.05)
+        which-key-idle-secondary-delay 0.05)
+  (which-key-add-key-based-replacements
+    "C-x RET" "language"
+    "C-x 8" "unicode"
+    "C-x 8 e" "emoji"
+    "C-x a" "abbrev"
+    "C-x n" "narrow"
+    "C-x p" "project"
+    "C-x r" "register"
+    "C-x t" "tab"
+    "C-x x" "buffer")
   (which-key-mode 1))
 
 (use-package page-break-lines
@@ -118,6 +128,10 @@
   :init
   (setq diary-display-function #'diary-fancy-display
         diary-number-of-entries 7)
+  :autoload
+  diary-sort-entries
+  diary-include-other-diary-files
+  diary-mark-included-diary-files
   :config
   (add-hook 'diary-list-entries-hook #'diary-sort-entries t)
   (add-hook 'diary-list-entries-hook #'diary-include-other-diary-files)
@@ -208,8 +222,8 @@
                (expand-file-name "~/.emacs.d/schema/schemas.xml"))
 
   (require 'time-stamp)
-  (defun nxml-insert-current-time ()
-    (interactive)
+  (defun nxml-insert-current-time (&optional prefix)
+    (interactive "P")
     (if rng-current-schema-file-name
         (let ((time-stamp-format
                (cond ((string-match-p "rss" rng-current-schema-file-name)
@@ -218,11 +232,13 @@
                       ;; fixme hard coded timezone
                       "%Y-%02m-%02dT%02H:%02M:%02S-06:00")
                      (t time-stamp-format))))
-          (save-excursion
-            (let ((end (nxml-token-after)))
-              (goto-char xmltok-start)
-              (delete-char (- end xmltok-start))
-              (insert (time-stamp-string))))))))
+          (if prefix
+              (insert (time-stamp-string))
+            (save-excursion
+              (let ((end (nxml-token-after)))
+                (goto-char xmltok-start)
+                (delete-char (- end xmltok-start))
+                (insert (time-stamp-string)))))))))
 
 (use-package emmet-mode
   :defer t

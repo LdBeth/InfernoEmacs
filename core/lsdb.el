@@ -1487,25 +1487,21 @@ always hide."
         (lsdb-fit-window-to-buffer window)))))
 
 ;;;_. Interface to Mew written by Hideyuki SHIRAI <shirai@meadowy.org>
-(eval-when-compile
-  (condition-case nil
-      (progn
-        (require 'mew)
-        ;; Avoid macro `mew-cache-hit' expand (Mew 1.94.2 or earlier).
-        ;; Changed `mew-cache-hit' from macro to function at Mew 2.0.
-        (if (not (fboundp 'mew-current-get-fld))
-            (setq byte-compile-macro-environment
-                  (cons '(mew-cache-hit . nil)
-                        byte-compile-macro-environment))))
-    (error
-     ;; Silence byte compiler for environments where Mew does not installed.
-     (autoload 'mew-sinfo-get-disp-msg "mew")
-     (autoload 'mew-current-get-fld "mew")
-     (autoload 'mew-current-get-msg "mew")
-     (autoload 'mew-frame-id "mew")
-     (autoload 'mew-cache-hit "mew")
-     (autoload 'mew-xinfo-get-decode-err "mew")
-     (autoload 'mew-xinfo-get-action "mew"))))
+(static-when (require 'mew nil t)
+  ;; Avoid macro `mew-cache-hit' expand (Mew 1.94.2 or earlier).
+  ;; Changed `mew-cache-hit' from macro to function at Mew 2.0.
+  (if (not (fboundp 'mew-current-get-fld))
+      (setq byte-compile-macro-environment
+            (cons '(mew-cache-hit . nil)
+                  byte-compile-macro-environment))))
+;; Silence byte compiler for environments where Mew does not installed.
+(autoload 'mew-sinfo-get-disp-msg "mew")
+(autoload 'mew-current-get-fld "mew")
+(autoload 'mew-current-get-msg "mew")
+(autoload 'mew-frame-id "mew")
+(autoload 'mew-cache-hit "mew")
+(autoload 'mew-xinfo-get-decode-err "mew")
+(autoload 'mew-xinfo-get-action "mew")
 
 ;;;###autoload
 (defun lsdb-mew-insinuate ()
@@ -1543,8 +1539,7 @@ always hide."
           (lsdb-update-records-and-display))))))
 
 ;;;_. Interface to MU-CITE
-(eval-when-compile
-  (autoload 'mu-cite-get-value "mu-cite"))
+(autoload 'mu-cite-get-value "mu-cite")
 
 (defun lsdb-mu-attribution (address)
   "Extract attribute information from LSDB."

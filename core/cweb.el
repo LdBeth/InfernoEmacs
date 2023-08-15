@@ -88,7 +88,7 @@ otherwise do an ordinary Meta-y."
   (let ((point-save (point)))
     (unwind-protect
         (progn (goto-char (mark))
-               (sit-for 0 300)) ;; wait 300 milliseconds
+               (sit-for 0.3)) ;; wait 300 milliseconds
       (goto-char point-save))))
 
 ; I prefer to change the standard copy-region command to the following,
@@ -122,35 +122,36 @@ otherwise do an ordinary Meta-y."
 ; I made RET check for unmatched delimiters if it ends a paragraph.
 ; Otherwise TeX mode remains as it was before.
 
-(setq TeX-mode-map (make-sparse-keymap))
-(define-key TeX-mode-map "\C-c\C-k" 'TeX-kill-job)
-(define-key TeX-mode-map "\C-c\C-l" 'TeX-recenter-output-buffer)
-(define-key TeX-mode-map "\C-c\C-q" 'TeX-show-print-queue)
-(define-key TeX-mode-map "\C-c\C-p" 'TeX-print)
-(define-key TeX-mode-map "\"" 'TeX-insert-quote)
-(define-key TeX-mode-map "\e}" 'up-list)
-(define-key TeX-mode-map "\e{" 'TeX-insert-braces)
-(define-key TeX-mode-map "\C-c\C-r" 'TeX-region)
-(define-key TeX-mode-map "\C-c\C-b" 'TeX-buffer)
-(define-key TeX-mode-map "\C-c\C-f" 'TeX-close-LaTeX-block)
-(define-key TeX-mode-map "\r" 'TeX-newline)
-(define-key TeX-mode-map "\t" 'indent-relative)
-(setq TeX-mode-hook '(lambda ()
-  (make-local-variable 'indent-line-function)
-  (setq indent-line-function 'indent-relative-maybe)))
+;; (setq TeX-mode-map (make-sparse-keymap))
+(define-key tex-mode-map "\C-c\C-k" 'tex-kill-job)
+(define-key tex-mode-map "\C-c\C-l" 'tex-recenter-output-buffer)
+(define-key tex-mode-map "\C-c\C-q" 'tex-show-print-queue)
+(define-key tex-mode-map "\C-c\C-p" 'tex-print)
+(define-key tex-mode-map "\"" 'tex-insert-quote)
+(define-key tex-mode-map "\e}" 'up-list)
+(define-key tex-mode-map "\e{" 'tex-insert-braces)
+(define-key tex-mode-map "\C-c\C-r" 'tex-region)
+(define-key tex-mode-map "\C-c\C-b" 'tex-buffer)
+(define-key tex-mode-map "\C-c\C-f" 'tex-close-latex-block)
+(define-key tex-mode-map "\r" 'tex-newline)
+(define-key tex-mode-map "\t" 'indent-relative)
+(add-to-list 'tex-mode-hook
+             (lambda ()
+               (make-local-variable 'indent-line-function)
+               (setq indent-line-function 'indent-relative-maybe)))
 
-(defun TeX-newline (arg)
+(defun tex-newline (arg)
 "If previous character is newline and no ARG, check for unbalanced braces
 and/or dollar signs in previous paragraph. If ARG is \\[universal-argument],
 do a single newline; otherwise do ordinary newline."
  (interactive "*P")
  (if (and (eq (preceding-char) ?\n) (not arg))
-     (TeX-check-paragraph)
+     (tex-check-paragraph)
    (if (listp arg)
        (newline)
      (newline arg))))
 
-(defun TeX-check-paragraph ()
+(defun tex-check-paragraph ()
 "Insert a newline following a newline, breaking a paragraph for TeX.
 Check for mismatched delimiters in paragraph being terminated."
   (interactive)

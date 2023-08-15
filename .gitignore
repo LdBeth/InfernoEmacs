@@ -19,3 +19,6 @@ url/
 local/
 sasl-xoauth2/
 emacs-gc-stats.eld
+tree-sitter/
+transient/
+multisession/
