@@ -655,7 +655,7 @@ running."
   (revert-buffer))
 
 (defun aria2-toggle-pause ()
-  "Toggle 'paused' status for download."
+  "Toggle `paused' status for download."
   (interactive)
   (if (aria2--is-paused-p)
       (aria2-resume)
@@ -744,14 +744,14 @@ path navigation."
   (widget-move 3))
 
 (defun aria2-remove-download (arg)
-  "Set download status to 'removed'."
+  "Set download status to `removed'."
   (interactive "P")
   (when (y-or-n-p "Really remove download? ")
     (remove-download aria2--cc (get-text-property (point) 'tabulated-list-id) (not (equal nil arg)))
     (tabulated-list-delete-entry)))
 
 (defun aria2-clean-removed-download (arg)
-  "Clean download with 'removed/completed/error' status.
+  "Clean download with `removed/completed/error' status.
 With prefix remove all applicable downloads."
   (interactive "P")
   (if (equal nil arg)
