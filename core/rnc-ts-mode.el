@@ -59,8 +59,6 @@
 
 (defconst rnc--delimiters '("&" "," "|")) 
 
-(defconst rnc--def-regexp "^[ \t]*\\([\\[:alpha:]][[:alnum:]-._]*\\)[ \t]*=")
-
 (defvar rnc-indent-level 2)
 
 (defvar rnc--treesit-font-lock-settings

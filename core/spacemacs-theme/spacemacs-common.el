@@ -188,6 +188,7 @@ to 'auto, tags may not be properly aligned. "
      '(font-lock-comment-face ((,class (:foreground ,(if spacemacs-theme-comment-italic comment-light comment) :background ,(when spacemacs-theme-comment-bg comment-bg) :slant ,(if spacemacs-theme-comment-italic 'italic 'normal)))))
      '(font-lock-constant-face ((,class (:foreground ,const))))
      '(font-lock-doc-face ((,class (:foreground ,meta))))
+     '(font-lock-delimiter-face ((,class (:foreground ,base-dim))))
      '(font-lock-function-name-face ((,class (:foreground ,func :inherit bold))))
      '(font-lock-keyword-face ((,class (:inherit bold :foreground ,keyword :slant ,(if spacemacs-theme-keyword-italic 'italic 'normal)))))
      '(font-lock-negation-char-face ((,class (:foreground ,const))))
