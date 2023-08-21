@@ -9,124 +9,124 @@ namespace html = "http://www.w3.org/1999/xhtml"
 start = lsmlElement
 
 lsmlElement =
-    element lsml {
-        (attribute version { "0.1" } &
-         attribute lang { xsd:language }? &
-         attribute format { "htmlonly" | "usetext" }?),
-        lsmlClient,
-        lsmlHeader,
-        lsmlBody,
-        lsmlSignature?
-    }
+  element lsml {
+    (attribute version { "0.1" } &
+     attribute lang { xsd:language }? &
+     attribute format { "htmlonly" | "usetext" }?),
+    lsmlClient,
+    lsmlHeader,
+    lsmlBody,
+    lsmlSignature?
+  }
 
 lsmlClient =
-    element config {
-        element usetext { empty }?,
-        element headers { attribute * { text }* },
-        element mime {
-            element item {
-                attribute cid { text },
-                attribute src { xsd:anyURI }
-            }*
-        }
-    }?
+  element config {
+    element usetext { empty }?,
+    element headers { attribute * { text }* },
+    element mime {
+      element item {
+        attribute cid { text },
+        attribute src { xsd:anyURI }
+      }*
+    }
+  }?
 
 lsmlHeader =
-    element head {
-        lsmlEmailHds,
-        lsmlPrev?,
-        lsmlRaw*
-    }
+  element head {
+    lsmlEmailHds,
+    lsmlPrev?,
+    lsmlRaw*
+  }
 
 lsmlPrev = element preview { text }
 lsmlEmailHds =
-    element Subject { text } &
-    element To { lsmlEmail+ }? &
-    element From { lsmlEmail }? &
-    element Cc { lsmlEmail+ }? &
-    element Bcc { lsmlEmail+ }? &
-    element headers {
-        (element * { text })+
-    }?
+  element Subject { text } &
+  element To { lsmlEmail+ }? &
+  element From { lsmlEmail }? &
+  element Cc { lsmlEmail+ }? &
+  element Bcc { lsmlEmail+ }? &
+  element headers {
+    (element * { text })+
+  }?
 
 email.string =
-    xsd:string { pattern = ".+@.+" }
+  xsd:string { pattern = ".+@.+" }
 
 lsmlEmail =
-    element name { text }?, element email { email.string }
+  element name { text }?, element email { email.string }
 
 rfc2392.cid =
-    xsd:string { pattern = "cid:.+" }
+  xsd:string { pattern = "cid:.+" }
 
 lsmlImage =
-    element img {
-        attribute alt { text } &
-        attribute src { xsd:anyURI | rfc2392.cid } &
-        attribute width { xsd:unsignedInt }? &
-        attribute height { xsd:unsignedInt }? 
-    }
+  element img {
+    attribute alt { text } &
+    attribute src { xsd:anyURI | rfc2392.cid } &
+    attribute width { xsd:unsignedInt }? &
+    attribute height { xsd:unsignedInt }? 
+  }
 lsmlAnyAttribute = attribute * { text }
 lsmlAnyHTML =
-    (text |
-     element html:* {
-         (lsmlAnyAttribute | text | lsmlAnyHTML)*
-     })+
+  (text |
+   element html:* {
+     (lsmlAnyAttribute | text | lsmlAnyHTML)*
+   })+
 
 lsmlBody = element body { lsmlTopElements+ }
 
 lsmlTopElements =
-    (lsmlCodeBlk | lsmlQuote |
-     lsmlList | lsmlRule |
-     lsmlPara | lsmlImage | lsmlSection | lsmlRaw)
+  (lsmlCodeBlk | lsmlQuote |
+   lsmlList | lsmlRule |
+   lsmlPara | lsmlImage | lsmlSection | lsmlRaw)
 
 lsmlCodeBlk =
-    element code {
-        attribute lang { text }?,
-        (text | lsmlDiff)*
-    }
+  element code {
+    attribute lang { text }?,
+    (text | lsmlDiff)*
+  }
 
 lsmlQuote =
-    element quote {
-        lsmlQuoteAttrs,
-        (lsmlTopElements+ | lsmlAnyHTML)
-    } | element vquote { text }
+  element quote {
+    lsmlQuoteAttrs,
+    (lsmlTopElements+ | lsmlAnyHTML)
+  } | element vquote { text }
 
 rfc822.date =
-    xsd:string { pattern =
-  "(((Mon)|(Tue)|(Wed)|(Thu)|(Fri)|(Sat)|(Sun)), )?\d{1,2} ((Jan)|(Feb)|(Mar)|(Apr)|(May)|(Jun)|(Jul)|(Aug)|(Sep)|(Oct)|(Nov)|(Dec)) \d{4} \d{2}:\d{2}(:\d{2})? ((UT)|(GMT)|(EST)|(EDT)|(CST)|(CDT)|(MST)|(MDT)|(PST)|(PDT)|([\+\-]\d{4}))"
-}
+  xsd:string { pattern =
+    "(((Mon)|(Tue)|(Wed)|(Thu)|(Fri)|(Sat)|(Sun)), )?\d{1,2} ((Jan)|(Feb)|(Mar)|(Apr)|(May)|(Jun)|(Jul)|(Aug)|(Sep)|(Oct)|(Nov)|(Dec)) \d{4} \d{2}:\d{2}(:\d{2})? ((UT)|(GMT)|(EST)|(EDT)|(CST)|(CDT)|(MST)|(MDT)|(PST)|(PDT)|([\+\-]\d{4}))"
+  }
 
 rfc2392.mid = xsd:string { pattern = "mid:.+" }
 lsmlQuoteAttrs =
-    attribute from { text }? &
-    attribute date { rfc822.date }? &
-    attribute cite { rfc2392.mid }?
+  attribute from { text }? &
+  attribute date { rfc822.date }? &
+  attribute cite { rfc2392.mid }?
 
 lsmlList =
-    element l {
-        lsmlListAttrs,
-        lsmlListEl+
-    }
+  element l {
+    lsmlListAttrs,
+    lsmlListEl+
+  }
 lsmlListEl = element o { lsmlText | lsmlList }
 lsmlListAttrs = attribute type { "ord" | "unord" }? 
 
 lsmlRaw =
-    element raw {
-        (attribute alt { text } | element alt { text } )?,
-        lsmlAnyHTML
-    }
+  element raw {
+    (attribute alt { text } | element alt { text } )?,
+    lsmlAnyHTML
+  }
 lsmlRule = element hr { empty }
 lsmlSection =
-    element section {
-        lsmlSecTitle?,
-        lsmlTopElements+
-    }
+  element section {
+    lsmlSecTitle?,
+    lsmlTopElements+
+  }
 
 lsmlSecTitle =
-    element title {
-        attribute level { "h1" | "h2" | "h3" | "h4" | "h5" | "h6" }?,
-        lsmlText
-    }
+  element title {
+    attribute level { "h1" | "h2" | "h3" | "h4" | "h5" | "h6" }?,
+    lsmlText
+  }
 
 lsmlText = mixed { (lsmlInline | lsmlDiff | lsmlBr | lsmlRaw)* }
 lsmlBr = element br { empty }
