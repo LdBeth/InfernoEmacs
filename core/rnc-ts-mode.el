@@ -82,10 +82,14 @@
       name: (identifier) @font-lock-function-name-face)
 
      (param
-      name: (identifier) @font-lock-variable-name-face))
+      name: (identifier) @font-lock-variable-name-face)
+
+     (annotation_attribute
+      name: (name) @font-lock-variable-name-face))
 
    :language 'rnc
    :feature 'namespace
+   :override t
    '((declare
       name: (identifier) @font-lock-constant-face)
      (name
@@ -95,7 +99,7 @@
 
    :language 'rnc
    :feature 'docstring
-   '((documentations) @font-lock-doc-face)
+   '((documentation) @font-lock-doc-face)
 
    :language 'rnc
    :feature 'operator
@@ -112,15 +116,21 @@
 (defvar rnc--treesit-indent-rules
   `((rnc
      ((parent-is "declare") parent-bol 0)
-     ((node-is "}") parent-bol 0)
-     ((node-is ")") parent-bol 0)
-     ((node-is "]") parent-bol 0)
+     ((node-is "}") grand-parent 0)
+     ((node-is ")") prev-sibling 0)
+     ((node-is "]") grand-parent 0)
      ((node-is "literal_segment") parent-bol 0)
+     ((node-is "follow_annotation") prev-sibling 0)
      ((parent-is "comment") prev-adaptive-prefix 0)
+     ((parent-is ,(rx (seq (one-or-more alpha) "_name_class")))
+      first-sibling 0)
+     ((node-is "documentation") parent-bol 0)
      ((parent-is ,(rx (seq (one-or-more alpha) "_pattern"))) first-sibling 0)
-     ((parent-is ,(rx (seq (one-or-more alpha) "_block"))) parent-bol rnc-indent-level)
+     ((parent-is ,(rx (seq (one-or-more alpha) "_block"))) grand-parent rnc-indent-level)
      ((parent-is "param") great-grand-parent rnc-indent-level)
+     ((parent-is "primary") great-grand-parent rnc-indent-level)
      ((field-is "body") parent-bol rnc-indent-level)
+     ((field-is "except") parent-bol rnc-indent-level)
      )))
 
 (defun rnc--treesit-defun-name (node)
@@ -135,6 +145,7 @@ Return nil if there is no name or if NODE is not a defun node."
 ;;;###autoload
 (define-derived-mode rnc-ts-mode prog-mode "RNC"
   "Major mode to edit Relax-NG Compact files."
+  :syntax-table rnc-mode-syntax-table
   (when (treesit-ready-p 'rnc)
     (setq-local comment-start "#")
     (treesit-parser-create 'rnc)
@@ -142,9 +153,14 @@ Return nil if there is no name or if NODE is not a defun node."
     (setq-local treesit-font-lock-feature-list
                 '((comment definition)
                   (keyword string)
-                  (bracket delimiter operator docstring namespace)))
-    (setq-local reesit-defun-name-function #'rnc--treesit-defun-name)
+                  (delimiter docstring namespace)))
+    (setq-local treesit-defun-type-regexp (rx bos (or "define" "declare") eos))
+    (setq-local treesit-defun-name-function #'rnc--treesit-defun-name)
     (setq-local treesit-simple-indent-rules rnc--treesit-indent-rules)
+    (setq-local treesit-simple-imenu-settings
+                `(("Definition" ,(rx bos "define" eos) nil nil)
+                  ("Namespace" ,(rx bos "declare" eos)
+                   nil nil)))
     (treesit-major-mode-setup)))
 
 
