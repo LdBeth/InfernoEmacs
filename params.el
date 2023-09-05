@@ -64,6 +64,10 @@
       ;; erc-autojoin-channels-alist '(("libera.chat" "#commonlisp" "#emacs"))
       )
 
+;; langtool
+(setq langtool-http-server-host "localhost"
+      langtool-http-server-port 8080)
+
 ;; Newsticker
 (setq newsticker-url-list
       '(("xkcd" "https://xkcd.com/rss.xml")

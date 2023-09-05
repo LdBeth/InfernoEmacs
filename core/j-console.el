@@ -135,7 +135,7 @@ the containing buffer"
 (defun j-console-execute-line ()
   "Sends current line to the j-console-cmd session and exectues it"
   (interactive)
-  (j-console-execute-region (point-at-bol) (point-at-eol)))
+  (j-console-execute-region (pos-bol) (pos-eol)))
 
 (defun j-console-execute-buffer ()
   "Sends current buffer to the j-console-cmd session and exectues it"

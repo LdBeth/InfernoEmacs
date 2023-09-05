@@ -22,7 +22,7 @@
  '(custom-safe-themes
    '("58500d06b2e3d12c038c153f568b244611d584230fb04324b995c16b3e886dd4" "512fe37090a702098710d2a33ab1aad365d7f7e0063fe6afb75b20df25f16903" "4f87934838378e5bdd9a85a8ef46eb75e55a68b0a400a44ea45a3fd3c9167562" default))
  '(package-selected-packages
-   '(flyspell-correct frimacs orderless vertico ctrlf sudo-edit z3-mode xquery-mode emmet-mode elpher maude-mode corfu dyalog-mode filladapt gnu-elpa-keyring-update pinentry wanderlust mwim unfill sly which-key))
+   '(langtool flyspell-correct frimacs orderless vertico ctrlf sudo-edit z3-mode xquery-mode emmet-mode elpher maude-mode corfu dyalog-mode filladapt gnu-elpa-keyring-update pinentry wanderlust mwim unfill sly which-key))
  '(safe-local-variable-values
    '((smie-indent-basic . 2)
      (xquery-tool-xml-catalog-file . "/Users/ldbeth/Public/Projects/symbdoc/catalog.xml")

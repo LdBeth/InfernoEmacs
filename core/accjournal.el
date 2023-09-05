@@ -535,7 +535,7 @@ buffer."
                                (with-current-buffer accjournal-buffer
                                  (accjournal-completion-accounts)))
                          (setq accjournal-completion-accounts-done t))
-                       (accjournal--complete-with-action
+                       (complete-with-action
                         action accjournal-completion-accounts str pred))
                      nil  ;; pred
                      nil  ;; require-match
@@ -995,28 +995,28 @@ Return the position of the start of an account name at point."
 This source completes account names by open accounts at point.
 
 Closed accounts are not completed.  If an account is closed by
-\"@\" somewhere before point then it's not open.  If an account
-is opened by \"!\" somewhere after point then it's not open at
+\"@\" somewhere before point then it\\='s not open.  If an account
+is opened by \"!\" somewhere after point then it\\='s not open at
 point.  The two accounts on the current line are excluded.  One
 is the partial name at point being completed, the other would
 make a duplicate \"foo -> foo\".
 
-There's no particularly easy config for this source yet.  The
+There\\='s no particularly easy config for this source yet.  The
 suggestion is from the mode hook set `ac-sources' to
 `accjournal-ac-source-accounts' and any other desired sources.
 
-    (add-hook 'accjournal-mode-hook
+    (add-hook \\='accjournal-mode-hook
               (lambda ()
-                (set (make-local-variable 'ac-sources)
-                     '(accjournal-ac-source-accounts))))
+                (set (make-local-variable \\='ac-sources)
+                     \\='(accjournal-ac-source-accounts))))
 
 Then `M-x auto-complete-mode' for temporary use in the usual way,
-or have it permanently by adding to `ac-modes' as described in
+or have it permanently by adding to `ac-modes\\=' as described in
 the auto-complete.el manual under \"Enable auto-complete-mode
 automatically for specific modes\".
 
     (eval-after-load \"auto-complete\"
-      '(add-to-list 'ac-modes 'accjournal-mode))")
+      \\='(add-to-list \\='ac-modes \\='accjournal-mode))")
 
 
 ;;-----------------------------------------------------------------------------

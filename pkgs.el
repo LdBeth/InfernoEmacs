@@ -172,6 +172,7 @@
           (dark :ascent 80 :foreground "#292b2e" :background "#b2b2b2"))))
 
 (use-package mime-diff
+  :disabled
   :defer t
   :after mime-view)
 

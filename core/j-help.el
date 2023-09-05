@@ -167,8 +167,8 @@ string * int -> (string * string) list"
   "int -> (string * string) list"
   (save-excursion
     (goto-char point)
-    (let* ((bol (point-at-bol))
-           (eol (point-at-eol))
+    (let* ((bol (pos-bol))
+           (eol (pos-eol))
            (s (buffer-substring-no-properties bol eol)))
       (j-help-determine-symbol s (- point bol)))))
 
@@ -188,8 +188,8 @@ string * int -> (string * string) list"
   (save-excursion
     (goto-char point)
     (j-help-branch-determine-symbol-at-point*
-     (buffer-substring-no-properties (point-at-bol) (point-at-eol))
-     (- (max (- point j-help-symbol-search-branch-limit) (point-at-bol)) (point-at-bol))
+     (buffer-substring-no-properties (pos-bol) (pos-eol))
+     (- (max (- point j-help-symbol-search-branch-limit) (pos-bol)) (pos-bol))
      (- point (point-at-bol))
      nil)))
 
