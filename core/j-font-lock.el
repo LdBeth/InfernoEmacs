@@ -106,16 +106,16 @@
 (defvar j-font-lock-control-structures
   '("assert."  "break."  "continue."  "while."  "whilst."  "for."  "do."  "end."
     "if."  "else."  "elseif."  "return."  "select."  "case."  "fcase."  "throw."
-    "try."  "catch."  "catchd."  "catcht."  "end."
+    "try."  "catch."  "catchd."  "catcht."  "end." "{{" "}}"
     ;; "for_[a-zA-Z]+\\."  "goto_[a-zA-Z]+\\."  "label_[a-zA-Z]+\\."
     ))
 
 (defvar j-font-lock-foreign-conjunctions
-  '("0!:" "1!:" "2!:" "3!:" "4!:" "5!:" "6!:" "7!:" "8!:" "9!:" "11!:" "13!:"
+  '("0!:" "1!:" "2!:" "3!:" "4!:" "5!:" "6!:" "7!:" "8!:" "9!:" "13!:"
     "15!:" "18!:" "128!:" ))
 
 (defvar j-font-lock-len-3-verbs
-  '("_9:" "p.." "{::"))
+  '("p.." "{::"))
 (defvar j-font-lock-len-2-verbs
   '("x:" "u:" "s:" "r." "q:" "p:" "p." "o." "L." "j." "I." "i:" "i." "E." "e."
     "C." "A." "?." "\":" "\"." "}:" "}." "{:" "{." "[:" "/:" "\\:" "#:" "#." ";:" ",:"
@@ -126,12 +126,14 @@
 (defvar j-font-lock-verbs
   (append j-font-lock-len-3-verbs j-font-lock-len-2-verbs j-font-lock-len-1-verbs))
 
+(defvar j-font-lock-len-3-adverbs
+  '("\\.."))
 (defvar j-font-lock-len-2-adverbs
-  '("t:" "t." "M." "f." "b." "/."))
+  '("]:" "M." "f." "b." "/." "\\."))
 (defvar j-font-lock-len-1-adverbs
-  '("}" "." "\\" "/" "~"))
+  '("}" "\\" "/" "~"))
 (defvar j-font-lock-adverbs
-  (append j-font-lock-len-2-adverbs j-font-lock-len-1-adverbs))
+  (append j-font-lock-len-3-adverbs j-font-lock-len-2-adverbs j-font-lock-len-1-adverbs))
 
 (defvar j-font-lock-len-3-others
   '("NB."))
@@ -146,9 +148,9 @@
   '("&.:"))
 (defvar j-font-lock-len-2-conjunctions
   '("T." "S:" "L:" "H." "D:" "D." "d." "&:" "&." "@:" "@." "`:" "!:" "!." ";."
-    "::" ":." ".:" ".." "^:"))
+    "::" ":." ".:" ".." "^:" " ."))
 (defvar j-font-lock-len-1-conjunctions
-  '("&" "@" "`" "\"" ":" "."))
+  '("&" "@" "`" "\"" ":"))
 (defvar j-font-lock-conjunctions
   (append j-font-lock-len-3-conjunctions
           j-font-lock-len-2-conjunctions
@@ -159,16 +161,20 @@
   `(
     ("\\([_a-zA-Z0-9]+\\)\s*\\(=[.:]\\)"
      (1 font-lock-variable-name-face) (2 j-other-face))
-
     (,(regexp-opt j-font-lock-foreign-conjunctions) . font-lock-warning-face)
     (,(concat (regexp-opt j-font-lock-control-structures)
               "\\|\\(?:\\(?:for\\|goto\\|label\\)_[a-zA-Z]+\\.\\)")
      . font-lock-keyword-face)
     (,(regexp-opt j-font-lock-constants) . font-lock-constant-face)
-    (,(regexp-opt j-font-lock-len-3-verbs) . j-verb-face)
+    (,(concat (regexp-opt j-font-lock-len-3-verbs)
+              "\\|\\(_[0-9]:\\)")
+     . j-verb-face)
+    (,(regexp-opt j-font-lock-len-3-adverbs) . j-adverb-face)
     (,(regexp-opt j-font-lock-len-3-conjunctions) . j-conjunction-face)
     ;;(,(regexp-opt j-font-lock-len-3-others) . )
-    (,(regexp-opt j-font-lock-len-2-verbs) . j-verb-face)
+    (,(concat (regexp-opt j-font-lock-len-2-verbs)
+              "\\|\\([0-9]:\\)")
+     . j-verb-face)
     (,(regexp-opt j-font-lock-len-2-adverbs) . j-adverb-face)
     (,(regexp-opt j-font-lock-len-2-conjunctions) . j-conjunction-face)
     ;;(,(regexp-opt j-font-lock-len-2-others) . )
