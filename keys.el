@@ -234,6 +234,9 @@ end if")))
             nil
           (window-adjust-process-window-size-smallest proc win))))
 
+;; gpg 2.4
+(fset 'epg-wait-for-status 'ignore)
+
 ;; (add-hook 'minibuffer-setup-hook 'corfu-mode)
 
 (eval-when-compile
