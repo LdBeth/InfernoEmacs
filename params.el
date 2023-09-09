@@ -52,7 +52,7 @@
       tab-always-indent 'complete
       enable-recursive-minibuffers t)
 
-(setq recentf-exclude '("mime-example$" ".emacs.d/\\([a-z]\\|-\\)*$")
+(setq recentf-exclude '("mime-example$" "\\.emacs\\.d/\\([a-z]\\|-\\)*$" "[0a-f]+\\.plstore$")
       dired-use-ls-dired nil)
 
 ;; ERC

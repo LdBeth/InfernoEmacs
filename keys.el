@@ -237,8 +237,6 @@ end if")))
 ;; gpg 2.4
 (fset 'epg-wait-for-status 'ignore)
 
-;; (add-hook 'minibuffer-setup-hook 'corfu-mode)
-
 (eval-when-compile
   (require 'use-package)
   (setq use-package-expand-minimally t))
