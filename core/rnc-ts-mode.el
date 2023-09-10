@@ -121,6 +121,8 @@
      ((node-is "]") grand-parent 0)
      ((node-is "literal_segment") parent-bol 0)
      ((node-is "follow_annotation") prev-sibling 0)
+     ((node-is "define") parent 0)
+     ((node-is "declare") parent 0)
      ((parent-is "comment") prev-adaptive-prefix 0)
      ((parent-is ,(rx (seq (one-or-more alpha) "_name_class")))
       first-sibling 0)
@@ -131,6 +133,7 @@
      ((parent-is "primary") great-grand-parent rnc-indent-level)
      ((field-is "body") parent-bol rnc-indent-level)
      ((field-is "except") parent-bol rnc-indent-level)
+     (no-node parent-bol rnc-indent-level)
      )))
 
 (defun rnc--treesit-defun-name (node)
