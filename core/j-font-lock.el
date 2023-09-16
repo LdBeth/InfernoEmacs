@@ -118,7 +118,7 @@
     "15!:" "18!:" "128!:" ))
 
 (defvar j-font-lock-len-3-verbs
-  '("p.." "{::"))
+  '("p.." "{::" "__:"))
 (defvar j-font-lock-len-2-verbs
   '("x:" "u:" "s:" "r." "q:" "p:" "p." "o." "L." "j." "I." "i:" "i." "E." "e."
     "C." "A." "?." "\":" "\"." "}:" "}." "{:" "{." "[:" "/:" "\\:" "#:" "#." ";:" ",:"
@@ -141,16 +141,18 @@
 (defvar j-font-lock-len-3-others
   '("NB."))
 (defvar j-font-lock-len-2-others
-  '("=." "=:" "_." "a." "a:"))
+  '("=." "=:" "a." "a:" ;; "__" "_."
+    ))
 (defvar j-font-lock-len-1-others
   '("_" ))
 (defvar j-font-lock-others
   (append j-font-lock-len-3-others j-font-lock-len-2-others j-font-lock-len-1-others))
 
 (defvar j-font-lock-len-3-conjunctions
-  '("&.:"))
+  '("&.:" "F.." "F.:" "F:." "F::"))
 (defvar j-font-lock-len-2-conjunctions
-  '("T." "S:" "L:" "H." "D:" "D." "d." "&:" "&." "@:" "@." "`:" "!:" "!." ";."
+  '("T." "S:" "L:" "H." "D:" "D." "d." "F." "F:"
+    "&:" "&." "@:" "@." "`:" "!:" "!." ";."
     "::" ":." ".:" ".." "^:" " ."))
 (defvar j-font-lock-len-1-conjunctions
   '("&" "@" "`" "\"" ":"))
@@ -180,12 +182,12 @@
      . j-verb-face)
     (,(regexp-opt j-font-lock-len-2-adverbs) . j-adverb-face)
     (,(regexp-opt j-font-lock-len-2-conjunctions) . j-conjunction-face)
-    ;;(,(regexp-opt j-font-lock-len-2-others) . )
+    (,(regexp-opt j-font-lock-len-2-others) . j-other-face)
     (,(regexp-opt j-font-lock-direct-definition) . font-lock-keyword-face)
     (,(regexp-opt j-font-lock-len-1-verbs) . j-verb-face)
     (,(regexp-opt j-font-lock-len-1-adverbs) . j-adverb-face)
     (,(regexp-opt j-font-lock-len-1-conjunctions) . j-conjunction-face)
-    ;;(,(regexp-opt j-font-lock-len-1-other) . )
+    ;;(,(regexp-opt j-font-lock-len-1-others) . j-other-face)
     )
   "J Mode font lock keys words")
 

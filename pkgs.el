@@ -71,14 +71,8 @@
   (counsel-mode))
 
 (use-package ctrlf
-  :init
+  :config
   (ctrlf-mode 1))
-
-(use-package swiper
-  :disabled
-  :defer t
-  :bind
-  ([remap isearch-forward] . swiper-isearch))
 
 (use-package which-key
   :config
@@ -170,11 +164,6 @@
   (setq x-face-image-attributes
         '((light :ascent 80 :foreground "#655370")
           (dark :ascent 80 :foreground "#292b2e" :background "#b2b2b2"))))
-
-(use-package mime-diff
-  :disabled
-  :defer t
-  :after mime-view)
 
 ;; Programming
 (use-package lsp-mode

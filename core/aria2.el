@@ -670,21 +670,19 @@ path navigation."
   (or (file-directory-p file)
       (string-match-p aria2-supported-file-extension-regexp file)))
 
-(defun aria2-add-file ()
+(defun aria2-add-file (file &optional options)
   "Prompt for a file and add it. Supports .torrent .meta4 and
 .metalink files."
-  (interactive)
-  (let ((chosen-file
-         (expand-file-name
-          (read-file-name
-           "Choose .meta4, .metalink or .torrent file: "
-           default-directory nil nil nil 'aria2--supported-file-type-p))))
+  (interactive (list (read-file-name
+                      "Choose .meta4, .metalink or .torrent file: "
+                      default-directory nil nil nil 'aria2--supported-file-type-p)))
+  (let ((chosen-file (expand-file-name file)))
     (if (or (string-blank-p chosen-file)
             (not (file-exists-p chosen-file)))
         (message "No file selected.")
       (if (string-match-p "\\.torrent$" chosen-file)
-          (addTorrent aria2--cc chosen-file)
-        (addMetalink aria2--cc chosen-file))))
+          (addTorrent aria2--cc chosen-file options)
+        (addMetalink aria2--cc chosen-file options))))
   (revert-buffer))
 
 (defvar aria2-dialog-map

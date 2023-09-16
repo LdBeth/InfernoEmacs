@@ -8418,7 +8418,7 @@ Key bindings for other parts in the file:
 
   (set (make-local-variable 'comment-start) "*")
   (set (make-local-variable 'comment-end) "")
-  (set (make-local-variable 'comment-start-skip) "\*")
+  (set (make-local-variable 'comment-start-skip) "\\*")
   (set (make-local-variable 'comment-multi-line) nil)
 
   ;;------------------------------------------------------------

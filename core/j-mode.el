@@ -47,8 +47,7 @@
 ;;; Code:
 
 ;; Required eval depth for older systems
-(setq max-lisp-eval-depth (max 500 max-lisp-eval-depth))
-
+;; (setq max-lisp-eval-depth (max 500 max-lisp-eval-depth))
 (require 'j-font-lock)
 (require 'j-console)
 (require 'j-help)
@@ -57,7 +56,7 @@
 (defconst j-mode-version "1.1.1"
   "`j-mode' version")
 
-(defgroup j-mode nil
+(defgroup j nil
   "A mode for J"
   :group 'languages
   :prefix "j-")
@@ -91,27 +90,22 @@
     ["Help on J-mode" describe-mode t]))
 
 ;;;###autoload
-(defun j-mode ()
+(define-derived-mode j-mode prog-mode "J"
   "Major mode for editing J"
-  (interactive)
-  (kill-all-local-variables)
-  (use-local-map j-mode-map)
-  (setq mode-name "J"
-        major-mode 'j-mode)
-  (set-syntax-table j-font-lock-syntax-table)
-  (setq comment-start
-        "NB. "
-        comment-start-skip
-        "\\(\\(^\\|[^\\\\\n]\\)\\(\\\\\\\\\\)*\\)NB. *"
-        font-lock-comment-start-skip
-        "NB. *"
-        font-lock-defaults
-        '(j-font-lock-keywords
-          nil nil nil nil
-          ;;(font-lock-mark-block-function . mark-defun)
-          (font-lock-syntactic-face-function
-           . j-font-lock-syntactic-face-function)))
-  (run-mode-hooks 'j-mode-hook))
+  :group 'j
+  :syntax-table j-font-lock-syntax-table
+  (setq-local comment-start
+              "NB. "
+              comment-start-skip
+              "\\(\\(^\\|[^\\\\\n]\\)\\(\\\\\\\\\\)*\\)NB. *"
+              font-lock-comment-start-skip
+              "NB. *"
+              font-lock-defaults
+              '(j-font-lock-keywords
+                nil nil nil nil
+                ;;(font-lock-mark-block-function . mark-defun)
+                (font-lock-syntactic-face-function
+                 . j-font-lock-syntactic-face-function))))
 
 
 ;;;###autoload

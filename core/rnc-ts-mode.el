@@ -4,7 +4,7 @@
 
 ;; Author: LdBeth <ldbeth@sdf.org>
 ;; Keywords: xml relaxng
-;; Version: 0.3
+;; Version: 0.5
 
 ;; This file is not part of GNU Emacs.
 
@@ -40,6 +40,7 @@
     (modify-syntax-entry ?\n ">" st)
     (modify-syntax-entry ?\" "\"" st)
     (modify-syntax-entry ?\' "\"" st)
+    (modify-syntax-entry ?\\ "w" st)
     (modify-syntax-entry ?- "_" st)
     (modify-syntax-entry ?. "_" st)
     (modify-syntax-entry ?: "_" st)
@@ -128,7 +129,8 @@
       first-sibling 0)
      ((node-is "documentation") parent-bol 0)
      ((parent-is ,(rx (seq (one-or-more alpha) "_pattern"))) first-sibling 0)
-     ((parent-is ,(rx (seq (one-or-more alpha) "_block"))) grand-parent rnc-indent-level)
+     ((parent-is ,(rx (seq (one-or-more alpha) "_block")))
+      grand-parent rnc-indent-level)
      ((parent-is "param") great-grand-parent rnc-indent-level)
      ((parent-is "primary") great-grand-parent rnc-indent-level)
      ((field-is "body") parent-bol rnc-indent-level)

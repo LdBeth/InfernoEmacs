@@ -24,8 +24,7 @@
  '(package-selected-packages
    '(yasnippet langtool flyspell-correct frimacs orderless vertico ctrlf sudo-edit z3-mode xquery-mode emmet-mode elpher maude-mode corfu dyalog-mode filladapt gnu-elpa-keyring-update pinentry wanderlust mwim unfill sly which-key))
  '(safe-local-variable-values
-   '((smie-indent-basic . 2)
-     (xquery-tool-xml-catalog-file . "/Users/ldbeth/Public/Projects/symbdoc/catalog.xml")
+   '((xquery-tool-xml-catalog-file . "/Users/ldbeth/Public/Projects/symbdoc/catalog.xml")
      (xquery-tool-resolve-xincludes . t)))
  '(warning-suppress-types '((auto-save))))
 (custom-set-faces

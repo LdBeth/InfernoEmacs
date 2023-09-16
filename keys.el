@@ -142,8 +142,6 @@ end if")))
 
 (define-key key-translation-map (kbd "￥") (kbd "\\"))
 
-(add-to-list 'auto-mode-alist '("\\.spad" . prog-mode) t)
-
 ;(pixel-scroll-precision-mode 1)
 ;(setq pixel-scroll-precision-interpolate-page t)
 ;(defalias 'scroll-up-command 'pixel-scroll-interpolate-down)

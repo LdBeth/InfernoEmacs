@@ -1,9 +1,10 @@
+
 (package-initialize)
 (load (concat user-emacs-directory "pkgs"))
-(dolist (package
-         '(mwim unfill ctrlf ;orderless
-                which-key bind-key))
+(dolist (package '(mwim unfill ctrlf yasnippet ;orderless
+                        which-key bind-key))
   (require package))
+
 (defconst dumped-load-path load-path)
 (garbage-collect)
 (dump-emacs-portable "~/.emacs.d/Emacs.pdmp")
