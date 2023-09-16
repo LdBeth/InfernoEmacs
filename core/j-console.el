@@ -86,7 +86,8 @@ Should be NIL if there is no file not the empty string"
 
 (defun j-console-create-session ()
   "Starts a comint session wrapped around the j-console-cmd"
-  (setq comint-process-echoes t)
+  (setq comint-process-echoes nil
+        comint-use-prompt-regexp t)
   (apply 'make-comint j-console-cmd-buffer-name
          j-console-cmd j-console-cmd-init-file j-console-cmd-args)
   (mapc
@@ -110,7 +111,8 @@ Should be NIL if there is no file not the empty string"
         (get-process j-console-cmd-buffer-name))))
 
 (define-derived-mode inferior-j-mode comint-mode "Inferior J"
-  "Major mode for J inferior process.")
+  "Major mode for J inferior process."
+  (setq comint-prompt-regexp "\s+"))
 
 ;;;###autoload
 (defun j-console ()
