@@ -186,7 +186,7 @@ layla/mondriaan/draccdl/spectre).")
 
 
 ;;;###autoload
-(defcustom spice-standard '(spice2g6 (hspice eldo eldorf eldovloga fasthenry))
+(defcustom spice-standard '(spice2g6 (gnucap))
   "Spice standards used.
 
 Basic standard:
@@ -212,7 +212,8 @@ Additional standards:
                     (const :tag "Layla"  layla)
                     (const :tag "Mondriaan"  mondriaan)
                     (const :tag "DracCDL"  draccdl)
-                    (const :tag "Spectre Spice Compatibility"  spectre)))
+                    (const :tag "Spectre Spice Compatibility"  spectre)
+                    (const :tag "GnuCAP"  gnucap)))
   :set (lambda (variable value)
          (spice-custom-set variable value
                            'spice-check-spice-standard
@@ -426,14 +427,16 @@ waveform viewer command."
 
 ;;;###autoload
 (defcustom spice-waveform-viewer nil ; example: "Nutmeg"
-  "Spice command, used when starting waveform viewer, see also `spice-waveform-viewer-switches'."
+  "Spice command, used when starting waveform viewer, see also
+`spice-waveform-viewer-switches'."
   :group 'spice-simulate
   :type  'string)
 
 
 ;;;###autoload
 (defcustom spice-waveform-viewer-switches "" ; example "-b"
-  "Spice waveform viewer command switches, see also `spice-waveform-viewer'."
+  "Spice waveform viewer command switches, see also
+`spice-waveform-viewer'."
   :group 'spice-simulate
   :type  'string)
 
@@ -795,6 +798,25 @@ NOTE: Activate the new setting in a spice buffer by re-fontifying it (menu
     "sweep" "poi"
     )
   "List of Hspice analysis modifier keywords.")
+
+(defconst spice-gnucap-keywords
+  '(
+    "width" "unmark" "unfault"
+    "title" "temperature" "temp"
+    "pause" "quit" "exit" "save" "status" "parameter"
+    "store" "probe" "freeze" "unfreeze"
+    "param" "options" "nodeset" "modify" "mod" "merge"
+    "measure" "meas" "mark" "log" "list"
+    "load" "lib" "inc" "ic" "get" "gen" "generator"
+    "eval"
+    "del" "delete" "fault" "clear" "chdir" "cd" "build" "b"
+    "alter" "alarm"
+    )
+  "List of Gnucap keywords.")
+
+(defconst spice-gnucap-analyses
+  '("tr")
+  "List of Gnucap analysis keywords.")
 
 (defconst spice-fasthenry-keywords
   '(
@@ -1292,7 +1314,9 @@ NOTE: Activate the new setting in a spice buffer by re-fontifying it (menu
                 (when (spice-standard-p 'eldorf)
                   spice-eldorf-keywords)
                 (when (spice-standard-p 'fasthenry)
-                  spice-fasthenry-keywords)))
+                  spice-fasthenry-keywords)
+                (when (spice-standard-p 'gnucap)
+                  spice-gnucap-keywords)))
   (setq spice-colon-keywords
         (append (when (spice-standard-p 'eldo)
                   spice-eldo-colon-keywords)
@@ -1307,7 +1331,9 @@ NOTE: Activate the new setting in a spice buffer by re-fontifying it (menu
                 (when (spice-standard-p 'eldorf)
                   spice-eldorf-analyses)
                 (when (spice-standard-p 'fasthenry)
-                  spice-fasthenry-analyses)))
+                  spice-fasthenry-analyses)
+                (when (spice-standard-p 'gnucap)
+                  spice-gnucap-analyses)))
   (setq spice-analysis-modifiers
         (append spice-spice2g6-analysis-modifiers
                 (when (spice-standard-p 'hspice)
@@ -2137,10 +2163,11 @@ have the same support for this as XEmacs has."
             (setq overlays (cdr overlays)))) ; let
                                         ; make new ones, could reuse deleted one ?
         (while (search-forward-regexp spice-library-regexp-start end-point t)
-          (let (start-lib extent)
-            (setq start-lib (point))
+          ;; (let (start-lib extent)
+          ;;  (setq start-lib (point))
             (search-forward-regexp spice-library-regexp-end end-point) ; (let ((end-lib (point)))
-            ))))))
+          ;;  )
+          )))))
 
 
 (defun spice-colorize-libraries-buffer ()
@@ -8006,25 +8033,6 @@ returns it. Non-comment paragraphs can also be filled correctly."
 
 
 ;; ======================================================================
-;; msb fix (from cperl-mode.el)
-(defvar spice-msb-fixed nil) ;; global variable keeping track of addition
-
-(defun spice-msb-fix ()
-  "Adds \"Spice Decks\" entry in msb menu, assumes that msb is already loaded"
-  (setq spice-msb-fixed t)
-  (let* ((l (length msb-menu-cond))
-         (last (nth (1- l) msb-menu-cond))
-         (precdr (nthcdr (- l 2) msb-menu-cond)) ; cdr of this is last
-         (handle (1- (nth 1 last))))
-    (setcdr precdr (list
-                    (list
-                     '(eq major-mode 'spice-mode)
-                     handle
-                     "Spice Decks (%d)")
-                    last))))
-
-
-;; ======================================================================
 ;; utility spice-mode functions
 
 (defun spice-about ()
@@ -8260,8 +8268,6 @@ Usage & Features:
          a first pass (for instance when starting from an included file).
 
    - Postscript printing with fontification (through `ps-print' package).
-
-   - Addition of Spice Deck submenu in msb mode, see `msb', `spice-msb-fix'.
 
    - Section support (as in eldo-mode):
        + add section headers, goto section through menu entries or interactive
@@ -8513,13 +8519,6 @@ Key bindings for other parts in the file:
   (when spice-imenu-add-to-menubar
     (imenu-add-to-menubar "Index"))
 
-  ;; msb fix, run only once
-  (and (featurep 'msb) ;; have we got this feature ?
-       msb-mode ;; is it on ?
-       (boundp 'msb-menu-cond) ;; still using msb-menu-cond ?
-       (not spice-msb-fixed) ;; haven't yet added spice decks category ?
-       (spice-msb-fix)) ;; add category
-
   ;; open describe window, hope this doesn't annoy people too much...
   (if spice-show-describe-mode
       (save-excursion
@@ -8544,1196 +8543,3 @@ Key bindings for other parts in the file:
 ;;; Local Variables:
 ;;; mode:Emacs-lisp
 ;;; End:
-
-;;;### (autoloads nil "aria2" "aria2.el" (0 0 0 0))
-;;; Generated autoloads from aria2.el
-
-(autoload 'aria2-downloads-list "aria2" "\
-Display aria2 downloads list.  Enable `aria2-mode' to controll the process." t)
-
-(register-definition-prefixes "aria2" '("aria2-"))
-
-;;;***
-
-;;;### (autoloads nil "clean-mode" "clean-mode.el" (0 0 0 0))
-;;; Generated autoloads from clean-mode.el
-
-(unless (assoc "\\.[id]cl\\'" auto-mode-alist) (add-to-list 'auto-mode-alist '("\\.[id]cl\\'" . clean-mode)))
-
-(register-definition-prefixes "clean-mode" '("clean-mode"))
-
-;;;***
-
-;;;### (autoloads nil "cweb" "cweb.el" (0 0 0 0))
-;;; Generated autoloads from cweb.el
-
-(autoload 'cweb-mode "cweb" "\
-Major mode like TeX mode plus \\[forward-module] and \\[backward-module]
-for relative module movement. The automatic \" feature is disabled.
-
-\(fn)" t)
-
-(setq auto-mode-alist (cons '("\\.w$" . cweb-mode) auto-mode-alist))
-
-(register-definition-prefixes "cweb" '("backward-module" "ditto" "forward-module" "indicate-" "into-pending-list" "move-to-module" "new-" "pending-list" "pop-pending-list" "tex-" "web-mode"))
-
-;;;***
-
-;;;### (autoloads nil "dim-paren" "dim-paren.el" (0 0 0 0))
-;;; Generated autoloads from dim-paren.el
-
-(autoload 'paren-face-mode "dim-paren" "\
-Use a dedicated face just for parentheses.
-
-This is a minor mode.  If called interactively, toggle the
-`Paren-Face mode' mode.  If the prefix argument is positive,
-enable the mode, and if it is zero or negative, disable the mode.
-
-If called from Lisp, toggle the mode if ARG is `toggle'.  Enable
-the mode if ARG is nil, omitted, or is a positive number.
-Disable the mode if ARG is a negative number.
-
-To check whether the minor mode is enabled in the current buffer,
-evaluate `paren-face-mode'.
-
-The mode's hook is called both when the mode is enabled and when
-it is disabled.
-
-\(fn &optional ARG)" t)
-
-(put 'global-paren-face-mode 'globalized-minor-mode t)
-
-(defvar global-paren-face-mode nil "\
-Non-nil if Global Paren-Face mode is enabled.
-See the `global-paren-face-mode' command
-for a description of this minor mode.
-Setting this variable directly does not take effect;
-either customize it (see the info node `Easy Customization')
-or call the function `global-paren-face-mode'.")
-
-(custom-autoload 'global-paren-face-mode "dim-paren" nil)
-
-(autoload 'global-paren-face-mode "dim-paren" "\
-Toggle Paren-Face mode in all buffers.
-With prefix ARG, enable Global Paren-Face mode if ARG is positive;
-otherwise, disable it.
-
-If called from Lisp, toggle the mode if ARG is `toggle'.
-Enable the mode if ARG is nil, omitted, or is a positive number.
-Disable the mode if ARG is a negative number.
-
-Paren-Face mode is enabled in all buffers where
-`turn-on-paren-face-mode-if-desired' would do it.
-
-See `paren-face-mode' for more information on Paren-Face mode.
-
-\(fn &optional ARG)" t)
-
-(register-definition-prefixes "dim-paren" '("paren-face-" "turn-on-paren-face-mode-if-desired"))
-
-;;;***
-
-;;;### (autoloads nil "expire-lsdb" "expire-lsdb.el" (0 0 0 0))
-;;; Generated autoloads from expire-lsdb.el
-
-(register-definition-prefixes "expire-lsdb" '("database-" "decode-date"))
-
-;;;***
-
-;;;### (autoloads nil "horoscope" "horoscope.el" (0 0 0 0))
-;;; Generated autoloads from horoscope.el
-
-(autoload 'horoscope "horoscope" "\
-Generate a random horoscope.
-If called interactively, display the resulting horoscope in a buffer.
-If called with a prefix argument or the lisp argument INSERTP non-nil,
-isnert the resulting horoscope into the current buffer.
-
-\(fn &optional INSERTP)" t)
-
-(register-definition-prefixes "horoscope" '("horoscope-"))
-
-;;;***
-
-;;;### (autoloads nil "j-console" "j-console.el" (0 0 0 0))
-;;; Generated autoloads from j-console.el
-
-(autoload 'j-console "j-console" "\
-Ensures a running j-console-cmd session and switches focus to
-the containing buffer" t)
-
-(register-definition-prefixes "j-console" '("inferior-j-mode" "j-console-"))
-
-;;;***
-
-;;;### (autoloads nil "j-font-lock" "j-font-lock.el" (0 0 0 0))
-;;; Generated autoloads from j-font-lock.el
-
-(register-definition-prefixes "j-font-lock" '("j-"))
-
-;;;***
-
-;;;### (autoloads nil "j-help" "j-help.el" (0 0 0 0))
-;;; Generated autoloads from j-help.el
-
-(autoload 'j-help-lookup-symbol "j-help" "\
-Lookup symbol in dictionary
-
-\(fn SYMBOL)" t)
-
-(autoload 'j-help-lookup-symbol-at-point "j-help" "\
-Determine the symbol nearest to POINT and look it up in the dictionary
-
-\(fn POINT)" t)
-
-(register-definition-prefixes "j-help" '("group-by" "j-"))
-
-;;;***
-
-;;;### (autoloads nil "j-mode" "j-mode.el" (0 0 0 0))
-;;; Generated autoloads from j-mode.el
-
-(autoload 'j-mode "j-mode" "\
-Major mode for editing J" t)
-
-(add-to-list 'auto-mode-alist '("\\.ij[rstp]$" . j-mode))
-
-(register-definition-prefixes "j-mode" '("j-mode-"))
-
-;;;***
-
-;;;### (autoloads nil "lsdb" "lsdb.el" (0 0 0 0))
-;;; Generated autoloads from lsdb.el
- (autoload 'lsdb "lsdb")
-
-(autoload 'lsdb-gnus-insinuate "lsdb" "\
-Call this function to hook LSDB into Semi-gnus.")
-
-(autoload 'lsdb-wl-insinuate "lsdb" "\
-Call this function to hook LSDB into Wanderlust.")
-
-(autoload 'lsdb-wl-update-record "lsdb" nil t)
-
-(autoload 'lsdb-mew-insinuate "lsdb" "\
-Call this function to hook LSDB into Mew.")
-
-(autoload 'lsdb-mu-insinuate "lsdb")
-
-(register-definition-prefixes "lsdb" '("lsdb"))
-
-;;;***
-
-;;;### (autoloads nil "lsdb-wl-address" "lsdb-wl-address.el" (0 0
-;;;;;;  0 0))
-;;; Generated autoloads from lsdb-wl-address.el
-
-(autoload 'lsdb-wl-address-init "lsdb-wl-address" "\
-Reload `wl-address-file'.
-Refresh `wl-address-list', `wl-address-completion-list', and
-`wl-address-petname-hash'.")
-
-(register-definition-prefixes "lsdb-wl-address" '("lsdb-wl-address-"))
-
-;;;***
-
-;;;### (autoloads nil "lsml" "lsml.el" (0 0 0 0))
-;;; Generated autoloads from lsml.el
-
-(autoload 'lsml-compose "lsml" "\
-Compose mail from current lsml file." t)
-
-(autoload 'lsml-export-to-draft-buffer "lsml" "\
-Export the messaged to opened draft buffer. Usefully when
-constructing a reply." t)
-
-(register-definition-prefixes "lsml" '("lsml-"))
-
-;;;***
-
-;;;### (autoloads nil "mime-diff" "mime-diff.el" (0 0 0 0))
-;;; Generated autoloads from mime-diff.el
-
-(register-definition-prefixes "mime-diff" '("mime-display-"))
-
-;;;***
-
-;;;### (autoloads nil "mu-cite" "mu-cite.el" (0 0 0 0))
-;;; Generated autoloads from mu-cite.el
-
-(autoload 'mu-cite-original "mu-cite" "\
-Citing filter function.
-This is callable from the various mail and news readers' reply
-function according to the agreed upon standard." t)
-
-(autoload 'fill-cited-region "mu-cite" "\
-Fill each of the paragraphs in the region as a cited text.
-
-\(fn BEG END)" t)
-
-(autoload 'compress-cited-prefix "mu-cite" "\
-Compress nested cited prefixes." t)
-
-(register-definition-prefixes "mu-cite" '("citation-" "detect-paragraph-cited-prefix" "fill-column-for-fill-cited-region" "mu-cite-" "replace-top-string" "string-compare-from-top"))
-
-;;;***
-
-;;;### (autoloads nil "mu-register" "mu-register.el" (0 0 0 0))
-;;; Generated autoloads from mu-register.el
-
-(autoload 'mu-cite-get-prefix-method "mu-register")
-
-(autoload 'mu-cite-get-prefix-register-method "mu-register")
-
-(autoload 'mu-cite-get-prefix-register-verbose-method "mu-register" "\
-
-
-\(fn &optional NO-RETURN)")
-
-(autoload 'mu-cite-get-no-prefix-register-verbose-method "mu-register")
-
-(register-definition-prefixes "mu-register" '("mu-"))
-
-;;;***
-
-;;;### (autoloads nil "page-break-lines" "page-break-lines.el" (0
-;;;;;;  0 0 0))
-;;; Generated autoloads from page-break-lines.el
-
-(autoload 'page-break-lines-mode "page-break-lines" "\
-Toggle Page Break Lines mode.
-
-In Page Break mode, page breaks (^L characters) are displayed as a
-horizontal line of `page-break-lines-char' characters.
-
-This is a minor mode.  If called interactively, toggle the
-`Page-Break-Lines mode' mode.  If the prefix argument is
-positive, enable the mode, and if it is zero or negative, disable
-the mode.
-
-If called from Lisp, toggle the mode if ARG is `toggle'.  Enable
-the mode if ARG is nil, omitted, or is a positive number.
-Disable the mode if ARG is a negative number.
-
-To check whether the minor mode is enabled in the current buffer,
-evaluate `page-break-lines-mode'.
-
-The mode's hook is called both when the mode is enabled and when
-it is disabled.
-
-\(fn &optional ARG)" t)
-
-(autoload 'page-break-lines-mode-maybe "page-break-lines" "\
-Enable `page-break-lines-mode' in the current buffer if desired.
-When `major-mode' is listed in `page-break-lines-modes', then
-`page-break-lines-mode' will be enabled.")
-
-(put 'global-page-break-lines-mode 'globalized-minor-mode t)
-
-(defvar global-page-break-lines-mode nil "\
-Non-nil if Global Page-Break-Lines mode is enabled.
-See the `global-page-break-lines-mode' command
-for a description of this minor mode.
-Setting this variable directly does not take effect;
-either customize it (see the info node `Easy Customization')
-or call the function `global-page-break-lines-mode'.")
-
-(custom-autoload 'global-page-break-lines-mode "page-break-lines" nil)
-
-(autoload 'global-page-break-lines-mode "page-break-lines" "\
-Toggle Page-Break-Lines mode in all buffers.
-With prefix ARG, enable Global Page-Break-Lines mode if ARG is
-positive; otherwise, disable it.
-
-If called from Lisp, toggle the mode if ARG is `toggle'.
-Enable the mode if ARG is nil, omitted, or is a positive number.
-Disable the mode if ARG is a negative number.
-
-Page-Break-Lines mode is enabled in all buffers where
-`page-break-lines-mode-maybe' would do it.
-
-See `page-break-lines-mode' for more information on Page-Break-Lines
-mode.
-
-\(fn &optional ARG)" t)
-
-(register-definition-prefixes "page-break-lines" '("page-break-lines-"))
-
-;;;***
-
-;;;### (autoloads nil "rnc-ts-mode" "rnc-ts-mode.el" (0 0 0 0))
-;;; Generated autoloads from rnc-ts-mode.el
-
-(add-to-list 'auto-mode-alist '("\\.rnc\\'" . rnc-ts-mode))
-
-(autoload 'rnc-ts-mode "rnc-ts-mode" "\
-Major mode to edit Relax-NG Compact files.
-
-\(fn)" t)
-
-(register-definition-prefixes "rnc-ts-mode" '("rnc-"))
-
-;;;***
-
-;;;### (autoloads nil "rpl-base" "rpl-base.el" (0 0 0 0))
-;;; Generated autoloads from rpl-base.el
-
-(register-definition-prefixes "rpl-base" '("rpl-"))
-
-;;;***
-
-;;;### (autoloads nil "rpl-edb" "rpl-edb.el" (0 0 0 0))
-;;; Generated autoloads from rpl-edb.el
-
-(register-definition-prefixes "rpl-edb" '("rpl-"))
-
-;;;***
-
-;;;### (autoloads nil "sasm-mode" "sasm-mode.el" (0 0 0 0))
-;;; Generated autoloads from sasm-mode.el
-
-(autoload 'sasm-mode "sasm-mode" "\
-Major mode for SASM assembler language.
-
-\(fn)" t)
-
-(register-definition-prefixes "sasm-mode" '("sasm-"))
-
-;;;***
-
-;;;### (autoloads nil "sip" "sip.el" (0 0 0 0))
-;;; Generated autoloads from sip.el
-
-(autoload 'voip-login "sip" nil t)
-
-(register-definition-prefixes "sip" '("voip-"))
-
-;;;***
-
-;;;### (autoloads nil "spacemacs-buffer" "spacemacs-buffer.el" (0
-;;;;;;  0 0 0))
-;;; Generated autoloads from spacemacs-buffer.el
-
-(register-definition-prefixes "spacemacs-buffer" '("spacemacs"))
-
-;;;***
-
-;;;### (autoloads nil "sysrpl-mode" "sysrpl-mode.el" (0 0 0 0))
-;;; Generated autoloads from sysrpl-mode.el
-
-(autoload 'sysrpl-mode "sysrpl-mode" "\
-Major mode for the SysRPL language.
-
-\(fn)" t)
-
-(register-definition-prefixes "sysrpl-mode" '("sysrpl-"))
-
-;;;***
-
-;;;### (autoloads nil "tecoline" "tecoline.el" (0 0 0 0))
-;;; Generated autoloads from tecoline.el
-
-(register-definition-prefixes "tecoline" '("nano-modeline-"))
-
-;;;***
-
-;;;### (autoloads nil "thing-edit" "thing-edit.el" (0 0 0 0))
-;;; Generated autoloads from thing-edit.el
-
-(autoload 'thing-cut-sexp "thing-edit" "\
-Cut sexp at current point." t)
-
-(autoload 'thing-copy-sexp "thing-edit" "\
-Copy sexp at current point.
-With the universal argument, the text will also be killed.
-
-\(fn KILL-CONDITIONAL)" t)
-
-(autoload 'thing-replace-sexp "thing-edit" "\
-Replace sexp at current point with the content of kill-ring." t)
-
-(autoload 'thing-cut-email "thing-edit" "\
-Cut email at current point." t)
-
-(autoload 'thing-copy-email "thing-edit" "\
-Copy email at current point.
-With the universal argument, the text will also be killed
-
-\(fn KILL-CONDITIONAL)" t)
-
-(autoload 'thing-replace-email "thing-edit" "\
-Replace email at current point with the content kill ring." t)
-
-(autoload 'thing-cut-filename "thing-edit" "\
-Cut filename at current point." t)
-
-(autoload 'thing-copy-filename "thing-edit" "\
-Copy filename at current point.
-With the universal argument, the text will also be killed
-
-\(fn KILL-CONDITIONAL)" t)
-
-(autoload 'thing-replace-filename "thing-edit" "\
-Replace filename at current point with kill ring." t)
-
-(autoload 'thing-cut-url "thing-edit" "\
-Cut url at current point." t)
-
-(autoload 'thing-copy-url "thing-edit" "\
-Copy url at current point.
-With the universal argument, the text will also be killed
-
-\(fn KILL-CONDITIONAL)" t)
-
-(autoload 'thing-replace-url "thing-edit" "\
-Replace url at current point with kill ring." t)
-
-(autoload 'thing-cut-word "thing-edit" "\
-Cut words at point." t)
-
-(autoload 'thing-copy-word "thing-edit" "\
-Copy words at point.
-With the universal argument, the text will also be killed
-
-\(fn KILL-CONDITIONAL)" t)
-
-(autoload 'thing-replace-word "thing-edit" "\
-Replace words at point with kill ring." t)
-
-(autoload 'thing-cut-symbol "thing-edit" "\
-Cut symbol around point." t)
-
-(autoload 'thing-copy-symbol "thing-edit" "\
-Copy symbol around point.
- With the universal argument, the text will also be killed
-
-\(fn KILL-CONDITIONAL)" t)
-
-(autoload 'thing-replace-symbol "thing-edit" "\
-Replace symbol around point with kill ring." t)
-
-(autoload 'thing-cut-line "thing-edit" "\
-Cut current line into Kill-Ring without mark the line." t)
-
-(autoload 'thing-copy-line "thing-edit" "\
-Copy current line into Kill-Ring without mark the line.
- With the universal argument, the text will also be killed
-
-\(fn KILL-CONDITIONAL)" t)
-
-(autoload 'thing-replace-line "thing-edit" "\
-Replace current line with kill ring" t)
-
-(autoload 'thing-copy-paragraph "thing-edit" "\
-Copy current paragraph around the point.
-With the universal argument, the text will also be killed
-
-\(fn KILL-CONDITIONAL)" t)
-
-(autoload 'thing-replace-paragraph "thing-edit" "\
-Replace current paragraph around the point with the content of kill ring." t)
-
-(autoload 'thing-cut-paragraph "thing-edit" "\
-Cut current paragraph around the point" t)
-
-(autoload 'thing-cut-defun "thing-edit" "\
-Cut function around point." t)
-
-(autoload 'thing-copy-defun "thing-edit" "\
-Cut function around point.
- With the universal argument, the text will also be killed
-
-\(fn KILL-CONDITIONAL)" t)
-
-(autoload 'thing-replace-defun "thing-edit" "\
-Replace function around point with the content of kill ring." t)
-
-(autoload 'thing-cut-list "thing-edit" "\
-Cut list around point." t)
-
-(autoload 'thing-copy-list "thing-edit" "\
-Cut list around point.
- With the universal argument, the text will also be killed
-
-\(fn KILL-CONDITIONAL)" t)
-
-(autoload 'thing-replace-list "thing-edit" "\
-Replace list around point with the content of kill ring." t)
-
-(autoload 'thing-cut-sentence "thing-edit" "\
-Cut sentence around point." t)
-
-(autoload 'thing-copy-sentence "thing-edit" "\
-Cut sentence around point.
- With the universal argument, the text will also be killed
-
-\(fn KILL-CONDITIONAL)" t)
-
-(autoload 'thing-replace-sentence "thing-edit" "\
-Replace sentence around point with the content of currnt line." t)
-
-(autoload 'thing-cut-whitespace "thing-edit" "\
-Cut whitespace around point." t)
-
-(autoload 'thing-copy-whitespace "thing-edit" "\
-Cut whitespace around point.
- With the universal argument, the text will also be killed
-
-\(fn KILL-CONDITIONAL)" t)
-
-(autoload 'thing-replace-whitespace "thing-edit" "\
-Replace whitespace around point with the content of currnt line." t)
-
-(autoload 'thing-cut-page "thing-edit" "\
-Cut page around point." t)
-
-(autoload 'thing-copy-page "thing-edit" "\
-Cut page around point.
- With the universal argument, the text will also be killed
-
-\(fn KILL-CONDITIONAL)" t)
-
-(autoload 'thing-replace-page "thing-edit" "\
-Replace page around point with the content of currnt line." t)
-
-(autoload 'thing-cut-to-line-end "thing-edit" "\
-Cut content from current point to line end." t)
-
-(autoload 'thing-copy-to-line-end "thing-edit" "\
-Copy content from current point to line end.
-If `KILL-CONDITIONAL' is non-nil, kill object,
-otherwise copy object.
-
-\(fn &optional KILL-CONDITIONAL)" t)
-
-(autoload 'thing-cut-to-line-beginning "thing-edit" "\
-Cut content from current point to line beginning." t)
-
-(autoload 'thing-copy-to-line-beginning "thing-edit" "\
-Copy content from current point tot line beginning.
-If `KILL-CONDITIONAL' is non-nil, kill object,
-otherwise copy object.
-
-\(fn &optional KILL-CONDITIONAL)" t)
-
-(autoload 'thing-cut-comment "thing-edit" "\
-Cut the comment around line.
-If mark is active, it can cut all comment that in mark." t)
-
-(autoload 'thing-copy-comment "thing-edit" "\
-Copy the comment around line.
-If mark is active, it can copy all comment that in mark.
-If `KILL-CONDITIONAL' is non-nil, kill object,
-otherwise copy object.
-
-\(fn &optional KILL-CONDITIONAL)" t)
-
-(autoload 'thing-cut-number "thing-edit" "\
-Cut number at point." t)
-
-(autoload 'thing-copy-number "thing-edit" "\
-Copy number at point.
-With the universal argument, the text will also be killed
-
-\(fn KILL-CONDITIONAL)" t)
-
-(autoload 'thing-replace-number "thing-edit" "\
-Replace number at point with kill ring." t)
-
-(register-definition-prefixes "thing-edit" '("thing-"))
-
-;;;***
-
-;;;### (autoloads nil "wl-gravatar" "wl-gravatar.el" (0 0 0 0))
-;;; Generated autoloads from wl-gravatar.el
-
-(register-definition-prefixes "wl-gravatar" '("wl-gravatar-"))
-
-;;;***
-
-;;;### (autoloads nil "x-face-e21" "x-face-e21.el" (0 0 0 0))
-;;; Generated autoloads from x-face-e21.el
-
-(autoload 'x-face-to-bitmap "x-face-e21" "\
-Convert an X-FACE to raw bitmap data.
-If BOOL-VECTOR is non-nil, it will return a 2304-bit bool-vector,
-otherwise 288-byte binary data as a string.  If BIT-REVERSE is non-nil,
-each byte will be bit-reversed.  If CLEANED is non-nil, it is assumed
-that X-FACE includes neither the X-Face: header, whitespace nor
-newlines.
-
-\(fn X-FACE &optional BOOL-VECTOR BIT-REVERSE CLEANED)")
-
-(autoload 'x-face-bitmap-to-pbm "x-face-e21" "\
-Convert a raw BITMAP to a PBM format.
-BITMAP may be a 2304-bit bool-vector or a 288-byte binary string.  If
-PLAIN is non-nil, it will return a plain PBM format, otherwise a raw
-PBM format.
-
-\(fn BITMAP &optional PLAIN)")
-
-(autoload 'x-face-to-pbm "x-face-e21" "\
-Convert an X-FACE to a PBM format.
-If PLAIN is non-nil, it will return a plain PBM format, otherwise a
-raw PBM format.  If CLEANED is non-nil, it is assumed that X-FACE
-includes neither the X-Face: header, whitespace nor newlines.
-
-\(fn X-FACE &optional PLAIN CLEANED)")
-
-(autoload 'x-face-bitmap-to-xbm "x-face-e21" "\
-Convert a raw BITMAP to an XBM format.
-BITMAP may be a 2304-bit bool-vector or a 288-byte binary string.
-FILENAME is used to be identifiers in file contents which defaults to
-X_Face.
-
-\(fn BITMAP &optional FILENAME)")
-
-(autoload 'x-face-to-xbm "x-face-e21" "\
-Convert an X-FACE to an XBM format.
-FILENAME is used to be identifiers in file contents which defaults to
-X_Face.  If CLEANED is non-nil, it is assumed that X-FACE includes
-neither the X-Face: header, whitespace nor newlines.
-
-\(fn X-FACE &optional FILENAME CLEANED)")
-
-(autoload 'x-face-gray-x-faces-to-pixmap "x-face-e21" "\
-Convert gray X-FACES to a pixmap.
-Pixmap is a vector which contains 288-pixel raw gray map.  Each X-FACE
-is an encoded X-Face string which may or may not include the X-Face:
-header, whitespace or newlines.  If SORTED is non-nil, it is assumed
-that X-FACES are sorted in order from msb to lsb.
-
-\(fn X-FACES &optional SORTED)")
-
-(autoload 'x-face-gray-pixmap-to-pgm "x-face-e21" "\
-Convert a gray PIXMAP to a PGM format.
-PIXMAP is a vector which should contain 288-byte raw gray map.  MAXVAL
-is a number which specifies the white level.  If MAXVAL is nil, it
-will be guessed by the values of PIXMAP.  If PLAIN is non-nil, it will
-return a plain PGM format, otherwise a raw PGM format.
-
-\(fn PIXMAP &optional MAXVAL PLAIN)")
-
-(autoload 'x-face-gray-pixmap-to-xpm "x-face-e21" "\
-Convert a gray PIXMAP to an XPM format.
-PIXMAP is a vector which should contain 288-byte raw gray map.
-FILENAME is used to be identifiers in file contents which defaults to
-X_Face.  NCOLORS is a number which specifies how many colors PIXMAP
-has.  If NCOLORS is nil, it will be guessed by PIXMAP itself.  Note
-that it limits the image depth maximum to 6-bit, i.e., the lower bits
-will be ignored.
-
-\(fn PIXMAP &optional FILENAME NCOLORS)")
-
-(autoload 'x-face-gray-x-faces-to-xpm "x-face-e21" "\
-Convert gray X-FACES to an XPM format.
-Each X-FACE is an encoded X-Face string which may or may not include
-the X-Face: header, whitespace or newlines.  If SORTED is non-nil, it
-is assumed that X-FACES are sorted in order from msb to lsb.  FILENAME
-is used to be identifiers in file contents which defaults to X_Face.
-
-\(fn X-FACES &optional SORTED FILENAME)")
-
-(autoload 'x-face-create-image "x-face-e21" "\
-Create a PBM image from X-FACE.
-X-FACE is an encoded X-Face string which may or may not include the
-X-Face: header, whitespace or newlines.  The rest PROPS are additional
-image attributes assigning to the image.  The value of the
-`x-face-image-attributes' variable will be used to the default image
-attributes.
-
-Here are some examples of how to use this function:
-
-;; Insert an image at point.
-\(insert-image (x-face-create-image X-Face :KEYWORD VALUE ...))
-
-;; Create an image without any properties.
-\(let (x-face-image-attributes)
-  (x-face-create-image X-Face))
-
-;; Create a scaled image.
-\(x-face-create-image X-Face :scale-factor 0.707)
-
-;; Insert an image as an overlay.
-\(let ((overlay (make-overlay (point) (1+ (point))))
-      (image (x-face-create-image X-Face)))
-  (overlay-put overlay \\='evaporate t)
-  (overlay-put overlay \\='before-string (propertize \" \" \\='display image)))
-
-\(fn X-FACE &rest PROPS)")
-
-(autoload 'x-face-create-gray-image "x-face-e21" "\
-Convert gray X-FACES to an image in the PGM format.
-Each X-FACE should be cleaned up that the X-Face: header has been
-stripped.  For caching images, stripping also whitespace and newlines
-from each X-FACE string is recommended.  If SORTED is non-nil, it is
-assumed that X-FACES are sorted in order from msb to lsb.
-
-\(fn X-FACES &optional SORTED)")
-
-(autoload 'x-face-create-face-image "x-face-e21" "\
-Create a PNG (or PPM) image from FACE.
-FACE is a base64 encoded PNG Face string which may or may not include
-the Face: header, whitespace or newlines.  The rest PROPS are
-additional image attributes assigning to the image.  The value of the
-`x-face-image-attributes' variable will be used to the default image
-attributes.  It returns a PPM image rather than a PNG image if an
-image is scaled.
-
-\(fn FACE &rest PROPS)")
-
-(autoload 'x-face-decode-message-header "x-face-e21" "\
-Display X-Face images in the current message.
-Optional BEG and END are no more than placeholders to keep the backward
-compatibility.  If optional BUFFER is specified, it is assumed that the
-raw X-Face headers can be found in the BUFFER.  BUFFER can also be a
-function which is similar to the `x-face-possibly-change-buffer'
-function.  The optional IGNORE specifies the symbol of the type which
-should be ignored.  The valid values include nil, `face' and `x-face'.
-This requires a support for images in your Emacs and the external
-`uncompface' program.
-
-\(fn &optional BEG END BUFFER IGNORE)")
-
-(autoload 'x-face-show "x-face-e21" "\
-Toggle showing X-Face images.  With ARG, turn showing on if and only
-if ARG is positive.
-
-\(fn &optional ARG)" t)
-
-(autoload 'x-face-turn-off "x-face-e21" "\
-Remove X-face images from the buffer.")
-
-(autoload 'x-face-read-file-name "x-face-e21" "\
-Read an image file name.
-This function is equivalent to `read-file-name', except that it limits
-to image files.  The `x-face-read-file-name-type' variable controls
-what a type of image files should be read.  Note that since the
-`file-name-history' variable will not be updated in this function, use
-the `x-face-put-file-name-in-history' variable to register the actual
-file name after it has been decided.
-
-\(fn PROMPT &optional DIR DEFAULT-FILENAME MUSTMATCH INITIAL)")
-
-(autoload 'x-face-insert "x-face-e21" "\
-Insert XBM-FILE as an X-Face header.
-If XBM-FILE is omitted, the value of `x-face-default-xbm-file' will be
-used for it.  If the contents of a file do not look like the XBM
-format, they will be regarded as pre-encoded data.  If optional
-KEEP-EXISTING-HEADERS is non-nil, existing X-Face headers will not be
-removed.  This requires the external `compface' program.  It will
-override the value of the `x-face-use-overlay' variable to t
-buffer-locally.
-
-\(fn &optional XBM-FILE KEEP-EXISTING-HEADERS)" t)
-
-(autoload 'x-face-save "x-face-e21" "\
-Save X-Face headers to XBM, PNG or XPM files.
-This requires the external `uncompface' program.  It doesn't work
-with forwarded MIME parts, except for Mew.  Files will be named
-uniquely and saved into the directory specified by the
-`x-face-image-file-directory-for-save' variable." t)
-
-(autoload 'x-face-ascii-view "x-face-e21" "\
-Show X-Face images as ASCII pictures.
-If optional BUFFER is specified, it is assumed that the raw X-Face
-headers can be found in the BUFFER.  BUFFER can also be a function
-similarly to `x-face-possibly-change-buffer'.  It does not work with
-forwarded MIME parts, except for Mew.  If you are a Gnus user, you can
-use this function as the main X-Face viewer as follows. :-p
-
-\(setq gnus-article-x-face-command
-      (lambda (&rest args) (x-face-ascii-view \\='ignore)))
-
-Note that this example can only be used with Gnus v 5.10.3 and later
-or T-gnus 6.16.3 and later.
-
-\(fn &optional BUFFER)" t)
-
-(register-definition-prefixes "x-face-e21" '("compface-program" "uncompface-program" "x-face-"))
-
-;;;***
-
-;;;### (autoloads nil "xquery-tool" "xquery-tool.el" (0 0 0 0))
-;;; Generated autoloads from xquery-tool.el
-
-(let ((loads (get 'xquery-tool 'custom-loads))) (if (member '"xquery-tool" loads) nil (put 'xquery-tool 'custom-loads (cons '"xquery-tool" loads)) (put 'external 'custom-loads (cons 'xquery-tool (get 'external 'custom-loads)))))
-
-(autoload 'xquery-tool-query "xquery-tool" "\
-Run the query XQUERY on the current xml document.
-
-XQUERY can be:
- - a string: then that is used to compose an xquery;
- - a filename: then that is taken as input without further processing.
-
-XML-BUFF should be a buffer containing an xml document and
-defaults to the current buffer.  If a region is active, it will
-operate only on that region.
-
-If the result contains element nodes, the function tries to link
-them back to the source.  This is quite brittle.  If it is
-possible to create links, they are to the position (as returned
-by `point') in the source file or buffer.  This means that if
-something before that point is changed, all links to points after
-that position will stop working.  To disable this, and save on
-processing time, call the function with a double prefix
-arg (\\[universal-argument] \\[universal-argument] \\[xquery-tool-query])).
-
-To use this function, you might first have to customize the
-`xquery-tool-query-binary' setting (\\[customize-group] \\[newline] xquery-tool).
-
-If WRAP-IN-ROOT is not nil (or you use a prefix arg (`C-u') in
-the interactive call), the results will be wrapped in a root
-element, possibly generating a well-formed XML document for a
-node set.  Configure (\\[customize-variable]
-`xquery-tool-result-root-element-name' to choose the element
-name.
-
-If SAVE-NAMESPACE is not nil (or you use a triple prefix arg in
-the interactive call), then the attributes added to enable
-tracking of elements in the source document are not deleted.
-
-SHOW-RESULTS, true by default in interactive usage, nil
-otherwise, pops up a buffer showing the results.
-
-NO-INDEX-XML inhibits the creation of an indexed file.  Useful
-for large/deep files, or to speed up queries when you don't wish
-to do any editing based on the results.  Set the preference with
-`xquery-tool-index-xml'.
-
-The function returns the buffer that the results are in.
-
-\(fn XQUERY XML-BUFF &optional WRAP-IN-ROOT SAVE-NAMESPACE SHOW-RESULTS NO-INDEX-XML)" t)
-
-(autoload 'xquery-tool-query-string "xquery-tool" "\
-Run XQUERY on XML-STRING and return result as a string.
-
-For the other options, WRAP-IN-ROOT, SAVE-NAMESPACE,
-SHOW-RESULTS, and NO-INDEX-XML, see the documentation of
-‘xquery-tool’.
-
-\(fn XQUERY XML-STRING &optional WRAP-IN-ROOT SAVE-NAMESPACE SHOW-RESULTS NO-INDEX-XML)")
-
-(register-definition-prefixes "xquery-tool" '("xquery-tool-"))
-
-;;;***
-
-;;;### (autoloads nil nil ("bbdb-to-lsdb.el" "core-autoloads.el"
-;;;;;;  "j-mode-pkg.el") (0 0 0 0))
-
-;;;***
-
-;;;### (autoloads nil "accjournal" "accjournal.el" (0 0 0 0))
-;;; Generated autoloads from accjournal.el
-
-(let ((loads (get 'accjournal 'custom-loads))) (if (member '"accjournal" loads) nil (put 'accjournal 'custom-loads (cons '"accjournal" loads)) (put 'applications 'custom-loads (cons 'accjournal (get 'applications 'custom-loads)))))
-
-(put 'accjournal-mandatory-open 'safe-local-variable 'booleanp)
-
-(put 'accjournal-year-base 'safe-local-variable 'integerp)
-
-(autoload 'accjournal-mode "accjournal" "\
-Major mode for accounting journal.
-This is a minimal double-entry accounting system.  It's good for
-recording money movements for personal taxes etc or a little
-analysis of income versus expenses.
-
-There's no hierarchy of accounts, and there's no automatic
-transactions so every amount has to be entered individually.
-Manual entry is a little tedious but prevents a mistake in one
-place quietly propagating.
-
-\\{accjournal-mode-map}
-`accjournal-mode-hook' is run after initializations are complete.
-
-
-File Format
------------
-
-There's no specific filename extension or `auto-mode-alist' for
-accjournal yet, so use any name and put it into `accjournal-mode'
-with the following first-line cookie (see Info
-node `(emacs)Specifying File Variables').  Buffers must be in
-`accjournal-mode' to process.
-
-    # -*- mode: accjournal -*-
-
-Each line in the file is a transaction moving money from one
-account to another.  For example withdrawing cash from the bank
-might move from account \"Bank\" to account \"Wallet\",
-
-# some comment as extra reminder
-12 May 10  100.00  Bank -> Wallet   | cash machine
-
-Comment lines begin with a \"#\".  Account names can include
-spaces, digits and non-ASCII.  The \"|\" part is an optional
-free-form note.  Set a file coding system in the usual Emacs ways
-for non-ASCII (see Info node `(emacs)International').
-
-Dates can be any of the following forms.  Transactions don't have
-to be in date order in the file, so you group things logically
-and they're sorted in the output.
-
-    12 May 10
-    12 May 2010
-    2010-05-12
-
-The decimal point in values can be either \".\" or \",\".
-Decimal places are arbitrary and can even be none to work in
-whole dollars or a currency like Yen.  But any decimal places
-must be the same throughout the file.
-
-All calculations are made in Emacs integers.  An error is thrown
-for integer overflow.  Emacs 24 on a 32-bit system uses signed
-30-bit integers which means 8 digits or about +/- $5 million for
-amounts and balance.  For more try building --with-wide-int for
-62-bit integers even on a 32-bit system.
-
-Columns don't have to line up, the \"->\" and \"|\" separators
-are enough.  It's usually more readable to mostly align but you
-might want long lines tigher.  There's rules for `M-x align' to
-align groups of lines or a whole file (see align.el).
-
-Bad lines provoke an error from `accjournal-view'.  There's also
-`font-lock-mode' setups to show bad lines in warning face
-\(`font-lock-warning-face') while editing.
-
-
-Output
-------
-
-`accjournal-view' (\\[accjournal-view]) processes the input file
-into an *accjournal* output buffer with the following for each
-account,
-
-    Bank
-                  Debit    Credit    Balance
-    ...                              700.00
-    12 May 10    100.00              600.00  Wallet | cash machine
-    [Open]
-
-The balance shows what you've accumulated in the account and the
-Debit/Credit/Balance columns can be checked against a bank
-statement etc.
-
-To see a particular account put point on its name and use
-`accjournal-view-account' (\\[accjournal-view-account]).  This is good when entering
-transactions on a particular account and you want to see
-how the balance is going.
-
-What you record is a matter of what you want to verify or account
-for, such as assets, taxable income, expenditures, etc.  The
-level of detail is purely what's desired.  Tracking cash in and
-out of your wallet is probably too much, but you might put all
-cash withdrawals to a \"Personal Expenses\" account, or perhaps
-an account for each year like \"Personal 2012\", or just a
-\"Non-Deductible\" to separate them from tax deductibles.
-
-
-Opening and Closing
--------------------
-
-Accounts are automatically opened when first used, or you can
-write a \"!\" before the name to explicitly show that.  For
-example the following is a new personal loan going into your bank
-account, and repayments back to the loan,
-
-12 May 10  3500.00  !Pers Loan -> Bank       | new loan
-# then later ...
-30 Jun 10   150.00  Bank       -> Pers Loan  | repayment
-30 Jul 10   150.00  Bank       -> Pers Loan  | repayment
-
-The `accjournal-mandatory-open' variable can demand a \"!\" for
-each new account.  This helps prevent a typo becoming a new
-account but can be a little tedious at first so its default is
-nil.  In all cases \"!\" means the account must not already exist
-and therefore when used it should be on the first appearance of
-the account.
-
-Accounts are closed by writing an \"@\" after the name on its
-last use.  The balance must be zero.
-
-30 May 15   150.00  Bank -> Pers Loan@  | last repayment
-
-Closing an account with a non-zero balance gives an error from
-the view commands.  Usually the easiest way to fix this is remove
-the \"@\" and re-run the view to see what you have left or which
-transactions haven't added up.
-
-After an account is closed it cannot be re-opened.  But of course
-you can remove the \"@\" to use it further.
-
-
-Initial Balances
-----------------
-
-There's nothing special for creating initial balances.  Use a
-\"zInitial\" account or some such name and transfer from it to
-begin accounts.
-
-1 Jul 10   1234.00  zInitial -> !Bank	      | initial balance
-1 Jul 10  -5100.00  zInitial -> !Credit Card  | initial balance
-
-Making your Bank etc positive for credit balance and negative
-when a debt is the easiest way to check it against bank
-statements.  This will determine the sign positive or negative of
-everything else too.
-
-If you use positive for credit balance then accounts for income
-sources like employer salary are negative because you transfer
-\"from employer, to bank\".
-
-An accountant will tell you assets increase on the debit side.
-You can do that if you want.  AccJournal doesn't care what's
-positive or what's negative, it just adds up.
-
-
-Final Balances
---------------
-
-An accumulation account like taxable income for a given year can
-be sunk back to \"zInitial\" before closing.
-
-1 Jul 10  15000.00   09/10 taxable@ -> zInitial  | sink
-
-Or keep a zSink account or similar for such things.  The \"z\" in
-the name is a suggestion to keep dummy accounts at the end of the
-Open Accounts list in `accjournal-view'.  Use \"aa\" or similar
-if you prefer them at the start.
-
-If you sink back to zInitial then it changes from initial net
-value to a new value inclusive of the years income (etc).  It's
-not a \"net worth\" because assets are only held at cost price.
-You could add explicit asset revaluation transactions if you
-wanted.  If you're a share trader then annual mark-to-market
-might be mandatory.  But generally there's other better software
-for portfolio valuations, budgeting, etc, which would calculate a
-net worth.
-
-
-Sub-Files
----------
-
-An \"include\" directive reads another file.
-
-    include \"prev-year.txt\"
-
-Each sub-file should contain a mode line like
-
-    # -*- mode: accjournal -*-
-
-\(see Info node `Specifying File Variables'), since this ensures
-the right syntax and comment setups for `accjournal-view'
-processing.
-
-The `accjournal-mandatory-open' can be set by Emacs \"Local
-Variables\" in the usual way.  If using multiple files then
-remember to have it in each sub-file.
-
-All sub-files are crunched in full and the contents all shown in
-one big output.  Sub-files just help keep past year data etc
-separate.  It may be worth only archiving the very oldest
-transactions, so as not to have to search too many files to find
-for instance the \"buy\" of an only moderately old asset.
-
-For multiple past files it's convenient to chain them, so that
-say tax2010.txt starts with include \"tax2009.txt\" and that file
-in turn starts with include \"tax2008.txt\", etc.  This way a
-past file can be viewed with `accjournal-view'.  If you have
-instead a single single top-level master file then the view only
-works from there.
-
-Include lines are recognised by ffap-include-start.el which can
-make `M-x ffap' work with point at the start of the line as well
-as on the filename proper.
-
-
-Side Calculations
------------------
-
-If you have an amount which is an aggregate of a few things then
-a temporary account can record the breakdown and ensure it adds
-up as expected.  Suppose you buy shares in FooCo and BarCo and
-pay by a single cheque,
-
-30 May 10   7000.00  Bank	     -> !Shares 30may10 | cheque
-30 May 10   3000.00  Shares 30may10  -> FooCo		| buy
-30 May 10   4000.00  Shares 30may10@ -> BarCo		| buy
-
-This way \"Bank\" has a single 7000.00 amount the same as your
-bank statement but you have a record of the breakdown of the
-purchases and know that it adds up.
-
-If settlement is a few days after the buy date then it could look
-like the following, with the assets bought first from a temporary
-pending settlement account which is paid for later.
-
-30 May 10   3000.00  !Shares 30may10 -> FooCo		| buy
-30 May 10   4000.00  Shares 30may10  -> BarCo		| buy
- 5 Apr 10   7000.00  Bank	     -> Shares 30may10@	| settle
-
-Each such little account must have a different name.  Use a date
-or cheque number or similar to make it clear what is being split.
-Because it's all just a text file you can always search and
-replace to change the naming style later.
-
-
-Capital Gains
--------------
-
-A good use for accjournal is to track the cost base of assets
-subject to capital gains tax.  A buy is a transfer of money from
-your bank account (or wherever) to the asset account.  Further
-expenditure on it likewise from the bank to the asset, increasing
-its cost base.  Tax deductible depreciation goes out of the asset
-to tax deductions of a given year, reducing the cost base.
-A final sale is a transfer from the asset to your bank account
-and the balance left is a gain or loss.  For example an
-investment house,
-
- 1 Jul 85   20000.00  Bank	-> !InvHouse	 | buy
-30 May 86    5000.00  Bank	-> InvHouse	 | spent on renovation
-30 Jun 86     800.00  InvHouse	-> 85/86 deducts | depreciation claimed
-
-30 Nov 86   27000.00  InvHouse	-> Bank          | sell
-30 Nov 86    2800.00  86/87 cap gains -> InvHouse@
-
-A net gain leaves a negative amount in the asset account because
-more money came out than went in.  A net loss conversely leaves a
-positive since more went in than came out.  Either way it goes to
-total taxable for the year (negative for income, positive for
-deductions).
-
-
-Other
------
-
-See the examples subdirectory in the accjournal source
-distribution for some complete sample files and accumulation
-ideas.
-
-See balance.el and creditcard.el for similar personal accounting
-in a tighter file format.
-
-If you like a text file for good editing, undoing, etc, but
-accjournal is too limited then try ledger at
-URL `http://newartisans.com/software/ledger.html'.  It has more
-reports and automation, and includes a ledger.el editing mode.
-
-skeleton.el and similar could help entering frequent transactions
-\(see Info node `(autotype)Top').  Cut and paste is often good
-enough.
-
-There's a tie-in for auto-complete.el to complete AccJournal
-account names at point.  See `accjournal-ac-source-accounts' for
-how to set that up.
-
-
---------
-The accjournal home page is
-URL `http://user42.tuxfamily.org/accjournal/index.html'
-
-\(fn)" t)
-
-(register-definition-prefixes "accjournal" '("accjournal-"))
-
-;;;***
