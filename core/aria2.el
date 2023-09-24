@@ -315,21 +315,21 @@ reaching `most-positive-fixnum'"
 When sending magnet link, URLS must have only one element."
   (make-request this "aria2.addUri" (vconcat urls)))
 
-(cl-defmethod addTorrent ((this aria2-controller) path)
+(cl-defmethod addTorrent ((this aria2-controller) path &optional options)
   "Add PATH pointing at a torrent file to download list."
   (unless (file-exists-p path)
     (signal 'aria2-err-file-doesnt-exist '(path)))
   (unless (string-match-p "\\.torrent$" path)
     (signal 'aria2-err-not-a-torrent-file nil))
-  (make-request this "aria2.addTorrent" (aria2--base64-encode-file path)))
+  (make-request this "aria2.addTorrent" (aria2--base64-encode-file path) options))
 
-(cl-defmethod addMetalink ((this aria2-controller) path)
+(cl-defmethod addMetalink ((this aria2-controller) path &optional options)
   "Add local .metalink PATH to download list."
   (unless (file-exists-p path)
     (signal 'aria2-err-file-doesnt-exist '(path)))
   (unless (string-match-p "\\.meta\\(?:4\\|link\\)$" path)
     (signal 'aria2-err-not-a-metalink-file nil))
-  (make-request this "aria2.addMetalink" (aria2--base64-encode-file path)))
+  (make-request this "aria2.addMetalink" (aria2--base64-encode-file path) options))
 
 (cl-defmethod remove-download ((this aria2-controller) gid &optional force)
   "Remove download identified by GID. If FORCE don't unregister
