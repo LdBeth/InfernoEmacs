@@ -151,7 +151,7 @@
 (defvar j-font-lock-len-3-conjunctions
   '("&.:" "F.." "F.:" "F:." "F::"))
 (defvar j-font-lock-len-2-conjunctions
-  '("T." "S:" "L:" "H." "D:" "D." "d." "F." "F:"
+  '("T." "t." "S:" "L:" "H." "D:" "D." "d." "F." "F:" "m."
     "&:" "&." "@:" "@." "`:" "!:" "!." ";."
     "::" ":." ".:" ".." "^:" " ."))
 (defvar j-font-lock-len-1-conjunctions
