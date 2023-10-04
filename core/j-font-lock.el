@@ -94,14 +94,37 @@
     (modify-syntax-entry ?\( "()"  table)
     (modify-syntax-entry ?\) ")("  table)
     (modify-syntax-entry ?\' "\""  table)
-    (modify-syntax-entry ?N "w 1" table)
-    (modify-syntax-entry ?B "w 2" table)
+    (modify-syntax-entry ?N "w 1"  table)
+    (modify-syntax-entry ?B "w 2"  table)
     (modify-syntax-entry ?\n ">"   table)
     (modify-syntax-entry ?\r ">"   table)
     table)
   "Syntax table for j-mode")
 
-(defvar j-font-lock-constants '())
+(defvar j-font-lock-constants
+  '(
+    ;; char codes
+    "CR" "CRLF" "LF" "TAB"
+    ;; grammar codes
+    ;;0     1          2            3      3       4
+    "noun" "adverb"  "conjunction" "verb" "monad" "dyad"
+    ))
+
+(defvar j-font-lock-builtins
+  `(;; modules
+    "require" "load" "loadd" "script" "scriptd"
+    "jpath" "jcwdpath" "jhostpath" "jsystemdefs"
+    ;; OO
+    "coclass" "cocreate" "cocurrent" "codestroy" "coerase"
+    "coextend" "cofullname" "coinsert" "coname" "conames" "conew"
+    "conl" "copath" "coreset"
+    ;; environment
+    "type" "names" "nameclass" "nc" "namelist" "nl" "erase"
+    ;; system
+    "assert"
+    "getenv" "setenv" "exit" "stdin" "stdout" "stderr"
+    ;; :   :0
+    "def" "define" ))
 
 (defvar j-font-lock-control-structures
   '("assert."  "break."  "continue."  "while."  "whilst."  "for."  "do."  "end."
@@ -167,9 +190,10 @@
     ("\\([_a-zA-Z0-9]+\\)\s*\\(=[.:]\\)"
      (1 font-lock-variable-name-face) (2 j-other-face))
     (,(regexp-opt j-font-lock-foreign-conjunctions) . font-lock-warning-face)
-    (,(concat (regexp-opt j-font-lock-control-structures)
+    (,(concat "\\<" (regexp-opt j-font-lock-control-structures)
               "\\|\\(?:\\(for\\|goto\\|label\\)_[a-zA-Z]+\\.\\)")
      . font-lock-keyword-face)
+    (,(concat "\\<" (regexp-opt j-font-lock-builtins)) . font-lock-builtin-face)
     (,(regexp-opt j-font-lock-constants) . font-lock-constant-face)
     (,(concat (regexp-opt j-font-lock-len-3-verbs)
               "\\|\\(?:_[0-9]:\\)")

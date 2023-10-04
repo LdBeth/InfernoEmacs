@@ -240,6 +240,16 @@
   :init
   (setq frimacs-process-program "fricas -noht -noclef"))
 
+;; Hyperbole
+(use-package hpath
+  :defer t
+  :config
+  (setq
+   hpath:external-display-alist-x
+   (list (cons (format "\\.\\(%s\\)$"
+					   hpath:external-file-suffixes)
+			   "open"))))
+
 ;; TeX
 (use-package tex-mode
   :defer t
