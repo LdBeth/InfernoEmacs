@@ -1,0 +1,9 @@
+<figure${1: xml:id="${2:id}"}>
+  <title>$3</title>
+  <mediaobject>
+    <alt>$4</alt>
+    <imageobject>
+      <imagedata fileref="$5"/>
+    </imageobject>
+  </mediaobject>
+</figure>

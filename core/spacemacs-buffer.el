@@ -226,8 +226,6 @@ REAL-WIDTH: the real width of the line.  If the line contains an image, the size
                  :mouse-face 'highlight
                  :follow-link "\C-m"
                  (propertize "Newsticker" 'face 'font-lock-keyword-face))
-  ;; (spacemacs-buffer//center-line)
-  ;; (insert "\n")
   (insert " ")
   (widget-create 'push-button
                  :help-echo
@@ -238,6 +236,20 @@ REAL-WIDTH: the real width of the line.  If the line contains an image, the size
                  :mouse-face 'highlight
                  :follow-link "\C-m"
                  (propertize "Libera Chat"
+                             'face 'font-lock-keyword-face))
+  (spacemacs-buffer//center-line)
+  (insert "\n")
+  (widget-create 'push-button
+                 :help-echo
+                 "The Everyday Hypertextual Information Manager."
+                 :action (lambda (&rest _)
+                           (hyperbole-mode 1)
+                           (find-file
+                            (expand-file-name
+                             hbmap:filename hbmap:dir-user)))
+                 :mouse-face 'highlight
+                 :follow-link "\C-m"
+                 (propertize "Hyperbole"
                              'face 'font-lock-keyword-face))
   (spacemacs-buffer//center-line)
   (insert "\n"))
@@ -370,7 +382,7 @@ LIST: a list of string bookmark names made interactive in this function."
       (spacemacs-buffer//associate-to-project recent-file by-project))))
 
 (defun spacemacs-buffer//insert-recent-files (list-size)
-  (unless recentf-mode (recentf-mode))
+  (recentf-mode 1)
   (let ((recent-files-list
          (seq-take recentf-list list-size)))
     (when (spacemacs-buffer//insert-file-list

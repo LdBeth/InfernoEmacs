@@ -92,9 +92,12 @@
 ;; elpa
 (add-to-list 'package-archives
              '("melpa" . "https://melpa.org/packages/"))
+;;(add-to-list 'package-archives
+;;             '("elpa-devel" . "https://elpa.gnu.org/devel/"))
 
 (setq tramp-auto-save-directory (concat temporary-file-directory
-                                        "tramp/"))
+                                        "tramp/")
+      tramp-use-ssh-controlmaster-options nil)
 
 (defvar dumped-load-path)
 (if (not (boundp 'dumped-load-path))

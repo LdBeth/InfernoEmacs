@@ -814,6 +814,10 @@ NOTE: Activate the new setting in a spice buffer by re-fontifying it (menu
     )
   "List of Gnucap keywords.")
 
+(defconst spice-gnucap-output-types
+  '("tr" "op")
+  "List of Gnucap output keywords.")
+
 (defconst spice-gnucap-analyses
   '("tr")
   "List of Gnucap analysis keywords.")
@@ -1363,7 +1367,9 @@ NOTE: Activate the new setting in a spice buffer by re-fontifying it (menu
                 (when (spice-standard-p 'eldo)
                   spice-eldo-output-types)
                 (when (spice-standard-p 'eldorf)
-                  spice-eldorf-output-types)))
+                  spice-eldorf-output-types)
+                (when (spice-standard-p 'gnucap)
+                  spice-gnucap-output-types)))
   (setq spice-model-type-names
         (append spice-misc-model-type-names
                 spice-special-model-type-names))
@@ -2138,7 +2144,7 @@ Doc comments (starting with '!') are unaffected."
 ;; fsf-compat package for xemacs 21.4.5 (Linux). Anyone still following this ?
 
 
-(defun spice-colorize-libraries (beg end old-len)
+(defun spice-colorize-libraries (beg end _old-len)
   "Colorize libraries and included files when the mouse passes over them.
 
 Clicking on the middle-mouse button loads them in a buffer.
