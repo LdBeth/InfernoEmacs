@@ -108,19 +108,22 @@ found, else beginning and end of the match."
 (defun j-compute-indentation ()
   "Return what indentation should be in effect, disregarding
 contents of current line."
-  (save-excursion
-    ;; skip empty/comment lines, if that leaves us in the first line, return 0
-    (forward-line -1)
-    (if (= (pos-bol) (point-min))
-        0
-      (save-match-data
-        (back-to-indentation)
-        (if (and (looking-at j-indenting-keywords-regexp)
-                 (progn
-                   (goto-char (match-end 0))
-                   (not (j-thing-outside-string "\\<end\\."))))
-            (+ (current-indentation) j-indent-offset)
-          (current-indentation))))))
+  (let ((indent 0))
+    (save-excursion
+      ;; skip empty/comment lines, if that leaves us in the first line, return 0
+      (while (and (= (forward-line -1) 0)
+                  (if (looking-at "\\s *\\\\?$")
+                      t
+                    (setq indent (save-match-data
+                                   (back-to-indentation)
+                                   (if (and (looking-at j-indenting-keywords-regexp)
+                                            (progn
+                                              (goto-char (match-end 0))
+                                              (not (j-thing-outside-string "\\<end\\."))))
+                                       (+ (current-indentation) j-indent-offset)
+                                     (current-indentation))))
+                    nil))))
+    indent))
 
 (defun j-indent-line ()
   "Indent current line correctly."
