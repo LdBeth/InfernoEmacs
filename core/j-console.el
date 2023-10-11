@@ -2,10 +2,11 @@
 ;;; j-mode.el --- Major mode for editing J programs
 
 ;; Copyright (C) 2012 Zachary Elliott
+;; Copyright (C) 2023 LdBeth
 ;;
 ;; Authors: Zachary Elliott <ZacharyElliott1@gmail.com>
-;; URL: http://github.com/zellio/j-mode
-;; Version: 1.1.1
+;; URL: http://github.com/ldbeth/j-mode
+;; Version: 2.0.0
 ;; Keywords: J, Langauges
 
 ;; This file is not part of GNU Emacs.

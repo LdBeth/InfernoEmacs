@@ -52,7 +52,8 @@
       tab-always-indent 'complete
       enable-recursive-minibuffers t)
 
-(setq recentf-exclude '("mime-example$" "\\.emacs\\.d/\\([a-z]\\|-\\)*$" "[0a-f]+\\.plstore$")
+(setq recentf-exclude '("mime-example$" "HYPB$"
+                        "\\.emacs\\.d/\\([a-z]\\|-\\)*$" "[0a-f]+\\.plstore$")
       dired-use-ls-dired nil)
 
 ;; ERC
@@ -61,7 +62,6 @@
       erc-insert-timestamp-function 'erc-insert-timestamp-left
       erc-timestamp-format "%H%M "
       erc-autojoin-timing 'ident
-      ;; erc-autojoin-channels-alist '(("libera.chat" "#commonlisp" "#emacs"))
       )
 
 ;; langtool
@@ -89,6 +89,10 @@
 ;; lisp
 (setq inferior-lisp-program "ccl"
       common-lisp-hyperspec-root "file:///usr/local/share/doc/HyperSpec/")
+
+;;
+(setq smart-c-cpp-include-path
+      '("/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/"))
 ;; elpa
 (add-to-list 'package-archives
              '("melpa" . "https://melpa.org/packages/"))

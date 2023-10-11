@@ -1,4 +1,3 @@
-
 (package-initialize)
 (load (concat user-emacs-directory "pkgs"))
 (dolist (package '(mwim unfill ctrlf yasnippet ;orderless

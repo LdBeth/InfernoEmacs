@@ -2,10 +2,11 @@
 ;;; j-help.el --- Documentation extention for j-mode
 
 ;; Copyright (C) 2012 Zachary Elliott
+;; Copyright (C) 2023 LdBeth
 ;;
 ;; Authors: Zachary Elliott <ZacharyElliott1@gmail.com>
-;; URL: http://github.com/zellio/j-mode
-;; Version: 1.1.1
+;; URL: http://github.com/ldbeth/j-mode
+;; Version: 2.0.0
 ;; Keywords: J, Languages
 
 ;; This file is not part of GNU Emacs.
@@ -42,8 +43,6 @@
 
 ;;; Code:
 
-;;(set 'lexical-binding t)
-
 (defun group-by* ( list fn prev coll agr )
   "Helper method for the group-by function. Should not be called directly."
   (if list
@@ -61,9 +60,11 @@ It groups the objects in LIST according to the predicate FN"
     (group-by* sl fn '() '() '())))
 
 (defun j-some ( fn list )
-  (when list
-    (let ((val (funcall fn (car list))))
-	  (if val val (j-some fn (cdr list))))))
+  (let (val)
+    (while (and list (not val))
+      (setq val (funcall fn (car list))
+            list (cdr list)))
+    val))
 
 (defgroup j-help nil
   "Documentation extention for j-mode"
@@ -190,7 +191,7 @@ string * int -> (string * string) list"
     (j-help-branch-determine-symbol-at-point*
      (buffer-substring-no-properties (pos-bol) (pos-eol))
      (- (max (- point j-help-symbol-search-branch-limit) (pos-bol)) (pos-bol))
-     (- point (point-at-bol))
+     (- point (pos-bol))
      nil)))
 
 ;;;###autoload
