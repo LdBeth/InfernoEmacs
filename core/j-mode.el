@@ -54,10 +54,6 @@
 (require 'j-help)
 (eval-when-compile (require 'rx))
 
-
-(defconst j-mode-version "1.1.1"
-  "`j-mode' version")
-
 (defgroup j nil
   "A mode for J"
   :group 'languages
