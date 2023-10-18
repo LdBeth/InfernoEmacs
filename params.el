@@ -23,8 +23,8 @@
                            :width 'normal)
                 nil t)
 
-(set-fontset-font "fontset-default"
-                  'unicode
+(set-fontset-font nil
+                  nil
                   (font-spec :name "SImPL Medium" :size 13
 			                 :weight 'normal
                              :width 'normal)
@@ -61,7 +61,9 @@
       erc-nick "ldb"
       erc-insert-timestamp-function 'erc-insert-timestamp-left
       erc-timestamp-format "%H%M "
-      erc-autojoin-timing 'ident
+      erc-autojoin-timing 'connect
+      erc-autojoin-channels-alist
+      '(("libera.chat" "#emacs" "#jsoftware" "#commonlisp"))
       )
 
 ;; langtool

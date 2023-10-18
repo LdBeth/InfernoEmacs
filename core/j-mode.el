@@ -122,7 +122,9 @@ contents of current line."
                                    (if (and (looking-at j-indenting-keywords-regexp)
                                             (progn
                                               (goto-char (match-end 0))
-                                              (not (j-thing-outside-string "\\<end\\."))))
+                                              (not (j-thing-outside-string
+                                                    (rx (or (seq word-start "end.")
+                                                            "}}"))))))
                                        (+ (current-indentation) j-indent-offset)
                                      (current-indentation))))
                     nil))))
