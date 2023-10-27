@@ -18,6 +18,12 @@
 (setq make-backup-files nil
       create-lockfiles nil)
 
+(setq-default bidi-display-reordering nil)
+(setq bidi-inhibit-bpa t
+      long-line-threshold 1000
+      large-hscroll-threshold 1000
+      syntax-wholeline-max 1000)
+
 (set-frame-font (font-spec :name "SF Mono" :size 13
 			               :weight 'normal
                            :width 'normal)
