@@ -125,17 +125,18 @@ where the last three elements are optional."
     (www 4)
     (aka 4 ?,)
     (score -1)
-    (x-face -1)
-    (face -1)
+    (x-face -1 ?0)
+    (face -1 ?0)
     (sender -1))
   "Alist of entry types for presentation.
 The format of elements of this list should be
      (ENTRY SCORE [CLASS READ-ONLY])
 where the last two elements are optional.
-Possible values for CLASS are `?.' and '?,'.  If CLASS is `?.', the
+Possible values for CLASS are `?.', `?\,', `?0'.  If CLASS is `?.', the
 entry takes a unique value which is overridden by newly assigned one
-by `lsdb-mode-edit-entry' or such a command.  If CLASS is `?,', the
-entry can have multiple values separated by commas.
+by `lsdb-mode-edit-entry' or such a command.  If CLASS is `?\,', the
+entry can have multiple values separated by commas. If CLASS is `?0',
+the stored values are normalize.
 If the fourth element READ-ONLY is non-nil, it is assumed that the
 entry cannot be modified."
   :group 'lsdb
@@ -589,12 +590,17 @@ Overrides `temp-buffer-show-function'.")
                                   field-body)))
                             (lsdb-fetch-fields (car header))))))
             (when bodies
-              (let ((entry (or (nth 2 header)
-                               'notes)))
+              (let* ((entry (or (nth 2 header)
+                                'notes))
+                     (code (nth 2 (assq entry lsdb-entry-type-alist))))
                 (push (cons entry
-                            (if (eql ?. (nth 2 (assq entry lsdb-entry-type-alist)))
+                            (if (eql ?. code)
                                 (car bodies)
-                              bodies))
+                              (if (eql ?0 code)
+                                  (mapcar (lambda (s)
+                                            (replace-regexp-in-string "[ \t\r\n]+" "" s t t))
+                                          bodies)
+                                bodies)))
                       interesting)))))))
     (when save
       (setq senders

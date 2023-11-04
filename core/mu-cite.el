@@ -66,85 +66,65 @@
 
 (defvar mu-cite-default-methods-alist
   (eval-when-compile
-    (list (cons 'from
-	        (lambda ()
-		  (mu-cite-get-field-value "From")))
-	  (cons 'date
-	        (lambda ()
-		  (mu-cite-get-field-value "Date")))
-	  (cons 'message-id
-	        (lambda ()
-		  (mu-cite-get-field-value "Message-Id")))
-	  (cons 'subject
-	        (lambda ()
-		  (mu-cite-get-field-value "Subject")))
-	  (cons 'ml-name
-	        (lambda ()
-		  (mu-cite-get-field-value "X-Ml-Name")))
-	  (cons 'ml-count #'mu-cite-get-ml-count-method)
-	  (cons 'address-structure
-	        (lambda ()
-		  (car
-		   (std11-parse-address-string (mu-cite-get-value 'from)))))
-	  (cons 'full-name
-	        (lambda ()
-		  (std11-full-name-string
-		   (mu-cite-get-value 'address-structure))))
-          (cons 'name-list
-	        (lambda ()
-		  (let ((namestring (mu-cite-get-value 'full-name)))
-                    (split-string namestring "[ \t._]+" t))))
-          (cons 'firstname
-	        (lambda ()
-		  (car (mu-cite-get-value 'name-list))))
-          (cons 'lastname
-	        (lambda ()
-		  (car (reverse (mu-cite-get-value 'name-list)))))
-          (cons 'initials
-	        (lambda ()
-		  (mapconcat
-                   (lambda (name)
-                     (if (< 0 (length name))
-	                 (substring name 0 1)))
-                   (mu-cite-get-value 'name-list) "")))
-	  (cons 'address
-	        (lambda ()
-		  (std11-address-string
-		   (mu-cite-get-value 'address-structure))))
-	  (cons 'id
-	        (lambda ()
-		  (let ((ml-name (mu-cite-get-value 'ml-name))
-		        (ml-count (mu-cite-get-value 'ml-count)))
-		    (if ml-name
-		        (concat "["
-			        ml-name
-			        (if ml-count
-				    (concat " : No." ml-count))
-			        "]")
-		      (mu-cite-get-value 'message-id)))))
-	  (cons 'in-id
-	        (lambda ()
-		  (let ((id (mu-cite-get-value 'id)))
-		    (if id
-		        (format ">>>>> In %s \n" id)
-		      ""))))
-	  (cons 'x-attribution
-	        (lambda ()
-		  (mu-cite-get-field-value "X-Attribution")))
-	  (cons 'x-cite-me
-	        (lambda ()
-		  (mu-cite-get-field-value "X-Cite-Me")))
-	  (cons 'top-posting
-	        #'mu-cite-get-original-header)
+    `((from . ,(lambda ()
+		         (mu-cite-get-field-value "From")))
+	  (date . ,(lambda ()
+		         (mu-cite-get-field-value "Date")))
+	  (message-id . ,(lambda ()
+		               (mu-cite-get-field-value "Message-Id")))
+	  (subject . ,(lambda ()
+		            (mu-cite-get-field-value "Subject")))
+	  (ml-name . ,(lambda ()
+		            (mu-cite-get-field-value "X-Ml-Name")))
+	  (ml-count . ,#'mu-cite-get-ml-count-method)
+	  (address-structure . ,(lambda ()
+		                      (car
+		                       (std11-parse-address-string
+                                (mu-cite-get-value 'from)))))
+	  (full-name . ,(lambda ()
+		              (std11-full-name-string
+		               (mu-cite-get-value 'address-structure))))
+      (name-list . ,(lambda ()
+		              (let ((namestring (mu-cite-get-value 'full-name)))
+                        (split-string namestring "[ \t._]+" t))))
+      (firstname . ,(lambda ()
+		              (car (mu-cite-get-value 'name-list))))
+      (lastname . ,(lambda ()
+		             (car (reverse (mu-cite-get-value 'name-list)))))
+      (initials . ,(lambda ()
+		             (mapconcat
+                      (lambda (name)
+                        (if (< 0 (length name))
+	                        (substring name 0 1)))
+                      (mu-cite-get-value 'name-list) "")))
+	  (address . ,(lambda ()
+		            (std11-address-string
+		             (mu-cite-get-value 'address-structure))))
+	  (id . ,(lambda ()
+		       (let ((ml-name (mu-cite-get-value 'ml-name))
+		             (ml-count (mu-cite-get-value 'ml-count)))
+		         (if ml-name
+		             (concat "["
+			                 ml-name
+			                 (if ml-count
+				                 (concat " : No." ml-count))
+			                 "]")
+		           (mu-cite-get-value 'message-id)))))
+	  (in-id . ,(lambda ()
+		          (let ((id (mu-cite-get-value 'id)))
+		            (if id
+		                (format ">>>>> In %s \n" id)
+		              ""))))
+	  (x-attribution . ,(lambda ()
+		                  (mu-cite-get-field-value "X-Attribution")))
+	  (x-cite-me . ,(lambda ()
+		              (mu-cite-get-field-value "X-Cite-Me")))
+	  (top-posting . ,#'mu-cite-get-original-header)
 	  ;; mu-register
-	  (cons 'prefix #'mu-cite-get-prefix-method)
-	  (cons 'prefix-register
-	        #'mu-cite-get-prefix-register-method)
-	  (cons 'prefix-register-verbose
-	        #'mu-cite-get-prefix-register-verbose-method)
-	  (cons 'no-prefix-register-verbose
-	        #'mu-cite-get-no-prefix-register-verbose-method)
-	  )))
+	  (prefix . ,#'mu-cite-get-prefix-method)
+	  (prefix-register . ,#'mu-cite-get-prefix-register-method)
+	  (prefix-register-verbose . ,#'mu-cite-get-prefix-register-verbose-method)
+	  (no-prefix-register-verbose . ,#'mu-cite-get-no-prefix-register-verbose-method))))
 
 
 ;;; @ formats
@@ -258,14 +238,14 @@ registered in variable `mu-cite-get-field-value-method-alist' is called."
 You can use the top-posting style with this most simple way:
 
 (setq mu-cite-prefix-format nil)
-(setq mu-cite-top-format '(top-posting))
+(setq mu-cite-top-format \\='(top-posting))
 
 But it might not necessarily be convenient as the case may be.  If you
 want to use it for only replying to [1]certain recipients, or [2]those
 who use the top-posting style, try this:
 
 \(add-hook
- 'mu-cite-pre-cite-hook
+ \\='mu-cite-pre-cite-hook
  (lambda ()
    (let ((last-point (point))
          (case-fold-search nil))
@@ -283,10 +263,10 @@ who use the top-posting style, try this:
           ;; [3]the last resort
           (y-or-n-p \"Use top-posting? \"))
          (progn
-           (set (make-local-variable 'mu-cite-prefix-format)
+           (set (make-local-variable \\='mu-cite-prefix-format)
                 nil)
-           (set (make-local-variable 'mu-cite-top-format)
-                '(top-posting))))
+           (set (make-local-variable \\='mu-cite-top-format)
+                \\='(top-posting))))
      (goto-char last-point))))
 
 This is just an example; modify it to make it suitable to your taste."
@@ -377,7 +357,7 @@ the variable `mu-cite-ml-count-field-list', in a header.
 If the field is found, the function returns a number part of the
 field.
 
-Notice that please use (mu-cite-get-value 'ml-count)
+Notice that please use (mu-cite-get-value \\='ml-count)
 instead of to call the function directly."
   (catch 'tag
     (dolist (field mu-cite-ml-count-field-list)
@@ -568,8 +548,9 @@ to 70. :-)"
     (re-search-forward
      (concat "^" (regexp-quote mail-header-separator) "$") nil t)
     (while (re-search-forward
-	    (concat "^\\([ \t]*[^ \t\n" citation-mark-chars "]*["
-		    citation-mark-chars "]\\)+") nil t)
+	        (concat "^\\([ \t]*[^ \t\n" citation-mark-chars "]*["
+		            citation-mark-chars "]\\)+")
+            nil t)
       (let* ((b (match-beginning 0))
 	     (e (match-end 0))
 	     (prefix (buffer-substring b e))
@@ -624,7 +605,4 @@ to 70. :-)"
 ;;;
 
 (provide 'mu-cite)
-
-(run-hooks 'mu-cite-load-hook)
-
 ;;; mu-cite.el ends here
