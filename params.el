@@ -30,9 +30,8 @@
                 nil t)
 
 (set-fontset-font t
-                  nil
-                  (font-spec :name "SImPL Medium" :size 13
-			                 :weight 'normal
+                  'symbol
+                  (font-spec :name "SImPL" :size 13
                              :width 'normal))
 
 (set-face-attribute 'variable-pitch
