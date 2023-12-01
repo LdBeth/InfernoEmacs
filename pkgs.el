@@ -182,6 +182,12 @@
   :config
   (setq lsp-sourcekit-executable "/usr/bin/sourcekit-lsp"))
 
+(use-package eglot
+  :defer t
+  :config
+  (add-to-list 'eglot-server-programs
+               '(objc-mode . ("clangd"))))
+
 (use-package dyalog-mode
   :defer t
   :init

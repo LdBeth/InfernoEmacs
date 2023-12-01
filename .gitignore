@@ -1,4 +1,5 @@
 *.elc
+*.dylib
 *-autoloads.el
 *~
 *.css

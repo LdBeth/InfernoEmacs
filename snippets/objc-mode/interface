@@ -1,0 +1,7 @@
+# key: interface
+# name: ObjC Interface Definition
+# --
+@interface ${1:Class} : ${2:Super Class} {
+  $0
+}
+@end

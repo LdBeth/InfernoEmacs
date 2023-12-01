@@ -283,8 +283,8 @@ end if")))
   (advice-reentry
    accept-process-output
    ;; wait_reading_process_output users (not all users)
-   ;; sleep-for
-   ;; process-send-eof
-   ;; process-send-region
-   ;; process-send-string
+   sleep-for
+   process-send-eof
+   process-send-region
+   process-send-string
    ))
