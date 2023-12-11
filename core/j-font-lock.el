@@ -195,13 +195,18 @@
           "_:") ;; Self-Effacing References
      . font-lock-warning-face)
     (,(regexp-opt j-font-lock-foreign-conjunctions) . font-lock-warning-face)
-    (,(rx symbol-start (or (regexp (regexp-opt j-font-lock-control-structures))
-                  (seq (or "for" "goto" "label")
-                       "_" (+ (any "a-zA-Z")) ".")))
+    (,(rx symbol-start
+          (or (regexp (regexp-opt j-font-lock-control-structures))
+              (seq (or "for" "goto" "label")
+                   "_" (+ (any "a-zA-Z")) ".")))
      . font-lock-keyword-face)
     (,(rx symbol-start (regexp (regexp-opt j-font-lock-builtins)) eow)
      . font-lock-builtin-face)
-    (,(regexp-opt j-font-lock-constants) . font-lock-constant-face)
+    (,(rx symbol-start
+          (regexp
+           (regexp-opt j-font-lock-constants))
+          eow)
+     . font-lock-constant-face)
     (,(regexp-opt j-font-lock-len-3-verbs)
      . j-verb-face)
     (,(regexp-opt j-font-lock-len-3-adverbs) . j-adverb-face)
