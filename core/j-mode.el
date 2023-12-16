@@ -84,9 +84,13 @@
                         (regexp "_[a-zA-Z]+\\."))))
           (seq (regexp "[_a-zA-Z0-9]+")
                (* "\s") "=" (or "." ":") (* "\s")
-               "{{"))))
+               (or "{{"
+                   (seq "0" (+ "\s") ":" (* "\s")
+                        (or "dyad" "verb" "monad" "3" "4")
+                        eol))))))
 (defconst j-dedenting-keywords-regexp
   (rx (or "}}"
+          (seq bol ")" eol)
           (seq bow
                (regexp (regexp-opt '("end."
                                      "else." "elseif."
@@ -124,7 +128,8 @@ contents of current line."
                                               (goto-char (match-end 0))
                                               (not (j-thing-outside-string
                                                     (rx (or (seq word-start "end.")
-                                                            "}}"))))))
+                                                            "}}"
+                                                            (seq bol ")" eol)))))))
                                        (+ (current-indentation) j-indent-offset)
                                      (current-indentation))))
                     nil))))
