@@ -86,7 +86,10 @@
                (* "\s") "=" (or "." ":") (* "\s")
                (or "{{"
                    (seq "0" (+ "\s") ":" (* "\s")
-                        (or "dyad" "verb" "monad" "3" "4")
+                        (regexp
+                         (regexp-opt
+                          '("dyad" "monad" "adverb" "verb" "conjunction"
+                            "1" "2" "3" "4")))
                         eol))))))
 (defconst j-dedenting-keywords-regexp
   (rx (or "}}"
