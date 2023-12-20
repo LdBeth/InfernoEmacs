@@ -187,7 +187,10 @@ contents of current line."
   (setq-local comment-start
               "NB. "
               comment-start-skip
-              "\\(\\(^\\|[^\\\\\n]\\)\\(\\\\\\\\\\)*\\)NB. *"
+              (rx (group (group (or bol (not (any "\\" "\n" ))))
+                         (* (group "\\\\")))
+                  "NB."
+                  (* "\s"))
               comment-column 40
               indent-tabs-mode nil
               indent-line-function #'j-indent-line
