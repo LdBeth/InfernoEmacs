@@ -42,7 +42,8 @@
     (modify-syntax-entry ?\n ">" table)
 
     ;; Strings can be single-quoted
-    (modify-syntax-entry ?' "\"" table)
+    (modify-syntax-entry ?\" "\"\"" table)
+    (modify-syntax-entry ?\' "\"'" table)
     table))
 
 (defcustom elvish-keywords
@@ -252,6 +253,19 @@ stable, this should probably be switched to using SMIE."
        (current-column)))
       (back-to-indentation)))
 
+(defun elvish-font-lock-backslash-quote ()
+  (if (eq (save-excursion (nth 3 (syntax-ppss (match-beginning 0)))) ?\')
+      ;; In a '...' the backslash is not escaping.
+      (string-to-syntax ".")
+    nil))
+
+(defun elvish-syntax-propertize-function (start end)
+  (funcall
+   (syntax-propertize-rules
+    ;; In a '...' the backslash is not escaping.
+    ("\\(\\\\\\)'" (1 (elvish-font-lock-backslash-quote))))
+   start end))
+
 ;;;###autoload
 (define-derived-mode elvish-mode prog-mode "elvish"
   "Major mode for the Elvish language"
@@ -259,7 +273,9 @@ stable, this should probably be switched to using SMIE."
   (setq-local font-lock-defaults '(elvish-highlights))
   (setq-local indent-line-function #'elvish-indent-function)
   (setq-local comment-start "#")
-  (setq-local comment-end ""))
+  (setq-local comment-end "")
+  (setq-local comment-start-skip "#+[\t ]*")
+  (setq-local syntax-propertize-function #'elvish-syntax-propertize-function))
 
 ;;;###autoload
 (add-to-list 'auto-mode-alist '("\\.elv\\'" . elvish-mode))
