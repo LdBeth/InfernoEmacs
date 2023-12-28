@@ -259,12 +259,10 @@ stable, this should probably be switched to using SMIE."
       (string-to-syntax ".")
     nil))
 
-(defun elvish-syntax-propertize-function (start end)
-  (funcall
-   (syntax-propertize-rules
-    ;; In a '...' the backslash is not escaping.
-    ("\\(\\\\\\)'" (1 (elvish-font-lock-backslash-quote))))
-   start end))
+(defalias 'elvish-syntax-propertize-function
+  (syntax-propertize-rules
+   ;; In a '...' the backslash is not escaping.
+   ("\\(\\\\\\)'" (1 (elvish-font-lock-backslash-quote)))))
 
 ;;;###autoload
 (define-derived-mode elvish-mode prog-mode "elvish"
@@ -280,6 +278,8 @@ stable, this should probably be switched to using SMIE."
 ;;;###autoload
 (add-to-list 'auto-mode-alist '("\\.elv\\'" . elvish-mode))
 
+(eval-when-compile
+  (require 'eglot))
 (with-eval-after-load 'eglot
   (add-to-list 'eglot-server-programs '(elvish-mode . ("elvish" "-lsp"))))
 

@@ -37,16 +37,17 @@
   :type 'string
   :group 'rpl)
 
+(defcustom sysrpl-indent-offset 1
+  "Amount of offset per level of indentation."
+  :type 'natnum
+  :group 'rpl)
+
 (defface sysrpl-name '((t :inherit font-lock-builtin-face))
   "Face used for displaying SysRPL names (e.g DROP)."
   :group 'rpl)
 
 (defface sysrpl-keyword '((t :inherit font-lock-keyword-face))
   "Face used for displaying SysRPL keywords (e.g. :: ;)."
-  :group 'rpl)
-
-(defface sysrpl-comment '((t :inherit font-lock-comment-face))
-  "Face used for displaying SysRPL comments."
   :group 'rpl)
 
 (defcustom sysrpl-font-lock-name-face 'sysrpl-name
@@ -59,11 +60,6 @@
   :type 'symbol
   :group 'rpl)
 
-(defcustom sysrpl-font-lock-comment-face 'sysrpl-comment
-  "Name of face to use for displaying SysRPL comments."
-  :type 'symbol
-  :group 'rpl)
-
 (defun sysrpl-edb-calculator (calculator)
   "Map SysRPL calculator identifier to EDB identifier."
   (cond ((eql calculator :HP48G) :48G)
@@ -72,6 +68,8 @@
 
 (defvar sysrpl-mode-syntax-table
   (let ((table (make-syntax-table prog-mode-syntax-table)))
+    (modify-syntax-entry ?{  "(}" table)
+    (modify-syntax-entry ?}  "){" table)
     (modify-syntax-entry ?:  "w" table)
     (modify-syntax-entry ?\; "w" table)
     (modify-syntax-entry ?!  "w" table)
@@ -91,8 +89,14 @@
     (modify-syntax-entry ?<  "w" table)
     (modify-syntax-entry ?>  "w" table)
     (modify-syntax-entry ?|  "w" table)
+    (modify-syntax-entry ?\n ">" table)
     table)
   "The SysRPL syntax table.")
+
+(defalias 'sysrpl-mode-syntax-propertize
+  (syntax-propertize-rules
+   ("^*" (0 "<"))
+   ("\\((\\)\s[^)]*\s\\()\\)" (1 "<1b") (2 ">4b"))))
 
 (defvar sysrpl-rplcomp-keywords '("LAM" "ID" "TAG" "CHR" "CODE" "CODEM" "ENDCODE" "PTR"
                                   "ROMPTR" "FLASHPTR" "ZINT" "ARRY" "LNKARRY" "HXS" "GROB"
@@ -107,9 +111,7 @@
 
 (defun sysrpl-font-lock-compile-keywords (names)
   "Construct a list of keyword matcher clauses suitable for `font-lock-keywords'."
-  (append (list (list "^\\*.*$" (list 0 'sysrpl-font-lock-comment-face))
-                (list "(.*)" (list 0 'sysrpl-font-lock-comment-face))
-                (list (concat "\\<" (regexp-opt sysrpl-rplcomp-keywords) "\\>")
+  (append (list (list (concat "\\<" (regexp-opt sysrpl-rplcomp-keywords) "\\>")
                       (list 0 'sysrpl-font-lock-keyword-face)))
           (mapcar (lambda (str) (list (concat "\\<" (regexp-quote str) "\\>")
                                       (list 0 'sysrpl-font-lock-name-face)))
@@ -191,9 +193,13 @@ point."
 (define-derived-mode sysrpl-mode prog-mode "SysRPL"
   "Major mode for the SysRPL language."
   :group 'rpl
-  (make-local-variable 'eldoc-documentation-function)
-  (setq eldoc-documentation-function 'sysrpl-get-eldoc-message)
+  (setq-local eldoc-documentation-function 'sysrpl-get-eldoc-message)
   (setq font-lock-defaults (list 'sysrpl-font-lock-keywords))
+  (setq-local comment-start "( "
+              comment-end " )"
+              comment-start-skip "\\(^*+\\|(\s\\)\s*"
+              comment-end-skip "[\t\s]*\\(\\s>\\|\n\\|)\\)"
+              syntax-propertize-function #'sysrpl-mode-syntax-propertize)
   (setq rpl-menu-compile-buffer-enable t))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
