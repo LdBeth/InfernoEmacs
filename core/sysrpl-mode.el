@@ -68,6 +68,7 @@
 
 (defvar sysrpl-mode-syntax-table
   (let ((table (make-syntax-table prog-mode-syntax-table)))
+    (modify-syntax-entry ?\) ">4b" table)
     (modify-syntax-entry ?{  "(}" table)
     (modify-syntax-entry ?}  "){" table)
     (modify-syntax-entry ?:  "w" table)
@@ -96,7 +97,7 @@
 (defalias 'sysrpl-mode-syntax-propertize
   (syntax-propertize-rules
    ("^*" (0 "<"))
-   ("\\((\\)\s[^)]*\s\\()\\)" (1 "<1b") (2 ">4b"))))
+   ("\\((\\)\s" (1 "<1b"))))
 
 (defvar sysrpl-rplcomp-keywords '("LAM" "ID" "TAG" "CHR" "CODE" "CODEM" "ENDCODE" "PTR"
                                   "ROMPTR" "FLASHPTR" "ZINT" "ARRY" "LNKARRY" "HXS" "GROB"
@@ -111,11 +112,11 @@
 
 (defun sysrpl-font-lock-compile-keywords (names)
   "Construct a list of keyword matcher clauses suitable for `font-lock-keywords'."
-  (append (list (list (concat "\\<" (regexp-opt sysrpl-rplcomp-keywords) "\\>")
-                      (list 0 'sysrpl-font-lock-keyword-face)))
-          (mapcar (lambda (str) (list (concat "\\<" (regexp-quote str) "\\>")
-                                      (list 0 'sysrpl-font-lock-name-face)))
-                  names)))
+  `((,(concat "\\<" (regexp-opt sysrpl-rplcomp-keywords) "\\>")
+     (0 sysrpl-font-lock-keyword-face))
+    ,@(mapcar (lambda (str) (list (concat "\\<" (regexp-quote str) "\\>")
+                                  (list 0 'sysrpl-font-lock-name-face)))
+              names)))
 
 (defvar sysrpl-font-lock-keywords
   (sysrpl-font-lock-compile-keywords (rpl-edb-all-names (sysrpl-edb-calculator sysrpl-default-calculator))))

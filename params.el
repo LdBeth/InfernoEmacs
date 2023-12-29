@@ -102,8 +102,6 @@
 ;; elpa
 (add-to-list 'package-archives
              '("melpa" . "https://melpa.org/packages/"))
-;;(add-to-list 'package-archives
-;;             '("elpa-devel" . "https://elpa.gnu.org/devel/"))
 
 (setq tramp-auto-save-directory (concat temporary-file-directory
                                         "tramp/")

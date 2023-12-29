@@ -9,9 +9,7 @@
     st))
 
 (defvar mkfile-dependency-regex
-  (rx bol (group graph (*? nonl) ":")
-      (? (+? nonl) (group ":"))
-      (or (regexp "[\t\s]") eol)))
+  "^\\([[:graph:]].*?\\)\\(?::[DENnQRUV]*\\(?:P[^\n]*\\)?\\)?\\(:\\)\\(?:[\t\s]\\|$\\)")
 
 (defvar mkfile-rule-action-regex
   "^[ \t]+\\(?:\\([-@]+\\)[ \t]*\\)\\(.*\\(?:\\\\\n.*\\)*\\)")
