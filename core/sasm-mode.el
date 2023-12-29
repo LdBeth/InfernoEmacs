@@ -69,15 +69,29 @@
     (modify-syntax-entry ?-  "w" table)
     (modify-syntax-entry ?!  "w" table)
     (modify-syntax-entry ?&  "w" table)
-    (modify-syntax-entry ?\( "w" table)
-    (modify-syntax-entry ?\) "w" table)
+    (modify-syntax-entry ?\( "()" table)
+    (modify-syntax-entry ?\) "()" table)
     table)
   "The SASM syntax table.")
 
+(defalias 'sasm-mode-syntax-propertize
+  (syntax-propertize-rules
+   ("^*" (0 "<"))
+   ("\\((\\)\s" (1 "<1b"))
+   ("\\({\\)\s" (1 "(}"))
+   ("\s\\(}\\)" (1 "){"))))
+
+(defvar sasm-keywords '("BSS" "CON" "REL" "NIBASC" "STRING" "NIBHEX"
+                        "NIBFS" "LINK" "SLINK" "INC" "ASC" "ASCM"
+                        "HEX" "HEXM" "NIBBIN" "NIBGRB"
+                        "TITLE" "STITLE" "EJECT" "UNLIST"
+                        "LIST" "LISTM" "LISTALL" "CLRLIST" "SETLIST")
+  "Keywords used by the SASM assembler.")
+
 (defvar sasm-font-lock-keywords
-  (list (list "^\\*.*$" (list 0 'sasm-font-lock-comment-face))
-        ;; !!! TODO !!!
-        ))
+  `(("^\\*.*$" (0 sasm-font-lock-comment-face))
+    (,(concat "\\<" (regexp-opt sasm-keywords) "\\>")
+     (0 sasm-font-lock-keyword-face))))
 
 (defun sasm-compile-buffer ()
   "Assemble the current buffer."
@@ -115,11 +129,12 @@
   "Hook for customizing SASM mode.")
 
 ;;;###autoload
-(define-derived-mode sasm-mode asm-mode "SASM"
+(define-derived-mode sasm-mode prog-mode "SASM"
   "Major mode for SASM assembler language."
   :group 'rpl
-  (make-local-variable 'eldoc-documentation-function)
-  (setq eldoc-documentation-function 'sasm-get-eldoc-message)
+  :syntax-table sasm-mode-syntax-table
+  (setq-local eldoc-documentation-function #'sasm-get-eldoc-message
+              syntax-propertize-function #'sasm-mode-syntax-propertize)
   (setq font-lock-defaults (list 'sasm-font-lock-keywords))
   (setq rpl-menu-compile-buffer-enable t))
 

@@ -69,8 +69,8 @@
 (defvar sysrpl-mode-syntax-table
   (let ((table (make-syntax-table prog-mode-syntax-table)))
     (modify-syntax-entry ?\) ">4b" table)
-    (modify-syntax-entry ?{  "(}" table)
-    (modify-syntax-entry ?}  "){" table)
+    (modify-syntax-entry ?{  "w" table)
+    (modify-syntax-entry ?}  "w" table)
     (modify-syntax-entry ?:  "w" table)
     (modify-syntax-entry ?\; "w" table)
     (modify-syntax-entry ?!  "w" table)
@@ -97,7 +97,9 @@
 (defalias 'sysrpl-mode-syntax-propertize
   (syntax-propertize-rules
    ("^*" (0 "<"))
-   ("\\((\\)\s" (1 "<1b"))))
+   ("\\((\\)\s" (1 "<1b"))
+   ("\\({\\)\s" (1 "(}"))
+   ("\s\\(}\\)" (1 "){"))))
 
 (defvar sysrpl-rplcomp-keywords '("LAM" "ID" "TAG" "CHR" "CODE" "CODEM" "ENDCODE" "PTR"
                                   "ROMPTR" "FLASHPTR" "ZINT" "ARRY" "LNKARRY" "HXS" "GROB"
@@ -194,6 +196,7 @@ point."
 (define-derived-mode sysrpl-mode prog-mode "SysRPL"
   "Major mode for the SysRPL language."
   :group 'rpl
+  :syntax-table sysrpl-mode-syntax-table
   (setq-local eldoc-documentation-function 'sysrpl-get-eldoc-message)
   (setq font-lock-defaults (list 'sysrpl-font-lock-keywords))
   (setq-local comment-start "( "
