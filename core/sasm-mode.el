@@ -71,6 +71,7 @@
     (modify-syntax-entry ?&  "w" table)
     (modify-syntax-entry ?\( "()" table)
     (modify-syntax-entry ?\) "()" table)
+    (modify-syntax-entry ?\n ">" table)
     table)
   "The SASM syntax table.")
 
@@ -85,11 +86,12 @@
                         "NIBFS" "LINK" "SLINK" "INC" "ASC" "ASCM"
                         "HEX" "HEXM" "NIBBIN" "NIBGRB"
                         "TITLE" "STITLE" "EJECT" "UNLIST"
-                        "LIST" "LISTM" "LISTALL" "CLRLIST" "SETLIST")
+                        "LIST" "LISTM" "LISTALL" "CLRLIST" "SETLIST"
+                        "END")
   "Keywords used by the SASM assembler.")
 
 (defvar sasm-font-lock-keywords
-  `(("^\\*.*$" (0 sasm-font-lock-comment-face))
+  `(("^[^\s\t\n]+" (0 sasm-font-lock-label-face))
     (,(concat "\\<" (regexp-opt sasm-keywords) "\\>")
      (0 sasm-font-lock-keyword-face))))
 

@@ -100,6 +100,11 @@
     table)
   "Syntax table for j-mode")
 
+(defalias 'j-mode-syntax-propertize
+  (syntax-propertize-rules
+   ("^\\()\\)" (1 "."))
+   ("{{\\()\\)\s" (1 "."))))
+
 (defvar j-font-lock-constants
   '(
     ;; char codes

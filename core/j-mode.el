@@ -192,6 +192,7 @@ contents of current line."
                   "NB."
                   (* "\s"))
               comment-column 40
+              syntax-propertize-function #'j-mode-syntax-propertize
               indent-tabs-mode nil
               indent-line-function #'j-indent-line
               font-lock-comment-start-skip
