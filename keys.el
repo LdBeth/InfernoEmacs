@@ -114,6 +114,14 @@ end if")))
 
 ;; (setq mac-right-command-modifier 'meta)
 
+(autoload 'time-stamp-string "time-stamp")
+(defun insert-current-time (&optional _prefix)
+  (interactive "P")
+  (defvar time-stamp-format)
+  (let ((time-stamp-format
+         "%3a, %02d %3b %Y %02H:%02M:%02S %Z"))
+    (insert (time-stamp-string))))
+
 (defun gopher-club ()
   (interactive)
   (elpher-go "gopher://gopher.club/1/phlogs/"))
@@ -288,3 +296,18 @@ end if")))
    process-send-region
    process-send-string
    ))
+
+(defvar elmo-split-mail-function nil)
+(eval-when-compile (require 'wl))
+(defun wl-split-mail (&rest _ignore)
+  "Start Wanderlust and split inbox."
+  (require 'wl-batch)
+  (wl 1)
+  (when (functionp elmo-split-mail-function)
+    (funcall elmo-split-mail-function))
+  (let (wl-demo	elmo-folder-update-confirm wl-interactive-exit)
+    (wl-exit)))
+
+(add-to-list
+ 'command-switch-alist
+ '("wlsp" . wl-split-mail))

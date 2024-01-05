@@ -215,26 +215,7 @@
   (setq nxml-section-element-name-regexp
         "article\\|sect\\([1-5]\\|ion\\)\\|chapter\\|appendix\\|part\\|preface\\|reference\\|simplesect\\|bibliography\\|bibliodiv\\|glossary\\|glossdiv")
   (add-to-list 'rng-schema-locating-files
-               (expand-file-name "~/.emacs.d/schema/schemas.xml"))
-
-  (require 'time-stamp)
-  (defun nxml-insert-current-time (&optional prefix)
-    (interactive "P")
-    (if rng-current-schema-file-name
-        (let ((time-stamp-format
-               (cond ((string-match-p "rss" rng-current-schema-file-name)
-                      "%3a, %02d %3b %Y %02H:%02M:%02S %Z")
-                     ((string-match-p "atom" rng-current-schema-file-name)
-                      ;; fixme hard coded timezone
-                      "%Y-%02m-%02dT%02H:%02M:%02S-06:00")
-                     (t time-stamp-format))))
-          (if prefix
-              (insert (time-stamp-string))
-            (save-excursion
-              (let ((end (nxml-token-after)))
-                (goto-char xmltok-start)
-                (delete-char (- end xmltok-start))
-                (insert (time-stamp-string)))))))))
+               (expand-file-name "~/.emacs.d/schema/schemas.xml")))
 
 (use-package emmet-mode
   :defer t
