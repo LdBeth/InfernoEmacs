@@ -201,7 +201,7 @@
 
 (defvar j-font-lock-keywords
   `(
-    (,(rx (group (* (any "_a-zA-Z0-9")))
+    (,(rx (group (+ (any "_a-zA-Z0-9")))
           (* "\s") "=" (or "." ":"))
      (1 font-lock-variable-name-face))
     (,j-font-lock-multiassign-regexp

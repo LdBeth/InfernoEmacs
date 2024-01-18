@@ -82,7 +82,7 @@
                        "for.")))
                    (seq (or "for" "goto" "label")
                         (regexp "_[a-zA-Z]+\\."))))
-          (seq (regexp "[_a-zA-Z0-9]+")
+          (seq (regexp "[_a-zA-Z0-9]+") (? "'")
                (* "\s") "=" (or "." ":") (* "\s")
                (or "{{"
                    (seq "0" (+ "\s") ":" (* "\s")
