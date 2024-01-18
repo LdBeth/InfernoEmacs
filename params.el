@@ -12,7 +12,7 @@
 (tool-bar-mode -1)
 (tooltip-mode -1)
 (blink-cursor-mode -1)
-(prefer-coding-system 'utf-8)
+;; (prefer-coding-system 'utf-8)
 
 (setq inhibit-startup-screen t)
 (setq make-backup-files nil
@@ -54,7 +54,8 @@
 (setq ring-bell-function 'ignore
       use-short-answers t
       tab-always-indent 'complete
-      enable-recursive-minibuffers t)
+      enable-recursive-minibuffers t
+      help-enable-completion-autoload nil)
 
 (setq recentf-exclude '("mime-example$" "HYPB$"
                         "\\.emacs\\.d/\\([a-z]\\|-\\)*$" "[0a-f]+\\.plstore$")
@@ -81,7 +82,7 @@
         ("ldbeth" "https://ldbeth.sdf.org/rss.xml")
         ;;("ACG" "http://www.acgpiping.net/feed/")
         ("XML" "https://www.xml.com/feed/all/")
-        ("ndw" "https://so.nwalsh.com/feed/whatsnew.xml")
+        ("ndw" "https://so.nwalsh.com/feed/fulltext.xml")
         ))
 
 (setq corfu-auto t

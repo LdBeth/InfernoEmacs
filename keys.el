@@ -114,13 +114,9 @@ end if")))
 
 ;; (setq mac-right-command-modifier 'meta)
 
-(autoload 'time-stamp-string "time-stamp")
 (defun insert-current-time (&optional _prefix)
   (interactive "P")
-  (defvar time-stamp-format)
-  (let ((time-stamp-format
-         "%3a, %02d %3b %Y %02H:%02M:%02S %Z"))
-    (insert (time-stamp-string))))
+  (insert (format-time-string "%3a, %02d %3b %Y %02H:%02M:%02S %z")))
 
 (defun gopher-club ()
   (interactive)

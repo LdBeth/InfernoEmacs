@@ -87,6 +87,8 @@
     "C-x p" "project"
     "C-x r" "register"
     "C-x t" "tab"
+    "C-x w" "window"
+    "C-x w ^" "detach"
     "C-x x" "buffer")
   (which-key-mode 1))
 

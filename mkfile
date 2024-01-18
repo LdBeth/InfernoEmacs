@@ -7,6 +7,6 @@ all:VQ:
 	echo "Run mk redump."
 
 redump:V:
-	$EMDIR/Emacs --dump "${EMDUMPDIR}/Emacs.pdmp.bak" --batch --load $DUMP_EL
+	$EMDIR/Emacs --dump "${EMDUMPDIR}/Emacs.pdmp.bak" -q --batch --load $DUMP_EL
 	mv ~/.emacs.d/Emacs.pdmp "${EMDUMPDIR}/Emacs.pdmp"
 

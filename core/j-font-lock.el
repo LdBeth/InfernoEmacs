@@ -103,7 +103,8 @@
 (defalias 'j-mode-syntax-propertize
   (syntax-propertize-rules
    ("^\\()\\)" (1 "."))
-   ("{{\\()\\)\s" (1 "."))))
+   ("{{\\()\\)" (1 "."))
+   ("\\('\\)`?[0-9A-Z_a-z ]*\\('\\)\s*=[.:]" (1 ".") (2 "."))))
 
 (defvar j-font-lock-constants
   '(
@@ -148,7 +149,7 @@
   '("p.." "{::"))
 (defvar j-font-lock-len-2-verbs
   '("x:" "u:" "s:" "r." "q:" "p:" "p." "o." "L." "j." "I." "i:" "i." "E." "e."
-    "C." "A." "T." "?." "\":" "\"." "}:" "}." "{:" "{." "[:" "/:" "\\:" "#:" "#." ";:" ",:"
+    "C." "c." "A." "T." "?." "\":" "\"." "}:" "}." "{:" "{." "[:" "/:" "\\:" "#:" "#." ";:" ",:"
     ",." "|:" "|." "~:" "~." "$:" "$." "^." "%:" "%." "-:" "-." "*:" "*."  "+:"
     "+." ">:" ">." "<:" "<."))
 (defvar j-font-lock-len-1-verbs
@@ -188,13 +189,25 @@
           j-font-lock-len-2-conjunctions
           j-font-lock-len-1-conjunctions))
 
+(defun j-font-lock-prematch-variable ()
+  (re-search-backward (rx (group "'") (* (any "_a-zA-Z0-9 ")) (group "'")
+                          (* "\s") "=" (or "." ":"))
+                      (pos-bol))
+  (goto-char (match-end 1))
+  (match-end 2))
 
 (defvar j-font-lock-keywords
   `(
-    (,(rx (seq (group (* (any "_a-zA-Z0-9")))
-               (* "\s")
-               (group "=" (or "." ":"))))
-     (1 font-lock-variable-name-face) (2 j-other-face))
+    (,(rx (group (* (any "_a-zA-Z0-9")))
+          (* "\s") "=" (or "." ":"))
+     (1 font-lock-variable-name-face))
+    (,(rx (group "'") (* (any "_a-zA-Z0-9 ")) (group "'")
+          (* "\s") "=" (or "." ":"))
+     (1 font-lock-keyword-face)
+     (2 font-lock-keyword-face)
+     ("[_a-zA-Z0-9]+"
+      (j-font-lock-prematch-variable) nil
+      (0 font-lock-variable-name-face)))
     (,(rx bow (any "a-zA-Z")
           (* (any "_a-zA-Z0-9"))
           "_:") ;; Self-Effacing References
