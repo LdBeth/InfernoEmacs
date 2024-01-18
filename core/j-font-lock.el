@@ -189,9 +189,12 @@
           j-font-lock-len-2-conjunctions
           j-font-lock-len-1-conjunctions))
 
+(defvar j-font-lock-multiassign-regexp
+  (rx (group "'") (? "`") (* (any "_a-zA-Z0-9 ")) (group "'")
+      (* "\s") "=" (or "." ":")))
+
 (defun j-font-lock-prematch-variable ()
-  (re-search-backward (rx (group "'") (* (any "_a-zA-Z0-9 ")) (group "'")
-                          (* "\s") "=" (or "." ":"))
+  (re-search-backward j-font-lock-multiassign-regexp
                       (pos-bol))
   (goto-char (match-end 1))
   (match-end 2))
@@ -201,8 +204,7 @@
     (,(rx (group (* (any "_a-zA-Z0-9")))
           (* "\s") "=" (or "." ":"))
      (1 font-lock-variable-name-face))
-    (,(rx (group "'") (* (any "_a-zA-Z0-9 ")) (group "'")
-          (* "\s") "=" (or "." ":"))
+    (,j-font-lock-multiassign-regexp
      (1 font-lock-keyword-face)
      (2 font-lock-keyword-face)
      ("[_a-zA-Z0-9]+"
