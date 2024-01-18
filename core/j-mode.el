@@ -77,7 +77,7 @@
                        "if." "else." "elseif."
                        "select." "case." "fcase."
                        "throw."
-                       "try." "except." "catch." "catcht."
+                       "try." "except." "catch." "catcht." "catchd."
                        "while." "whilst."
                        "for.")))
                    (seq (or "for" "goto" "label")
@@ -98,7 +98,8 @@
                (regexp (regexp-opt '("end."
                                      "else." "elseif."
                                      "case." "fcase."
-                                     "catch." "catcht." "except.")))))))
+                                     "catch." "catcht." "catchd."
+                                     "except.")))))))
 
 (defun j-thing-outside-string (thing-regexp)
   "Look for REGEXP from `point' til `point-at-eol' outside strings and
@@ -147,7 +148,7 @@ contents of current line."
       (let* ((tentative-indent (j-compute-indentation))
              ;;FIXME doesn't handle comments correctly
              (indent (if (looking-at j-dedenting-keywords-regexp)
-                         (- tentative-indent j-indent-offset)
+                         (max 0 (- tentative-indent j-indent-offset))
                          tentative-indent))
              (delta (- indent (current-indentation))))
 ;;         (message "###DEBUGi:%d t:%d" indent tentative-indent)

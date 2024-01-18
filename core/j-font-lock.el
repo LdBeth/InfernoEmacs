@@ -189,7 +189,7 @@
           j-font-lock-len-2-conjunctions
           j-font-lock-len-1-conjunctions))
 
-(defvar j-font-lock-multiassign-regexp
+(defconst j-font-lock-multiassign-regexp
   (rx (group "'") (? "`") (* (any "_a-zA-Z0-9 ")) (group "'")
       (* "\s") "=" (or "." ":")))
 
