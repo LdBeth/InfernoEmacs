@@ -55,29 +55,25 @@
   :group 'j
   :group 'j-font-lock)
 
-(defvar j-verb-face
-  (defface j-verb-face
-    `((t (:foreground "Red")))
+(defface j-verb-face
+  `((t (:foreground "Red")))
   "Font Lock mode face used to higlight vrebs"
-  :group 'j-faces))
+  :group 'j-faces)
 
-(defvar j-adverb-face
-  (defface j-adverb-face
-    `((t (:foreground "Green")))
+(defface j-adverb-face
+  `((t (:foreground "Green")))
   "Font Lock mode face used to higlight adverbs"
-  :group 'j-faces))
+  :group 'j-faces)
 
-(defvar j-conjunction-face
-  (defface j-conjunction-face
-    `((t (:foreground "Blue")))
+(defface j-conjunction-face
+  `((t (:foreground "Blue")))
   "Font Lock mode face used to higlight conjunctions"
-  :group 'j-faces))
+  :group 'j-faces)
 
-(defvar j-other-face
-  (defface j-other-face
-    `((t (:foreground "Black")))
+(defface j-other-face
+  `((t (:foreground "Black")))
   "Font Lock mode face used to higlight others"
-  :group 'j-faces))
+  :group 'j-faces)
 
 (defvar j-font-lock-syntax-table
   (let ((table (make-syntax-table)))
@@ -158,7 +154,7 @@
   (append j-font-lock-len-3-verbs j-font-lock-len-2-verbs j-font-lock-len-1-verbs))
 
 (defvar j-font-lock-len-3-adverbs
-  '("\\.."))
+  '("/.."))
 (defvar j-font-lock-len-2-adverbs
   '("]:" "M." "f." "b." "/." "\\."))
 (defvar j-font-lock-len-1-adverbs
@@ -180,7 +176,7 @@
   '("&.:" "F.." "F.:" "F:." "F::" " ::" " :."))
 (defvar j-font-lock-len-2-conjunctions
   '("t." "S:" "L:" "H." "D:" "D." "d." "F." "F:" "m."
-    "&:" "&." "@:" "@." "`:" "!:" "!." ";."
+    "&:" "&." "@:" "@." "`:" "!:" "!." ";." "[." "]."
     "^:" " ." " :"))
 (defvar j-font-lock-len-1-conjunctions
   '("&" "@" "`" "\""))
@@ -194,10 +190,8 @@
       (* "\s") "=" (or "." ":")))
 
 (defun j-font-lock-prematch-variable ()
-  (re-search-backward j-font-lock-multiassign-regexp
-                      (pos-bol))
   (goto-char (match-end 1))
-  (match-end 2))
+  (match-beginning 2))
 
 (defvar j-font-lock-keywords
   `(
@@ -228,26 +222,26 @@
           eow)
      . font-lock-constant-face)
     (,(regexp-opt j-font-lock-len-3-verbs)
-     . j-verb-face)
-    (,(regexp-opt j-font-lock-len-3-adverbs) . j-adverb-face)
-    (,(regexp-opt j-font-lock-len-3-conjunctions) . j-conjunction-face)
+     . 'j-verb-face)
+    (,(regexp-opt j-font-lock-len-3-adverbs) . 'j-adverb-face)
+    (,(regexp-opt j-font-lock-len-3-conjunctions) . 'j-conjunction-face)
     ;;(,(regexp-opt j-font-lock-len-3-others) . )
     (,(rx (or (regexp (regexp-opt j-font-lock-len-2-verbs))
               (seq symbol-start (opt "_") (regexp "[0-9_]") ":")))
-     . j-verb-face)
-    (,(regexp-opt j-font-lock-len-2-adverbs) . j-adverb-face)
-    (,(regexp-opt j-font-lock-len-2-conjunctions) . j-conjunction-face)
-    (,(regexp-opt j-font-lock-len-2-others) . j-other-face)
-    (,(regexp-opt j-font-lock-direct-definition) . font-lock-keyword-face)
-    (,(regexp-opt j-font-lock-len-1-verbs) . j-verb-face)
-    (,(regexp-opt j-font-lock-len-1-adverbs) . j-adverb-face)
-    (,(regexp-opt j-font-lock-len-1-conjunctions) . j-conjunction-face)
-    ;;(,(regexp-opt j-font-lock-len-1-others) . j-other-face)
+     . 'j-verb-face)
+    (,(regexp-opt j-font-lock-len-2-adverbs) . 'j-adverb-face)
+    (,(regexp-opt j-font-lock-len-2-conjunctions) . 'j-conjunction-face)
+    (,(regexp-opt j-font-lock-len-2-others) . 'j-other-face)
+    (,(regexp-opt j-font-lock-direct-definition) . 'font-lock-keyword-face)
+    (,(regexp-opt j-font-lock-len-1-verbs) . 'j-verb-face)
+    (,(regexp-opt j-font-lock-len-1-adverbs) . 'j-adverb-face)
+    (,(regexp-opt j-font-lock-len-1-conjunctions) . 'j-conjunction-face)
+    ;;(,(regexp-opt j-font-lock-len-1-others) . 'j-other-face)
     )
   "J Mode font lock keys words")
 
 (defun j-font-lock-syntactic-face-function (state)
-  "Function for detection of string vs. Comment Note: J comments
+  "Function for detection of string vs. Comment. Note: J comments
 are three chars longs, there is no easy / evident way to handle
 this in emacs and it poses problems"
   (if (nth 3 state) font-lock-string-face
