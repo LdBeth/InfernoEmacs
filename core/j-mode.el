@@ -112,8 +112,10 @@ found, else beginning and end of the match."
         nil
         (let* ((thing-begin (match-beginning 0))
                (thing-end (match-end 0))
+               (eol (pos-eol))
                (parse (save-excursion
-                        (parse-partial-sexp (pos-eol) thing-end))))
+                        (parse-partial-sexp eol
+                                            (max eol thing-end)))))
           (if (or (nth 3 parse) (nth 4 parse))
               nil
               (list thing-begin thing-end))))))
@@ -159,7 +161,7 @@ contents of current line."
         (goto-char (max (point) (+ old-point delta))))
       )))
 
-(defsubst j-which-explict-definition ()
+(defun j-which-explict-definition ()
   "Return nil, `:one-liner' or `:multi-liner' depending on what
   kind of explicit definition we are `looking-at'. Modifies `match-data'!"
   ;; XXX we could dump the check for NB. if we prepending '^' to the others
@@ -181,44 +183,36 @@ contents of current line."
 (defun j-end-of-explicit-definition ()
   "Goto the end of the next explicit definition below point."
   (interactive)
-  (let ((old-point (point)))
-    (j-beginning-of-explicit-definition)
-    (j-end-of-explicit-definition-raw)
-    (if (<= (point) old-point)
-        (j-end-of-explicit-definition-raw))))
-
-(defun j-end-of-explicit-definition-raw ()
   (if (not (= (point) (pos-eol)))
       (beginning-of-line)
       (forward-line 1))
   (beginning-of-line)
   (save-match-data
-    (let ((type nil))
-      (while
-          (progn
-            (setq type (j-which-explict-definition))
-            (not
-             (or type (= (pos-eol) (point-max)))))
-        (forward-line 1))
-      (pcase type
-        ('nil nil)
-        (:one-liner (beginning-of-line 2) t)
-        (:multi-liner (search-forward-regexp "^)") t)
-        (:direct (search-forward-regexp
-                  (rx "}}" (or eol (not (any ".:")))))
-                 t)))))
+    (pcase (j-which-explict-definition)
+      ('nil (forward-line 1))
+      (:one-liner (beginning-of-line 2) t)
+      (:multi-liner (search-forward-regexp "^)") t)
+      (:direct (search-forward-regexp
+                (rx "}}" (or eol (not (any ".:")))))
+               t))))
 
 (defun j-beginning-of-explicit-definition ()
   "Got the start of the next explicit definition above point."
   (interactive)
-  (if (not (= (point) (pos-bol)))
-      (beginning-of-line)
-      (forward-line -1))
-    (save-match-data
-      (while (not (or (j-which-explict-definition)
-                      (= (pos-bol) (point-min))))
-        (forward-line -1)
-        t)))
+  (let ((cur (point)) beg end)
+    (save-excursion
+      (if (not (= (point) (pos-bol)))
+          (beginning-of-line)
+        (forward-line -1))
+      (save-match-data
+        (while (not (or (j-which-explict-definition)
+                        (= (pos-bol) (point-min))))
+          (forward-line -1)))
+      (setq beg (point))
+      (j-end-of-explicit-definition)
+      (setq end (point)))
+    (if (> end cur) (goto-char beg)
+      (beginning-of-line))))
 
 (defvar j-mode-map
   (let ((map (make-sparse-keymap)))
