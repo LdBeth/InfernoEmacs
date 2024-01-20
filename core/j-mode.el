@@ -85,15 +85,17 @@
           (seq (regexp "[_a-zA-Z0-9]+") (? "'")
                (* "\s") "=" (or "." ":") (* "\s")
                (or "{{"
-                   (seq "0" (+ "\s") ":" (* "\s")
-                        (regexp
+                   (seq (regexp
                          (regexp-opt
                           '("dyad" "monad" "adverb" "verb" "conjunction"
                             "1" "2" "3" "4")))
-                        eol))))))
+                        (+ "\s")
+                        (or (seq ":" (* "\s") "0")
+                            "define")))))))
+
 (defconst j-dedenting-keywords-regexp
   (rx (or "}}"
-          (seq bol ")" eol)
+          (seq ")" eol)
           (seq bow
                (regexp (regexp-opt '("end."
                                      "else." "elseif."
@@ -157,6 +159,67 @@ contents of current line."
         (goto-char (max (point) (+ old-point delta))))
       )))
 
+(defsubst j-which-explict-definition ()
+  "Return nil, `:one-liner' or `:multi-liner' depending on what
+  kind of explicit definition we are `looking-at'. Modifies `match-data'!"
+  ;; XXX we could dump the check for NB. if we prepending '^' to the others
+  (cond ((j-thing-outside-string (rx (or (seq bow "define")
+                                         (seq ":" (* "\s") "0"))
+                                     (* "\s")
+                                     eol))
+         :multi-liner)
+        ((j-thing-outside-string (rx (or (seq bow "def")
+                                         " :")
+                                     (+ "\s")))
+         (pcase (char-after (match-end 0))
+           ('nil (error "XXX Illegal definition?"))
+           (?\' :one-liner)
+           (_ :multi-liner)))
+        ((j-thing-outside-string "{{") :direct)
+        (t nil)))
+
+(defun j-end-of-explicit-definition ()
+  "Goto the end of the next explicit definition below point."
+  (interactive)
+  (let ((old-point (point)))
+    (j-beginning-of-explicit-definition)
+    (j-end-of-explicit-definition-raw)
+    (if (<= (point) old-point)
+        (j-end-of-explicit-definition-raw))))
+
+(defun j-end-of-explicit-definition-raw ()
+  (if (not (= (point) (pos-eol)))
+      (beginning-of-line)
+      (forward-line 1))
+  (beginning-of-line)
+  (save-match-data
+    (let ((type nil))
+      (while
+          (progn
+            (setq type (j-which-explict-definition))
+            (not
+             (or type (= (pos-eol) (point-max)))))
+        (forward-line 1))
+      (pcase type
+        ('nil nil)
+        (:one-liner (beginning-of-line 2) t)
+        (:multi-liner (search-forward-regexp "^)") t)
+        (:direct (search-forward-regexp
+                  (rx "}}" (or eol (not (any ".:")))))
+                 t)))))
+
+(defun j-beginning-of-explicit-definition ()
+  "Got the start of the next explicit definition above point."
+  (interactive)
+  (if (not (= (point) (pos-bol)))
+      (beginning-of-line)
+      (forward-line -1))
+    (save-match-data
+      (while (not (or (j-which-explict-definition)
+                      (= (pos-bol) (point-min))))
+        (forward-line -1)
+        t)))
+
 (defvar j-mode-map
   (let ((map (make-sparse-keymap)))
     (define-key map (kbd "C-c !")   'j-console)
@@ -196,6 +259,8 @@ contents of current line."
               syntax-propertize-function #'j-mode-syntax-propertize
               indent-tabs-mode nil
               indent-line-function #'j-indent-line
+              beginning-of-defun-function #'j-beginning-of-explicit-definition
+              end-of-defun-function       #'j-end-of-explicit-definition
               font-lock-comment-start-skip
               "NB. *"
               font-lock-defaults
