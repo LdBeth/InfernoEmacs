@@ -78,7 +78,7 @@
 (defvar j-font-lock-syntax-table
   (let ((table (make-syntax-table)))
     (modify-syntax-entry ?\{ "."   table)
-    (modify-syntax-entry ?\} "."   table)
+    (modify-syntax-entry ?\} ". 34b"   table)
     (modify-syntax-entry '(?! . ?&)  "." table)
     (modify-syntax-entry '(?* . ?/)  "." table)
     (modify-syntax-entry '(?: . ?@)  "." table)
@@ -89,16 +89,20 @@
     (modify-syntax-entry ?\( "()"  table)
     (modify-syntax-entry ?\) ")("  table)
     (modify-syntax-entry ?\' "\""  table)
-    (modify-syntax-entry ?N "w 1"  table)
-    (modify-syntax-entry ?B "w 2"  table)
+    ;; (modify-syntax-entry ?N "w 1"  table)
+    ;; (modify-syntax-entry ?B "w 2"  table)
     (modify-syntax-entry ?\n ">"   table)
-    (modify-syntax-entry ?\r ">"   table)
+    ;; (modify-syntax-entry ?\r ">"   table)
     table)
   "Syntax table for j-mode")
 
 (defalias 'j-mode-syntax-propertize
   (syntax-propertize-rules
-   ("^\\()\\)" (1 "."))
+   ("\\(N\\)\\(B\\)\\." (1 "w 1") (2 "w 2"))
+   ("\\(?:0\\|noun\\)\s+\\(?::\s*0\\|define\\).*\\(\n\\)"
+    (1 "< c"))
+   ("^\\()\\)" (1 "> c"))
+   ("\\({{\\))n" (1 ". 12b"))
    ("{{\\()\\)" (1 "."))
    ("\\('\\)`?[0-9A-Z_a-z ]*\\('\\)\s*=[.:]" (1 ".") (2 "."))))
 
@@ -237,6 +241,7 @@
     (,(regexp-opt j-font-lock-len-1-verbs) . 'j-verb-face)
     (,(regexp-opt j-font-lock-len-1-adverbs) . 'j-adverb-face)
     (,(regexp-opt j-font-lock-len-1-conjunctions) . 'j-conjunction-face)
+    (,(rx bol ":" eol) . 'j-conjunction-face)
     ;;(,(regexp-opt j-font-lock-len-1-others) . 'j-other-face)
     )
   "J Mode font lock keys words")
@@ -247,11 +252,14 @@ are three chars longs, there is no easy / evident way to handle
 this in emacs and it poses problems"
   (if (nth 3 state) font-lock-string-face
     (let* ((start-pos (nth 8 state)))
-      (and (<= (+ start-pos 3) (point-max))
-           (eq (char-after start-pos) ?N)
-           (string= (buffer-substring-no-properties
-                     start-pos (+ start-pos 3))
-                    "NB.")
-           font-lock-comment-face))))
+      (cond
+       ((and (<= (+ start-pos 3) (point-max))
+             (eql (char-after start-pos) ?N)
+             (string= (buffer-substring-no-properties
+                       start-pos (+ start-pos 3))
+                      "NB."))
+        font-lock-comment-face)
+       ((eq (char-after start-pos) ?\n) font-lock-doc-face)
+       (t font-lock-doc-face)))))
 
 (provide 'j-font-lock)
