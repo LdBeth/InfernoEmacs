@@ -102,7 +102,7 @@
    ("\\(?:0\\|noun\\)\s+\\(?::\s*0\\|define\\).*\\(\n\\)"
     (1 "< c"))
    ("^\\()\\)" (1 "> c"))
-   ("\\({{\\))n" (1 ". 12b"))
+   ("\\({{\\)\\()\\)n" (1 ". 12b") (2 "."))
    ("{{\\()\\)" (1 "."))
    ("\\('\\)`?[0-9A-Z_a-z ]*\\('\\)\s*=[.:]" (1 ".") (2 "."))))
 
@@ -178,11 +178,11 @@
   (append j-font-lock-len-3-others j-font-lock-len-2-others j-font-lock-len-1-others))
 
 (defvar j-font-lock-len-3-conjunctions
-  '("&.:" "F.." "F.:" "F:." "F::" " ::" " :."))
+  '("&.:" "F.." "F.:" "F:." "F::"))
 (defvar j-font-lock-len-2-conjunctions
   '("t." "S:" "L:" "H." "D:" "D." "d." "F." "F:" "m."
     "&:" "&." "@:" "@." "`:" "!:" "!." ";." "[." "]."
-    "^:" " ." " :"))
+    "^:"))
 (defvar j-font-lock-len-1-conjunctions
   '("&" "@" "`" "\""))
 (defvar j-font-lock-conjunctions
@@ -241,7 +241,8 @@
     (,(regexp-opt j-font-lock-len-1-verbs) . 'j-verb-face)
     (,(regexp-opt j-font-lock-len-1-adverbs) . 'j-adverb-face)
     (,(regexp-opt j-font-lock-len-1-conjunctions) . 'j-conjunction-face)
-    (,(rx bol ":" eol) . 'j-conjunction-face)
+    (,(rx (or bol (+ "\s")) (group (regexp (regexp-opt '(":" "." ":." "::")))))
+     (1 'j-conjunction-face))
     ;;(,(regexp-opt j-font-lock-len-1-others) . 'j-other-face)
     )
   "J Mode font lock keys words")

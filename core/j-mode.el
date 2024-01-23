@@ -82,6 +82,7 @@
                        "for.")))
                    (seq (or "for" "goto" "label")
                         (regexp "_[a-zA-Z]+\\."))))
+          (seq bol ":" eol)
           (seq (regexp "[_a-zA-Z0-9]+") (? "'")
                (* "\s") "=" (or "." ":") (* "\s")
                (or "{{"
@@ -151,15 +152,16 @@ contents of current line."
       (back-to-indentation)
       (let* ((tentative-indent (j-compute-indentation))
              ;;FIXME doesn't handle comments correctly
-             (indent (if (looking-at j-dedenting-keywords-regexp)
-                         (max 0 (- tentative-indent j-indent-offset))
-                         tentative-indent))
+             (indent (cond
+                      ((looking-at j-dedenting-keywords-regexp)
+                       (max 0 (- tentative-indent j-indent-offset)))
+                      ((looking-at ":") 0)
+                      (t tentative-indent)))
              (delta (- indent (current-indentation))))
 ;;         (message "###DEBUGi:%d t:%d" indent tentative-indent)
         (indent-line-to indent)
         (back-to-indentation)
-        (goto-char (max (point) (+ old-point delta))))
-      )))
+        (goto-char (max (point) (+ old-point delta)))))))
 
 (defun j-which-explict-definition ()
   "Return nil, `:one-liner' or `:multi-liner' depending on what
