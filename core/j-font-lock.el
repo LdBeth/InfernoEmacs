@@ -88,7 +88,7 @@
     ;; (modify-syntax-entry ?\: "_"   table)
     (modify-syntax-entry ?\( "()"  table)
     (modify-syntax-entry ?\) ")("  table)
-    (modify-syntax-entry ?\' "\""  table)
+    (modify-syntax-entry ?\' "."  table)
     ;; (modify-syntax-entry ?N "w 1"  table)
     ;; (modify-syntax-entry ?B "w 2"  table)
     (modify-syntax-entry ?\n ">"   table)
@@ -105,7 +105,8 @@
    ("{{)n" (0 (j-font-lock-multiline-string ?\{)))
    ("}}" (0 (j-font-lock-multiline-string ?\})))
    ("{{\\()\\)" (1 "."))
-   ("\\('\\)`?[0-9A-Z_a-z ]*\\('\\)\s*=[.:]" (1 ".") (2 "."))))
+   ("\\('\\)`?[0-9A-Z_a-z ]*\\('\\)\s*=[.:]" (1 ".") (2 "."))
+   ("\\('\\)\\(?:[^'\n]\\|''\\)*\\('\\)" (1 "\"") (2 "\""))))
 
 (defun j-font-lock-multiline-string (arg)
   (pcase arg
