@@ -27,7 +27,9 @@
       </xsl:attribute>
     </xsl:if>
     <head>
-      <title><xsl:value-of select="/*/lsml:head/lsml:Subject"/></title>
+      <xsl:if test="/*/lsml:head/lsml:Subject != ''">
+        <title><xsl:value-of select="/*/lsml:head/lsml:Subject"/></title>
+      </xsl:if>
       <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
     </head>
     <body style="margin:0;padding:0;">
