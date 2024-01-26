@@ -131,7 +131,7 @@
 ;;;
 
 (defcustom mu-cite-cited-prefix-regexp
-  "^[ \t]*[^ \t\n<>]+>+[ \t]*"
+  "^[ \t]*[-[:word:]]+>+[ \t]*"
   "Regexp to match the citation prefix.
 If match, mu-cite doesn't insert citation prefix."
   :type 'regexp
@@ -548,7 +548,7 @@ to 70. :-)"
     (re-search-forward
      (concat "^" (regexp-quote mail-header-separator) "$") nil t)
     (while (re-search-forward
-	        (concat "^\\([ \t]*[^ \t\n" citation-mark-chars "]*["
+	        (concat "^\\([ \t]*[-[:word:]]*["
 		            citation-mark-chars "]\\)+")
             nil t)
       (let* ((b (match-beginning 0))
