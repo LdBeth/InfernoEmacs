@@ -13,12 +13,13 @@ lsmlElement =
     (attribute version { "0.1" } &
      attribute lang { xsd:language }? &
      attribute format { "htmlonly" | "usetext" }?),
-    lsmlClient,
+    lsmlClient?,
     lsmlHeader,
     lsmlBody,
     lsmlSignature?
   }
 
+## Reserved for client insert mime information
 lsmlClient =
   element config {
     element usetext { empty }?,
@@ -29,7 +30,7 @@ lsmlClient =
         attribute src { xsd:anyURI }
       }*
     }
-  }?
+  }
 
 lsmlHeader =
   element head {

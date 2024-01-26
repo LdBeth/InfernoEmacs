@@ -120,6 +120,29 @@
     (compose-mail to subject headers)))
 
 ;;;###autoload
+(defun lsml-draft ()
+  "Draft lsml from current message draft buffer."
+  (interactive)
+  (let ((subject (save-restriction
+                   (std11-narrow-to-header)
+                   (std11-fetch-field "Subject"))))
+    (let ((buffer (generate-new-buffer "LsML"))
+          (major-mode 'nxml-mode))
+      (with-current-buffer buffer
+        (nxml-mode)
+        (insert (format "<lsml xmlns=\"https://ldbeth.sdf.org/lsml\" version=\"0.1\" >
+  <head>
+    <Subject>%s</Subject>
+  </head>
+  <body>
+  </body>
+</lsml>
+" subject))
+        (forward-line -3)
+        (rng-auto-set-schema))
+      (display-buffer buffer))))
+
+;;;###autoload
 (defun lsml-export-to-draft-buffer ()
   "Export the messaged to opened draft buffer. Usefully when
 constructing a reply."
