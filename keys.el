@@ -43,22 +43,34 @@ if prefix argument ARG is given, switch to it in an other, possibly new window."
 
 (eval-when-compile (require 'static))
 
-(static-when (functionp 'ns-do-applescript)
-(defun now-playing ()
-  (interactive)
-  (let ((nowplay (with-temp-buffer
-                   (call-process
-                    "osascript"
-                    nil t nil
-                    (expand-file-name "script/nowplay.scpt" user-emacs-directory))
-                   (string-trim-right (buffer-string)))))
-    (when (called-interactively-p 'interactive)
-      (message "%s" nowplay))
-    nowplay))
+(eval-when-compile
+  (defmacro do-applescript (text)
+    (cond
+     ((functionp 'ns-do-applescript)
+      `(ns-do-applescript, text))
+     ((functionp 'mac-osa-script)
+      `(read (mac-osa-script (eval-when-compile
+                               (mac-osa-compile ,text))
+                             t nil)))
+     (t `(error "Not a mac"))))
+  (defmacro call-applescript (file)
+    (cond
+     ((functionp 'ns-do-applescript)
+      `(with-temp-buffer
+         (call-process
+          "osascript"
+          nil t nil
+          (expand-file-name ,file user-emacs-directory))
+         (string-trim-right (buffer-string))))
+     ((functionp 'mac-osa-script)
+      `(read (mac-osa-script
+              (expand-file-name ,file user-emacs-directory)
+              "AppleScript" t)))
+     (t `(error "Not a mac")))))
 
 (defun now-browsing ()
   (interactive)
-  (let ((url (ns-do-applescript "if application \"Safari\" is running then
+  (let ((url (do-applescript "if application \"Safari\" is running then
   tell application \"Safari\"
     set display to URL of front document
   end tell
@@ -68,33 +80,14 @@ end if")))
     (when (called-interactively-p 'interactive)
       (kill-new url)
       (message "%s" url))
-    url)))
+    url))
 
-(static-when (functionp 'mac-osa-script)
 (defun now-playing ()
   (interactive)
-  (let ((nowplay (read (mac-osa-script
-                        (expand-file-name "script/nowplay.scpt" user-emacs-directory)
-                        "AppleScript" t))))
+  (let ((nowplay (call-applescript "script/nowplay.scpt")))
     (when (called-interactively-p 'interactive)
       (message "%s" nowplay))
     nowplay))
-
-(defun now-browsing ()
-  (interactive)
-  (let* ((script (eval-when-compile
-                   (mac-osa-compile "if application \"Safari\" is running then
-  tell application \"Safari\"
-    set display to URL of front document
-  end tell
-else
-  set display to \"No opened document.\"
-end if")))
-         (url (read (mac-osa-script script t nil))))
-    (when (called-interactively-p 'interactive)
-      (kill-new url)
-      (message "%s" url))
-    url)))
 
 (static-if (boundp 'mac-emulate-three-button-mouse)
     (setq mac-emulate-three-button-mouse t)
