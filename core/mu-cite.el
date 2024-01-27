@@ -44,6 +44,7 @@
 
 (require 'std11)
 (require 'alist)
+(require 'timezone)
 
 (autoload 'mu-cite-get-prefix-method "mu-register")
 (autoload 'mu-cite-get-prefix-register-method "mu-register")
@@ -369,7 +370,7 @@ instead of to call the function directly."
 ;;; @ fundamentals
 ;;;
 
-(defvar mu-cite-methods-alist nil)
+(defvar-local mu-cite-methods-alist nil)
 
 (defun mu-cite-make-methods ()
   (setq mu-cite-methods-alist
@@ -402,23 +403,24 @@ This is callable from the various mail and news readers' reply
 function according to the agreed upon standard."
   (interactive)
   (mu-cite-make-methods)
+  (undo-boundary)
   (save-restriction
     (if (< (mark t) (point))
-	(exchange-point-and-mark))
+	    (exchange-point-and-mark))
     (narrow-to-region (point)(point-max))
     (run-hooks 'mu-cite-pre-cite-hook)
     (let ((last-point (point))
-	  ;; Register a name before generating the top cite form.
-	  (prefix (mu-cite-eval-format mu-cite-prefix-format))
-	  (top (mu-cite-eval-format mu-cite-top-format)))
+	      ;; Register a name before generating the top cite form.
+	      (prefix (mu-cite-eval-format mu-cite-prefix-format))
+	      (top (mu-cite-eval-format mu-cite-top-format)))
       (if (re-search-forward "^-*$" nil nil)
-	  (forward-line 1))
+	      (forward-line 1))
       (widen)
       (delete-region last-point (point))
       (insert top)
       (setq last-point (point))
       (while (< (point)(mark t))
-	(cond ((looking-at "^>>>>>\\|^[ \t]*$"))
+	    (cond ((looking-at "^>>>>>\\|^[ \t]*$"))
               ((looking-at mu-cite-cited-prefix-regexp)
                (let ((beg (point)))
                  (skip-chars-forward " \t")
@@ -428,8 +430,8 @@ function according to the agreed upon standard."
                  (skip-chars-forward " \t")
                  (delete-region beg (point))
                  (insert ">")))
-	      (t (insert prefix)))
-	(forward-line 1))
+	          (t (insert prefix)))
+	    (forward-line 1))
       (goto-char last-point))
     (run-hooks 'mu-cite-post-cite-hook)))
 
@@ -574,11 +576,13 @@ to 70. :-)"
 			      (make-string nest ?>)))))
 	))))
 
-(defun replace-top-string (old new)
-  (interactive "*sOld string: \nsNew string: ")
-  (while (re-search-forward
-	  (concat "^" (regexp-quote old)) nil t)
-    (replace-match new)))
+(defun replace-nest-cite (level prefix)
+  (interactive "*nNested level: \nsNew prefix: ")
+  (let ((re (concat  "^\\(?:[\s\t]*[" citation-mark-chars "]\\)\\{"
+                     (number-to-string level) "\\}"))
+        (np (concat prefix ">")))
+    (while (re-search-forward re nil t)
+      (replace-match np))))
 
 (defun string-compare-from-top (str1 str2)
   (let* ((len1 (length str1))
