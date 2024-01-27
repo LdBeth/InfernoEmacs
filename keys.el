@@ -229,9 +229,6 @@ end if")))
             nil
           (window-adjust-process-window-size-smallest proc win))))
 
-;; gpg 2.4
-(fset 'epg-wait-for-status 'ignore)
-
 (eval-when-compile
   (require 'use-package)
   (setq use-package-expand-minimally t))
