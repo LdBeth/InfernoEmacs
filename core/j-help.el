@@ -125,7 +125,6 @@
           j-help-remote-dictionary-url))))
 
 (defun j-help-symbol-pair-to-doc-url ( alist-data )
-  ""
   (let ((dic (j-help-valid-dictionary)))
     (if (or (not alist-data) (string= dic ""))
         (error "%s" "No dictionary found. Please specify a dictionary.")
@@ -139,7 +138,6 @@
 
 (defun j-help--determine-symbol ( s point )
   "Internal function to determine j symbols. Should not be called directly
-
 string * int -> (string * string) list"
   (unless (or (< point 0) (< (length s) point))
     (let ((list j-help-dictionary-data-block)
@@ -167,7 +165,6 @@ string * int -> (string * string) list"
 
 (defun j-help-branch-determine-symbol-at-point*
   ( string current-index target-index resolved-symbol )
-  ""
   (if (> current-index target-index) resolved-symbol
     (let ((next-symbol (j-help--determine-symbol string current-index)))
       (j-help-branch-determine-symbol-at-point*
@@ -177,7 +174,6 @@ string * int -> (string * string) list"
        next-symbol))))
 
 (defun j-help-branch-determine-symbol-at-point ( point )
-  ""
   (save-excursion
     (goto-char point)
     (j-help-branch-determine-symbol-at-point*
