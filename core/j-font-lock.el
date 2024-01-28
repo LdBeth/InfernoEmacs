@@ -98,7 +98,7 @@
 
 (defalias 'j-mode-syntax-propertize
   (syntax-propertize-rules
-   ("\\(N\\)\\(B\\)\\." (1 "w 1") (2 "w 2")
+   ("\\(N\\)\\(B\\)\\..*$" (1 "w 1") (2 "w 2")
     (0 (j-font-lock-nota-bene)))
    ("\\(?:0\\|noun\\)\s+\\(?::\s*0\\|define\\)"
     (0 (j-font-lock-multiline-string ?:)))

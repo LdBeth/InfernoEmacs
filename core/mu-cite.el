@@ -370,20 +370,21 @@ instead of to call the function directly."
 ;;; @ fundamentals
 ;;;
 
-(defvar-local mu-cite--methods-alist nil)
+(defvar-local mu-cite-methods-alist nil
+  "Cached citation values per buffer.")
 
 (defun mu-cite-make-methods ()
-  (setq mu-cite--methods-alist
+  (setq mu-cite-methods-alist
 	(copy-alist mu-cite-default-methods-alist))
   (run-hooks 'mu-cite-instantiation-hook))
 
 (defun mu-cite-get-value (item)
   "Return a current value of ITEM."
-  (let ((ret (cdr (assoc item mu-cite--methods-alist))))
+  (let ((ret (cdr (assoc item mu-cite-methods-alist))))
     (if (functionp ret)
 	(prog1
 	    (setq ret (save-excursion (funcall ret)))
-	  (set-alist 'mu-cite--methods-alist item ret))
+	  (set-alist 'mu-cite-methods-alist item ret))
       ret)))
 
 (defun mu-cite-eval-format (list)
