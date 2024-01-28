@@ -579,11 +579,12 @@ to 70. :-)"
 ;;;###autoload
 (defun mu-cite-replace-nest-cite (level prefix)
   "Fix nested cite."
-  (interactive (list (read-number "Nestd level: "
-                                  (max 2 (how-many
-                                          (concat "[\s\t]*[" citation-mark-chars "]")
-                                          (pos-bol) (pos-eol))))
-                     (read-string "New prefix: ")))
+  (interactive (list
+                (read-number "Nestd level: "
+                             (max 2 (how-many
+                                     (concat "[\s\t]*[" citation-mark-chars "]")
+                                     (pos-bol) (pos-eol))))
+                (read-string "New prefix: ")))
   (if buffer-read-only
       (error "Needs in message buffer"))
   (if (< level 1)
