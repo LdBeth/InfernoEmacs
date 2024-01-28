@@ -370,20 +370,20 @@ instead of to call the function directly."
 ;;; @ fundamentals
 ;;;
 
-(defvar-local mu-cite-methods-alist nil)
+(defvar-local mu-cite--methods-alist nil)
 
 (defun mu-cite-make-methods ()
-  (setq mu-cite-methods-alist
+  (setq mu-cite--methods-alist
 	(copy-alist mu-cite-default-methods-alist))
   (run-hooks 'mu-cite-instantiation-hook))
 
 (defun mu-cite-get-value (item)
   "Return a current value of ITEM."
-  (let ((ret (cdr (assoc item mu-cite-methods-alist))))
+  (let ((ret (cdr (assoc item mu-cite--methods-alist))))
     (if (functionp ret)
 	(prog1
 	    (setq ret (save-excursion (funcall ret)))
-	  (set-alist 'mu-cite-methods-alist item ret))
+	  (set-alist 'mu-cite--methods-alist item ret))
       ret)))
 
 (defun mu-cite-eval-format (list)
@@ -456,7 +456,7 @@ TABLE defaults to the current buffer's category table (it is currently
 ignored)."
   (category-set-mnemonics (char-category-set character)))
 
-(defun detect-paragraph-cited-prefix ()
+(defun mu-cite--detect-paragraph-cited-prefix ()
   (save-excursion
     (goto-char (point-min))
     (let ((i 0)
@@ -469,7 +469,7 @@ ignored)."
 		    (setq str (buffer-substring
 			       (progn (beginning-of-line)(point))
 			       (progn (end-of-line)(point))))
-		    (setq ret (string-compare-from-top prefix str)))
+		    (setq ret (mu-cite--string-compare-from-top prefix str)))
 	  (setq prefix
 		(if (stringp ret)
 		    ret
@@ -513,7 +513,7 @@ to 70. :-)"
   :group 'mu-cite)
 
 ;;;###autoload
-(defun fill-cited-region (beg end)
+(defun mu-cite-fill-cited-region (beg end)
   "Fill each of the paragraphs in the region as a cited text."
   (interactive "*r")
   (save-excursion
@@ -522,7 +522,7 @@ to 70. :-)"
       (and (search-backward "\n" nil t)
 	   (setq end (match-end 0)))
       (narrow-to-region beg end)
-      (let* ((fill-prefix (detect-paragraph-cited-prefix))
+      (let* ((fill-prefix (mu-cite--detect-paragraph-cited-prefix))
 	     (fill-column (max (+ 1 (current-left-margin)
 				  (string-width fill-prefix))
 			       (or fill-column-for-fill-cited-region
@@ -576,15 +576,25 @@ to 70. :-)"
 			      (make-string nest ?>)))))
 	))))
 
-(defun replace-nest-cite (level prefix)
-  (interactive "*nNested level: \nsNew prefix: ")
+;;;###autoload
+(defun mu-cite-replace-nest-cite (level prefix)
+  "Fix nested cite."
+  (interactive (list (read-number "Nestd level: "
+                                  (max 2 (how-many
+                                          (concat "[\s\t]*[" citation-mark-chars "]")
+                                          (pos-bol) (pos-eol))))
+                     (read-string "New prefix: ")))
+  (if buffer-read-only
+      (error "Needs in message buffer"))
+  (if (< level 1)
+      (error "Level need to be positive"))
   (let ((re (concat  "^\\(?:[\s\t]*[" citation-mark-chars "]\\)\\{"
                      (number-to-string level) "\\}"))
         (np (concat prefix ">")))
     (while (re-search-forward re nil t)
       (replace-match np))))
 
-(defun string-compare-from-top (str1 str2)
+(defun mu-cite--string-compare-from-top (str1 str2)
   (let* ((len1 (length str1))
 	 (len2 (length str2))
 	 (len (min len1 len2))
