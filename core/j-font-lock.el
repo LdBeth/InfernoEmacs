@@ -109,6 +109,21 @@
    ("\\('\\)`?[0-9A-Z_a-z ]*\\('\\)\s*=[.:]" (1 ".") (2 "."))
    ("\\('\\)\\(?:[^'\n]\\|''\\)*\\('\\)" (1 "\"") (2 "\""))))
 
+(defalias 'j-lab-mode-syntax-propertize
+  (syntax-propertize-rules
+   ("\\(N\\)\\(?:B\\.\s*\\(?:===\\|---\\)\\|ote\s*''\\)"
+    (1 (j-font-lock-multiline-string ?N)))
+   ("\\(N\\)\\(B\\)\\..*$" (1 "w 1") (2 "w 2")
+    (0 (j-font-lock-nota-bene)))
+   ("\\(?:0\\|noun\\)\s+\\(?::\s*0\\|define\\)"
+    (0 (j-font-lock-multiline-string ?:)))
+   ("^\\()\\)" (1 (j-font-lock-multiline-string ?\))))
+   ("{{)n" (0 (j-font-lock-multiline-string ?\{)))
+   ("}}" (0 (j-font-lock-multiline-string ?\})))
+   ("{{\\()\\)" (1 "."))
+   ("\\('\\)`?[0-9A-Z_a-z ]*\\('\\)\s*=[.:]" (1 ".") (2 "."))
+   ("\\('\\)\\(?:[^'\n]\\|''\\)*\\('\\)" (1 "\"") (2 "\""))))
+
 (defun j-font-lock-nota-bene ()
   (let ((eol (pos-eol)))
     (put-text-property (1- eol) eol
@@ -122,6 +137,10 @@
             (put-text-property eol (1+ eol)
                                'syntax-table (string-to-syntax "|")))
           nil))
+    (?N (let ((ppss (save-excursion (goto-char (match-beginning 1))
+                                    (syntax-ppss))))
+          (unless (and (eq t (nth 3 ppss)) (nth 8 ppss)) ; inside string
+            (string-to-syntax "|"))))
     (?\{ (let* ((ppss (save-excursion (backward-char 4) (syntax-ppss)))
                (string-start (and (eq t (nth 3 ppss)) (nth 8 ppss)))
                (quote-starting-pos (- (point) 4)))
@@ -134,8 +153,9 @@
     (?\) (let* ((ppss (save-excursion (backward-char 2) (syntax-ppss)))
                 (string-start (and (eq t (nth 3 ppss)) (nth 8 ppss)))
                 (quote-starting-pos (- (point) 1)))
-           (if (and string-start (eql (char-after string-start)
-                                      ?\n))
+           (if (and string-start (or
+                                  (eql (char-after string-start) ?\n)
+                                  (eql (char-after string-start) ?N)))
                (put-text-property (1- quote-starting-pos) quote-starting-pos
                                   'syntax-table (string-to-syntax "|")))
            (string-to-syntax ".")))
@@ -303,11 +323,14 @@ are three chars longs, there is no easy / evident way to handle
 this in emacs and it poses problems"
   (let* ((start-pos (nth 8 state)))
     (cond
-     ((nth 3 state) (if (and
-                         (eql (char-after start-pos) ?\n)
-                         (j-font-lock-docstring-p state))
-                        font-lock-doc-face
-                      font-lock-string-face))
+     ((nth 3 state)
+      (if (or (and ; A free standing multiline string
+               (eql (char-after start-pos) ?\n)
+               (j-font-lock-docstring-p state))
+              ;; J Lab command
+              (eql (char-after start-pos) ?N))
+          font-lock-doc-face
+        font-lock-string-face))
      ((and (<= (+ start-pos 3) (point-max))
            (eql (char-after start-pos) ?N)
            (string= (buffer-substring-no-properties
