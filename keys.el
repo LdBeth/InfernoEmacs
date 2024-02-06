@@ -115,6 +115,15 @@ end if")))
   (interactive)
   (elpher-go "gopher://gopher.club/1/phlogs/"))
 
+(defun toggle-theme-dark-light ()
+  (interactive)
+  (if (custom-theme-enabled-p 'spacemacs-light)
+      (progn
+        (disable-theme 'spacemacs-light)
+        (enable-theme 'spacemacs-dark))
+    (disable-theme 'spacemacs-dark)
+    (enable-theme 'spacemacs-light)))
+
 (bind-keys
  :prefix "M-m"
  :prefix-map launchpad-keys
@@ -126,7 +135,8 @@ end if")))
  ("f" . make-frame-command)
  ("n" . newsticker-show-news)
  ("g" . gopher-club)
- ("t" . todo-show))
+ ("t" . todo-show)
+ ("l" . toggle-theme-dark-light))
 (bind-keys
  :prefix "M-m p"
  :prefix-map prover-loader
@@ -282,18 +292,3 @@ end if")))
    process-send-region
    process-send-string
    ))
-
-(defvar elmo-split-mail-function nil)
-(eval-when-compile (require 'wl))
-(defun wl-split-mail (&rest _ignore)
-  "Start Wanderlust and split inbox."
-  (require 'wl-batch)
-  (wl 1)
-  (when (functionp elmo-split-mail-function)
-    (funcall elmo-split-mail-function))
-  (let (wl-demo	elmo-folder-update-confirm wl-interactive-exit)
-    (wl-exit)))
-
-(add-to-list
- 'command-switch-alist
- '("wlsp" . wl-split-mail))
