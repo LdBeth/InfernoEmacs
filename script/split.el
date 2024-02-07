@@ -1,3 +1,5 @@
+(package-initialize)
+(load (concat user-emacs-directory "pkgs"))
 (require 'wl)
 (require 'wl-batch)
 (wl 1)

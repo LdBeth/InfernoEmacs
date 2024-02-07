@@ -6,6 +6,7 @@
     (modify-syntax-entry ?/ "|" table)
 
     (modify-syntax-entry ?\" "." table)
+    (modify-syntax-entry ?\' "." table)
     (modify-syntax-entry ?*  "." table)
     (modify-syntax-entry ?&  "."  table)
     (modify-syntax-entry ?+  "."  table)
@@ -22,7 +23,9 @@
 
 (defvar teco-font-lock-keywords
   '(("E[ABCFIKLNPQRWX]" (0 font-lock-builtin-face))
-    ("\\^[@A-Za-z[]" (0 font-lock-constant-face))))
+    ("\\^[@A-Za-z[]" (0 font-lock-constant-face))
+    ("\"[ACDEFGLNRSTUVW<>=]\\|'\\||" (0 font-lock-keyword-face))
+    ("F?[<>]" (0 font-lock-keyword-face))))
 
 ;;;###autoload
 (add-to-list 'auto-mode-alist '("\\.te[sc]\\'"  . teco-mode))
