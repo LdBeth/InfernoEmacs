@@ -70,9 +70,10 @@ TECO-64 looks for non whitespaces."
     table))
 
 (defvar teco-font-lock-keywords
-  '(("\33" (0 (progn (compose-region (match-beginning 0) (match-end 0)
-                                     ?$)
-                     font-lock-keyword-face)))
+  '(("\33\\|\\^\\["
+     (0 (progn (compose-region (match-beginning 0) (match-end 0)
+                               ?$)
+               font-lock-keyword-face)))
     ("[=<>]=\\|<>\\|//\\|<<\\|>>\\|\\^_\\|\\\\/" (0 'font-lock-operator-face))
     ("[#&*+/!~:@-]" (0 'font-lock-operator-face))
     ("F?['<>|]" (0 font-lock-keyword-face))
@@ -153,8 +154,7 @@ TECO-64 looks for non whitespaces."
 (define-derived-mode teco-mode prog-mode "TECO"
   :syntax-table teco-mode-syntax-table
   (setq font-lock-defaults (list 'teco-font-lock-keywords nil t)
-        font-lock-multiline t
-        prettify-symbols-alist '(("\33" . ?$)))
+        font-lock-multiline t)
   (setq-local comment-start "! "
               comment-end " !"
               syntax-propertize-function #'teco-mode-syntax-propertize))
