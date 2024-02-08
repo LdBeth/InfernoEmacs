@@ -47,6 +47,7 @@ TECO-64 looks for non whitespaces."
   (let ((table (make-syntax-table)))
     (modify-syntax-entry ?! "! 12b" table)
 
+    (modify-syntax-entry ?\C-a "\"" table)
     (modify-syntax-entry ?\" "." table)
     (modify-syntax-entry ?\' "." table)
     (modify-syntax-entry ?\[ "." table) ; Q-reg push
@@ -69,7 +70,10 @@ TECO-64 looks for non whitespaces."
     table))
 
 (defvar teco-font-lock-keywords
-  '(("[=<>]=\\|<>\\|//\\|<<\\|>>\\|\\^_\\|\\\\/" (0 'font-lock-operator-face))
+  '(("\33" (0 (progn (compose-region (match-beginning 0) (match-end 0)
+                                     ?$)
+                     font-lock-keyword-face)))
+    ("[=<>]=\\|<>\\|//\\|<<\\|>>\\|\\^_\\|\\\\/" (0 'font-lock-operator-face))
     ("[#&*+/!~:@-]" (0 'font-lock-operator-face))
     ("F?['<>|]" (0 font-lock-keyword-face))
     ("\\^[][_\\@A-Za-z]" (0 font-lock-constant-face))
@@ -149,7 +153,8 @@ TECO-64 looks for non whitespaces."
 (define-derived-mode teco-mode prog-mode "TECO"
   :syntax-table teco-mode-syntax-table
   (setq font-lock-defaults (list 'teco-font-lock-keywords nil t)
-        font-lock-multiline t)
+        font-lock-multiline t
+        prettify-symbols-alist '(("\33" . ?$)))
   (setq-local comment-start "! "
               comment-end " !"
               syntax-propertize-function #'teco-mode-syntax-propertize))
