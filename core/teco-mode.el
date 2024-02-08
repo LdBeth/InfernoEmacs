@@ -78,12 +78,12 @@ TECO-64 looks for non whitespaces."
         "^A"
         (any "\C-a=!INOS_")
         (seq (or "^U" "\C-u") teco-rx-regiser)))
-  ;; (rx-define teco-rx-1-arg
-  ;;   (or (seq "E" (or (any "%BGILNRW_")
-  ;;                    (seq (any "QM") teco-rx-regiser)))
-  ;;       (regex "F[BDMKR]")
-  ;;       (any "=!INOS_")
-  ;;       (seq (or "^U" "\C-u") teco-rx-regiser)))
+  (rx-define teco-rx-1-arg
+     (or (seq "E" (or (any "%BGILNRW_")
+                      (seq (any "QM") teco-rx-regiser)))
+         (regex "F[BDMKR]")
+         (any "=!INOS_")
+         (seq (or "^U" "\C-u") teco-rx-regiser)))
   (rx-define teco-rx-atsign-2-arg
     (seq "F" (any "1-4CNS_"))))
 
@@ -93,12 +93,60 @@ TECO-64 looks for non whitespaces."
                  'decompose-region)
  font-lock-keyword-face)
 
+(defmacro teco-font-lock-define-matcher (fn cmds delim)
+  `(defalias ',fn
+     (lambda (limit)
+       (when (re-search-forward (rx (group ,cmds)
+                                    (group (* (not ,delim)))
+                                    ,delim)
+                                limit t)
+         (let ((beg (match-beginning 0))
+               (end (match-end 0))
+               (pair (cons (match-string-no-properties 1)
+                           ,delim)))
+           (put-text-property (match-beginning 2) (match-end 2)
+                              'teco-delim-pair pair)
+           (put-text-property (match-beginning 2) (match-end 2)
+                              'face font-lock-string-face)
+           (put-text-property beg end 'font-lock-multiline 't)
+           (goto-char end))))))
+
+(teco-font-lock-define-matcher
+ teco-font-lock-control-out (or "^A" "\C-a") "\C-a")
+(teco-font-lock-define-matcher
+ teco-font-lock-1-arg teco-rx-1-arg "\e")
+
+(defun teco-font-lock-2-arg (limit)
+  (when (re-search-forward (rx (group teco-rx-atsign-2-arg)
+                               (group (* (not "\e")))
+                               "\e"
+                               (group (* (not "\e"))))
+                           limit t)
+    (let ((beg (match-beginning 0))
+          (end (match-end 0))
+          (pair1 (cons (match-string-no-properties 1)
+                       "\e"))
+          (pair2 (cons "\e" "\e")))
+      (put-text-property (match-beginning 2) (match-end 2)
+                         'teco-delim-pair pair1)
+      (put-text-property (match-beginning 2) (match-end 2)
+                         'face font-lock-string-face)
+      (put-text-property (match-beginning 3) (match-end 3)
+                         'teco-delim-pair pair2)
+      (put-text-property (match-beginning 3) (match-end 3)
+                         'face font-lock-string-face)
+      (put-text-property beg end 'font-lock-multiline 't)
+      (goto-char end))))
+
 (defvar teco-font-lock-keywords
   `(("[:<>=]?==?\\|<>\\|//\\|<<\\|>>\\|\\^_\\|\\\\/"
      (0 'font-lock-operator-face))
     ("[#&*+/!~:@-]" (0 'font-lock-operator-face))
     ("\e\\|\\^\\[" (0 (teco-font-lock-delim 0)))
     ("F?['<>|]" (0 font-lock-keyword-face))
+    (teco-font-lock-control-out)
+    (teco-font-lock-1-arg)
+    (teco-font-lock-2-arg)
     ("\\^[][_\\@A-Za-z]" 0 font-lock-constant-face prepend)
     ("\\^\\^." (0 'font-lock-preprocessor-face))
     (,(rx (or "^U"
@@ -111,9 +159,6 @@ TECO-64 looks for non whitespaces."
     ("E[1-4DEHOSTUV]" (0 'font-lock-variable-name-face))
     ("F?[HZ]\\|[B.]\\|F0" (0 'font-lock-variable-name-face))
     ))
-
-(defun teco-command-atsign-prefiexed-p (cmd-start)
-  )
 
 (defun teco-mode-syntax-propertize (start end)
   (goto-char start)
@@ -163,6 +208,15 @@ TECO-64 looks for non whitespaces."
                 (put-text-property (1- (point)) (point) 'syntax-table
                                    (if is-comment '(14) '(15)))))))))))
 
+(defun teco-fontify-extend-region (beg end _old-len)
+  (let ((str-beg (car (get-text-property beg 'teco-delim-pair)))
+        (str-end (cdr (get-text-property end 'teco-delim-pair)))
+        case-fold-search)
+    (save-excursion
+      (goto-char beg)
+      (cons (or (and str-beg (search-backward str-beg nil t)) beg)
+            (or (and str-end (search-forward str-end nil t)) end)))))
+
 ;;;###autoload
 (add-to-list 'auto-mode-alist '("\\.te[sc]\\'"  . teco-mode))
 
@@ -173,4 +227,6 @@ TECO-64 looks for non whitespaces."
         font-lock-multiline t)
   (setq-local comment-start "! "
               comment-end " !"
-              syntax-propertize-function #'teco-mode-syntax-propertize))
+              syntax-propertize-function #'teco-mode-syntax-propertize
+              font-lock-extend-after-change-region-function
+              #'teco-fontify-extend-region))
