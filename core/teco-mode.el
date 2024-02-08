@@ -47,7 +47,6 @@ TECO-64 looks for non whitespaces."
   (let ((table (make-syntax-table)))
     (modify-syntax-entry ?! "! 12b" table)
 
-    (modify-syntax-entry ?\C-a "\"" table)
     (modify-syntax-entry ?\" "." table)
     (modify-syntax-entry ?\' "." table)
     (modify-syntax-entry ?\[ "." table) ; Q-reg push
@@ -69,24 +68,7 @@ TECO-64 looks for non whitespaces."
     (modify-syntax-entry ?\n "> b" table)
     table))
 
-(defvar teco-font-lock-keywords
-  '(("\33\\|\\^\\["
-     (0 (progn (compose-region (match-beginning 0) (match-end 0)
-                               ?$)
-               font-lock-keyword-face)))
-    ("[=<>]=\\|<>\\|//\\|<<\\|>>\\|\\^_\\|\\\\/" (0 'font-lock-operator-face))
-    ("[#&*+/!~:@-]" (0 'font-lock-operator-face))
-    ("F?['<>|]" (0 font-lock-keyword-face))
-    ("\\^[][_\\@A-Za-z]" (0 font-lock-constant-face))
-    ("\\(?:^U\\|[]UXQGM*%\C-u[]\\)\\(\\.?[a-zA-Z0-9]\\)"
-     (1 font-lock-function-name-face))
-    ("\"[ACDEFGLNRSTUVW<>=]" (0 font-lock-keyword-face))
-    ("F[1-4BCDKMNRS_]" (0 font-lock-builtin-face))
-    ("E[ABCFGIJKLMNPQRWXYZ%_]" (0 font-lock-builtin-face))
-    ("E[1-4DEHOSTUV]" (0 'font-lock-variable-name-face))
-    ("F?[HZ]\\|[B.]\\|F0" (0 'font-lock-variable-name-face))))
-
-(eval-when-compile
+(eval-and-compile
   (rx-define teco-rx-regiser
     (seq (? ".") (any "A-Z0-9")))
   (rx-define teco-rx-atsign-1-arg
@@ -96,8 +78,39 @@ TECO-64 looks for non whitespaces."
         "^A"
         (any "\C-a=!INOS_")
         (seq (or "^U" "\C-u") teco-rx-regiser)))
+  ;; (rx-define teco-rx-1-arg
+  ;;   (or (seq "E" (or (any "%BGILNRW_")
+  ;;                    (seq (any "QM") teco-rx-regiser)))
+  ;;       (regex "F[BDMKR]")
+  ;;       (any "=!INOS_")
+  ;;       (seq (or "^U" "\C-u") teco-rx-regiser)))
   (rx-define teco-rx-atsign-2-arg
     (seq "F" (any "1-4CNS_"))))
+
+(defun teco-font-lock-delim (group)
+ (compose-region (match-beginning group) (match-end group)
+                 ?$
+                 'decompose-region)
+ font-lock-keyword-face)
+
+(defvar teco-font-lock-keywords
+  `(("[:<>=]?==?\\|<>\\|//\\|<<\\|>>\\|\\^_\\|\\\\/"
+     (0 'font-lock-operator-face))
+    ("[#&*+/!~:@-]" (0 'font-lock-operator-face))
+    ("\e\\|\\^\\[" (0 (teco-font-lock-delim 0)))
+    ("F?['<>|]" (0 font-lock-keyword-face))
+    ("\\^[][_\\@A-Za-z]" (0 font-lock-constant-face))
+    ("\\^\\^." (0 'font-lock-preprocessor-face))
+    (,(rx (or "^U"
+              (any "[]UXQGM*%\C-u"))
+          (group teco-rx-regiser))
+     (1 font-lock-function-name-face))
+    ("\"[ACDEFGLNRSTUVW<>=]" (0 font-lock-keyword-face))
+    ("F[1-4BCDKMNRS_]" (0 font-lock-builtin-face))
+    ("E[ABCFGIJKLMNPQRWXYZ%_]" (0 font-lock-builtin-face))
+    ("E[1-4DEHOSTUV]" (0 'font-lock-variable-name-face))
+    ("F?[HZ]\\|[B.]\\|F0" (0 'font-lock-variable-name-face))
+    ))
 
 (defun teco-mode-syntax-propertize (start end)
   (goto-char start)
