@@ -82,16 +82,19 @@ TECO-64 looks for non whitespaces."
      (or (seq "E" (or (any "%BGILNRW_")
                       (seq (any "QM") teco-rx-regiser)))
          (regex "F[BDMKR]")
-         (any "=!INOS_")
+         (any "=INOS_")
          (seq (or "^U" "\C-u") teco-rx-regiser)))
   (rx-define teco-rx-atsign-2-arg
     (seq "F" (any "1-4CNS_"))))
 
 (defun teco-font-lock-delim (group)
- (compose-region (match-beginning group) (match-end group)
-                 ?$
-                 'decompose-region)
- font-lock-keyword-face)
+  (let* ((beg (match-beginning group))
+         (end (match-end group))
+         (ppss (syntax-ppss end)))
+    (unless (or (nth 4 ppss) (nth 3 ppss))
+      (compose-region beg end ?$
+                      'decompose-region)
+      font-lock-keyword-face)))
 
 (defmacro teco-font-lock-define-matcher (fn cmds delim)
   `(defalias ',fn
@@ -106,8 +109,6 @@ TECO-64 looks for non whitespaces."
                            ,delim)))
            (put-text-property (match-beginning 2) (match-end 2)
                               'teco-delim-pair pair)
-           (put-text-property (match-beginning 2) (match-end 2)
-                              'face font-lock-string-face)
            (put-text-property beg end 'font-lock-multiline 't)
            (goto-char end))))))
 
@@ -129,24 +130,20 @@ TECO-64 looks for non whitespaces."
           (pair2 (cons "\e" "\e")))
       (put-text-property (match-beginning 2) (match-end 2)
                          'teco-delim-pair pair1)
-      (put-text-property (match-beginning 2) (match-end 2)
-                         'face font-lock-string-face)
       (put-text-property (match-beginning 3) (match-end 3)
                          'teco-delim-pair pair2)
-      (put-text-property (match-beginning 3) (match-end 3)
-                         'face font-lock-string-face)
       (put-text-property beg end 'font-lock-multiline 't)
       (goto-char end))))
 
 (defvar teco-font-lock-keywords
-  `(("[:<>=]?==?\\|<>\\|//\\|<<\\|>>\\|\\^_\\|\\\\/"
+  `((teco-font-lock-control-out (2 font-lock-string-face))
+    (teco-font-lock-1-arg (2 font-lock-string-face))
+    (teco-font-lock-2-arg (2 font-lock-string-face) (3 font-lock-string-face))
+    ("[:<>=]?==?\\|<>\\|//\\|<<\\|>>\\|\\^_\\|\\\\/"
      (0 'font-lock-operator-face))
     ("[#&*+/!~:@-]" (0 'font-lock-operator-face))
     ("\e\\|\\^\\[" (0 (teco-font-lock-delim 0)))
     ("F?['<>|]" (0 font-lock-keyword-face))
-    (teco-font-lock-control-out)
-    (teco-font-lock-1-arg)
-    (teco-font-lock-2-arg)
     ("\\^[][_\\@A-Za-z]" 0 font-lock-constant-face prepend)
     ("\\^\\^." (0 'font-lock-preprocessor-face))
     (,(rx (or "^U"
