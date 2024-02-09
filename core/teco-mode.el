@@ -68,9 +68,11 @@ TECO-64 looks for non whitespaces."
     (modify-syntax-entry ?\n "> b" table)
     table))
 
-(eval-and-compile
+(eval-when-compile
   (rx-define teco-rx-regiser
     (seq (? ".") (any "A-Z0-9")))
+  (rx-define teco-rx-atsign-prefix
+    (seq "@" (* (any "\s\t\n\r,:0-9"))))
   (rx-define teco-rx-atsign-1-arg
     (or (seq "E" (or (any "%BGILNRW_")
                      (seq (any "QM") teco-rx-regiser)))
@@ -91,10 +93,9 @@ TECO-64 looks for non whitespaces."
   (let* ((beg (match-beginning group))
          (end (match-end group))
          (ppss (syntax-ppss end)))
-    (unless (or (nth 4 ppss) (nth 3 ppss))
-      (compose-region beg end ?$
-                      'decompose-region)
-      font-lock-keyword-face)))
+    (unless (nth 4 ppss)
+      (compose-region beg end ?$ 'decompose-region))
+    font-lock-keyword-face))
 
 (defmacro teco-font-lock-define-matcher (fn cmds delim)
   `(defalias ',fn
@@ -142,10 +143,10 @@ TECO-64 looks for non whitespaces."
     ("[:<>=]?==?\\|<>\\|//\\|<<\\|>>\\|\\^_\\|\\\\/"
      (0 'font-lock-operator-face))
     ("[#&*+/!~:@-]" (0 'font-lock-operator-face))
-    ("\e\\|\\^\\[" (0 (teco-font-lock-delim 0)))
+    ("\e\\|\\^\\[" 0 (teco-font-lock-delim 0) prepend)
     ("F?['<>|]" (0 font-lock-keyword-face))
     ("\\^[][_\\@A-Za-z]" 0 font-lock-constant-face prepend)
-    ("\\^\\^." (0 'font-lock-preprocessor-face))
+    ("\\^\\^." 0 'font-lock-preprocessor-face prepend)
     (,(rx (or "^U"
               (any "[]UXQGM*%\C-u"))
           (group teco-rx-regiser))
@@ -165,45 +166,44 @@ TECO-64 looks for non whitespaces."
       (goto-char string-start)
       (search-backward "@" nil t)))
   (while (and (< (point) end)
-              (re-search-forward (rx (or (seq (regex "@[\s\t\n\r,:0-9]*")
+              (re-search-forward (rx (or (seq teco-rx-atsign-prefix
                                               (group teco-rx-atsign-1-arg))
-                                         (seq (regex "@[\s\t\n\r,:0-9]*")
+                                         (seq teco-rx-atsign-prefix
                                               (group teco-rx-atsign-2-arg))))
                                  end t))
-    (let* ((cmd (match-beginning 1))
-           is-comment
-           (delimiter
-            (if teco-atsign-ignore-spaces
-                (prog1 (and (looking-at "[\s\t\n\r]*\\([^\C-@]\\)")
-                            (char-after (match-beginning 1)))
-                  (goto-char (match-beginning 1)))
-              (char-after (point))))
-           (string-start (point)))
-      (when (and cmd (eql (char-after cmd) ?!))
-        ;; Cancel syntax class of `!'
-        (put-text-property cmd (1+ cmd) 'syntax-table '(1))
-        (setq is-comment t))
-      (if (and (eq teco-atsign-use-braces 'ignore)
-               (eql delimiter ?{))
-          (setq delimiter nil))
-      (let ((ppss (syntax-ppss)))
-        (unless (eq t (nth 3 ppss))
-          (setq cmd (if cmd 1 2))
-          (when delimiter
-            (put-text-property string-start (1+ string-start) 'syntax-table
-                               (if is-comment '(14) '(15)))
-            (let ((search
-                   (cond
-                    ((and teco-atsign-use-braces (eql delimiter ?\[))
-                     "]")
-                    ((and teco-atsign-use-braces (eql delimiter ?{))
-                     "}")
-                    (t
-                     (string delimiter)))))
-              (forward-char)
-              (when (search-forward search end t cmd)
-                (put-text-property (1- (point)) (point) 'syntax-table
-                                   (if is-comment '(14) '(15)))))))))))
+    (when (save-excursion
+            (null (nth 4 (syntax-ppss (match-beginning 0)))))
+      (let* ((cmd (match-beginning 1))
+             (delimiter
+              (if teco-atsign-ignore-spaces
+                  (prog1 (and (looking-at "[\s\t\n\r]*\\([^\C-@]\\)")
+                              (char-after (match-beginning 1)))
+                    (goto-char (match-beginning 1)))
+                (char-after (point))))
+             (string-start (point)))
+        (unless (eq t (nth 3 (syntax-ppss)))
+          (when (and cmd (eql (char-after cmd) ?!))
+            ;; Cancel syntax class of `!'
+            (put-text-property cmd (1+ cmd) 'syntax-table '(1)))
+          (if (and (eq teco-atsign-use-braces 'ignore)
+                   (eql delimiter ?{))
+              (setq delimiter nil))
+        (setq cmd (if cmd 1 2))
+        (when delimiter
+          (put-text-property string-start (1+ string-start) 'syntax-table
+                             '(15))
+          (let ((search
+                 (cond
+                  ((and teco-atsign-use-braces (eql delimiter ?\[))
+                   "]")
+                  ((and teco-atsign-use-braces (eql delimiter ?{))
+                   "}")
+                  (t
+                   (string delimiter)))))
+            (forward-char)
+            (when (search-forward search end t cmd)
+              (put-text-property (1- (point)) (point) 'syntax-table
+                                 '(15))))))))))
 
 (defun teco-fontify-extend-region (beg end _old-len)
   (let ((str-beg (car (get-text-property beg 'teco-delim-pair)))
@@ -214,13 +214,32 @@ TECO-64 looks for non whitespaces."
       (cons (or (and str-beg (search-backward str-beg nil t)) beg)
             (or (and str-end (search-forward str-end nil t)) end)))))
 
+(defun teco-font-lock-syntactic-face-function (state)
+  "Function for detection of string vs. Comment."
+  (let ((start-pos (nth 8 state)))
+    (cond
+     ((nth 3 state)
+      (if (save-excursion
+            (goto-char start-pos)
+            (search-backward "@" nil t)
+            (looking-at-p (rx teco-rx-atsign-prefix "!")))
+          font-lock-comment-face
+        font-lock-string-face))
+     (t
+      font-lock-comment-face))))
+
 ;;;###autoload
 (add-to-list 'auto-mode-alist '("\\.te[sc]\\'"  . teco-mode))
+;;;###autoload
+(add-to-list 'file-coding-system-alist '("\\.te[sc]\\'"  . utf-8))
 
 ;;;###autoload
 (define-derived-mode teco-mode prog-mode "TECO"
   :syntax-table teco-mode-syntax-table
-  (setq font-lock-defaults (list 'teco-font-lock-keywords nil t)
+  (setq font-lock-defaults '(teco-font-lock-keywords
+                             nil t nil nil
+                             (font-lock-syntactic-face-function
+                              . teco-font-lock-syntactic-face-function))
         font-lock-multiline t)
   (setq-local comment-start "! "
               comment-end " !"

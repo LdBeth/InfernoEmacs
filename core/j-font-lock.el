@@ -321,7 +321,7 @@
   "Function for detection of string vs. Comment. Note: J comments
 are three chars longs, there is no easy / evident way to handle
 this in emacs and it poses problems"
-  (let* ((start-pos (nth 8 state)))
+  (let ((start-pos (nth 8 state)))
     (cond
      ((nth 3 state)
       (if (or (and ; A free standing multiline string
