@@ -262,6 +262,14 @@
     ("bibtex %r" "%r.aux" "%r.bbl")
     ("dvipdfmx %r" "%r.dvi" "%r.pdf"))))
 
+(use-package plain-tex
+  :defer t
+  :init
+  (add-to-list 'major-mode-remap-alist
+               '(tex-mode . TeX-tex-mode))
+  (add-to-list 'major-mode-remap-alist
+               '(plain-tex-mode . plain-TeX-mode)))
+
 ;; Net
 (use-package newst-plainview
   :defer t

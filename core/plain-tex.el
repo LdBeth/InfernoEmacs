@@ -710,13 +710,6 @@ commands."
   :group 'TeX-command
   :type 'boolean)
 
-(defcustom TeX-LaTeX-sentinel-banner-regexp
-  "^\\(\\*\\* \\)?J?I?p?\\(La\\|Sli\\)TeX\\(2e\\)? \
-\\(Version\\|ver\\.\\|<[0-9/-]*\\(?:u[^>]*\\)?>\\)"
-  "Regexp to identify the banner line in the LaTeX output."
-  :group 'TeX-output
-  :type 'regexp)
-
 ;;; Portability.
 
 (defmacro TeX--if-macro-fboundp (name then &rest else)
@@ -3058,7 +3051,7 @@ See `completion-at-point-functions'."
   :type 'string
   :local t)
 
-(defcustom TeX-insert-braces t
+(defcustom TeX-insert-braces nil
   "If non-nil, append an empty pair of braces after inserting a macro.
 
 See also `TeX-insert-braces-alist'."

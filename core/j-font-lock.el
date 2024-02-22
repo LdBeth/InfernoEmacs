@@ -102,7 +102,7 @@
     (0 (j-font-lock-nota-bene)))
    ("\\(?:0\\|noun\\)\s+\\(?::\s*0\\|define\\)"
     (0 (j-font-lock-multiline-string ?:)))
-   ("^\\()\\)" (1 (j-font-lock-multiline-string ?\))))
+   ("^\\()\\)$" (1 (j-font-lock-multiline-string ?\))))
    ("{{)n" (0 (j-font-lock-multiline-string ?\{)))
    ("}}" (0 (j-font-lock-multiline-string ?\})))
    ("{{\\()\\)" (1 "."))
@@ -117,7 +117,7 @@
     (0 (j-font-lock-nota-bene)))
    ("\\(?:0\\|noun\\)\s+\\(?::\s*0\\|define\\)"
     (0 (j-font-lock-multiline-string ?:)))
-   ("^\\()\\)" (1 (j-font-lock-multiline-string ?\))))
+   ("^\\()\\)$" (1 (j-font-lock-multiline-string ?\))))
    ("{{)n" (0 (j-font-lock-multiline-string ?\{)))
    ("}}" (0 (j-font-lock-multiline-string ?\})))
    ("{{\\()\\)" (1 "."))
@@ -133,7 +133,10 @@
     (?: (let* ((ppss (syntax-ppss))
                (string-start (and (eq t (nth 3 ppss)) (nth 8 ppss)))
                (eol (pos-eol)))
-          (unless (or string-start (> (1+ eol) (point-max)))
+          (unless (or (or string-start (> (1+ eol) (point-max)))
+                      (save-excursion
+                        (goto-char (1+ eol))
+                        (looking-at "^)$")))
             (put-text-property eol (1+ eol)
                                'syntax-table (string-to-syntax "|")))
           nil))
