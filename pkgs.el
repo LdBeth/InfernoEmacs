@@ -142,7 +142,7 @@
         mail-envelope-from 'header
         mail-specify-envelope-from t
         mime-header-accept-quoted-encoded-words t
-        epg-pinentry-mode 'loopback
+        ;; epg-pinentry-mode 'loopback
         plstore-cache-passphrase-for-symmetric-encryption t)
   (define-mail-user-agent
     'wl-user-agent
@@ -241,6 +241,7 @@
 
 ;; TeX
 (use-package tex-mode
+  :disabled
   :defer t
   :config
   (setq tex-compile-commands

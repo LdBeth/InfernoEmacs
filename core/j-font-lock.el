@@ -137,8 +137,7 @@
             (put-text-property eol (1+ eol)
                                'syntax-table (string-to-syntax "|")))
           nil))
-    (?N (let ((ppss (save-excursion (goto-char (match-beginning 1))
-                                    (syntax-ppss))))
+    (?N (let ((ppss (save-excursion (syntax-ppss (match-beginning 1)))))
           (unless (and (eq t (nth 3 ppss)) (nth 8 ppss)) ; inside string
             (string-to-syntax "|"))))
     (?\{ (let* ((ppss (save-excursion (backward-char 4) (syntax-ppss)))

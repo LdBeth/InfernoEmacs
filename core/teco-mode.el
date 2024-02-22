@@ -47,24 +47,40 @@ TECO-64 looks for non whitespaces."
   (let ((table (make-syntax-table)))
     (modify-syntax-entry ?! "! 12b" table)
 
-    (modify-syntax-entry ?\" "." table)
-    (modify-syntax-entry ?\' "." table)
+    (modify-syntax-entry '(?\" . ?$) "." table)
+    (modify-syntax-entry '(?& . ?')  "." table)
+    (modify-syntax-entry '(?* . ?-)  "." table)
+    (modify-syntax-entry ?.  "_"  table)
+    (modify-syntax-entry ?/  "." table)
+    (modify-syntax-entry '(?\; . ??) "." table)
+    (modify-syntax-entry ?@  "'"  table)
+    (modify-syntax-entry ?:  "'"  table)
+    (modify-syntax-entry '(?A . ?Z) "." table)
+    (modify-syntax-entry '(?a . ?z) "." table)
+    (modify-syntax-entry ?E "w" table)
+    (modify-syntax-entry ?F "w" table)
+    (modify-syntax-entry ?G "w" table)
+    (modify-syntax-entry ?M "w" table)
+    (modify-syntax-entry ?U "w" table)
+    (modify-syntax-entry ?Q "w" table)
+    (modify-syntax-entry ?X "w" table)
+
+    (modify-syntax-entry ?e "w" table)
+    (modify-syntax-entry ?f "w" table)
+    (modify-syntax-entry ?g "w" table)
+    (modify-syntax-entry ?m "w" table)
+    (modify-syntax-entry ?u "w" table)
+    (modify-syntax-entry ?q "w" table)
+    (modify-syntax-entry ?x "w" table)
+    (modify-syntax-entry ?%  "_"  table)
+
+    (modify-syntax-entry ?^ "/" table)
     (modify-syntax-entry ?\[ "." table) ; Q-reg push
     (modify-syntax-entry ?\] "." table) ; Q-reg pop
-    (modify-syntax-entry ?*  "." table)
-    (modify-syntax-entry ?/  "." table)
-    (modify-syntax-entry ?&  "."  table)
-    (modify-syntax-entry ?#  "."  table)
-    (modify-syntax-entry ?+  "."  table)
-    (modify-syntax-entry ?-  "."  table)
-    (modify-syntax-entry ?*  "."  table)
-    (modify-syntax-entry ?.  "."  table)
-    (modify-syntax-entry ?:  "."  table)
-    (modify-syntax-entry ?@  "."  table)
-    (modify-syntax-entry ?=  "."  table)
-    (modify-syntax-entry ?<  "."  table)
-    (modify-syntax-entry ?>  "."  table)
-    (modify-syntax-entry ?|  "."  table)
+    (modify-syntax-entry ?\\ "." table)
+    (modify-syntax-entry ?_  "w" table)
+    (modify-syntax-entry ?`  "." table)
+
     (modify-syntax-entry ?\n "> b" table)
     table))
 
@@ -93,9 +109,10 @@ TECO-64 looks for non whitespaces."
   (let* ((beg (match-beginning group))
          (end (match-end group))
          (ppss (syntax-ppss end)))
-    (unless (nth 4 ppss)
-      (compose-region beg end ?$ 'decompose-region))
-    font-lock-keyword-face))
+    (unless (eql (char-after (1- beg)) ?^)
+      (unless (nth 4 ppss)
+        (compose-region beg end ?$ 'decompose-region))
+      font-lock-keyword-face)))
 
 (defmacro teco-font-lock-define-matcher (fn cmds delim)
   `(defalias ',fn
@@ -140,22 +157,23 @@ TECO-64 looks for non whitespaces."
   `((teco-font-lock-control-out (2 font-lock-string-face))
     (teco-font-lock-1-arg (2 font-lock-string-face))
     (teco-font-lock-2-arg (2 font-lock-string-face) (3 font-lock-string-face))
-    ("[:<>=]?==?\\|<>\\|//\\|<<\\|>>\\|\\^_\\|\\\\/"
-     (0 'font-lock-operator-face))
-    ("[#&*+/!~:@-]" (0 'font-lock-operator-face))
     ("\e\\|\\^\\[" 0 (teco-font-lock-delim 0) prepend)
-    ("F?['<>|]" (0 font-lock-keyword-face))
     ("\\^[][_\\@A-Za-z]" 0 font-lock-constant-face prepend)
     ("\\^\\^." 0 'font-lock-preprocessor-face prepend)
-    (,(rx (or "^U"
+    (,(rx (or bol (not "^"))
+          (or "^U"
               (any "[]UXQGM*%\C-u"))
           (group teco-rx-regiser))
      (1 font-lock-function-name-face))
+    ("F?['<>|]\\|:?;" (0 font-lock-keyword-face))
     ("\"[ACDEFGLNRSTUVW<>=]" (0 font-lock-keyword-face))
     ("F[1-4BCDKMNRS_]" (0 font-lock-builtin-face))
     ("E[ABCFGIJKLMNPQRWXYZ%_]" (0 font-lock-builtin-face))
     ("E[1-4DEHOSTUV]" (0 'font-lock-variable-name-face))
     ("F?[HZ]\\|[B.]\\|F0" (0 'font-lock-variable-name-face))
+    ("[:<>=]?==?\\|<>\\|//\\|<<\\|>>\\|\\^_\\|\\\\/"
+     (0 'font-lock-operator-face))
+    ("[#&*+/!~:@-]" (0 'font-lock-operator-face))
     ))
 
 (defun teco-mode-syntax-propertize (start end)
@@ -169,41 +187,50 @@ TECO-64 looks for non whitespaces."
               (re-search-forward (rx (or (seq teco-rx-atsign-prefix
                                               (group teco-rx-atsign-1-arg))
                                          (seq teco-rx-atsign-prefix
-                                              (group teco-rx-atsign-2-arg))))
+                                              (group teco-rx-atsign-2-arg))
+                                         (seq "^^"
+                                              (group anychar))))
                                  end t))
-    (when (save-excursion
-            (null (nth 4 (syntax-ppss (match-beginning 0)))))
-      (let* ((cmd (match-beginning 1))
-             (delimiter
-              (if teco-atsign-ignore-spaces
-                  (prog1 (and (looking-at "[\s\t\n\r]*\\([^\C-@]\\)")
-                              (char-after (match-beginning 1)))
-                    (goto-char (match-beginning 1)))
-                (char-after (point))))
-             (string-start (point)))
-        (unless (eq t (nth 3 (syntax-ppss)))
-          (when (and cmd (eql (char-after cmd) ?!))
-            ;; Cancel syntax class of `!'
-            (put-text-property cmd (1+ cmd) 'syntax-table '(1)))
-          (if (and (eq teco-atsign-use-braces 'ignore)
-                   (eql delimiter ?{))
-              (setq delimiter nil))
-        (setq cmd (if cmd 1 2))
-        (when delimiter
-          (put-text-property string-start (1+ string-start) 'syntax-table
-                             '(15))
-          (let ((search
-                 (cond
-                  ((and teco-atsign-use-braces (eql delimiter ?\[))
-                   "]")
-                  ((and teco-atsign-use-braces (eql delimiter ?{))
-                   "}")
-                  (t
-                   (string delimiter)))))
-            (forward-char)
-            (when (search-forward search end t cmd)
-              (put-text-property (1- (point)) (point) 'syntax-table
-                                 '(15))))))))))
+    (cond
+     ((and (or (match-beginning 1)
+               (match-beginning 2))
+           (char-after (match-end 0)))
+      (when (save-excursion
+              (null (nth 4 (syntax-ppss (match-beginning 0)))))
+        (let* ((cmd (match-beginning 1))
+               (delimiter
+                (if teco-atsign-ignore-spaces
+                    (prog1 (and (looking-at "[\s\t\n\r]*\\([^\C-@]\\)")
+                                (char-after (match-beginning 1)))
+                      (goto-char (match-beginning 1)))
+                  (char-after (point))))
+               (string-start (point)))
+          (unless (eq t (nth 3 (syntax-ppss)))
+            (when (and cmd (eql (char-after cmd) ?!))
+              ;; Cancel syntax class of `!'
+              (put-text-property cmd (1+ cmd) 'syntax-table '(1)))
+            (if (and (eq teco-atsign-use-braces 'ignore)
+                     (eql delimiter ?{))
+                (setq delimiter nil))
+            (setq cmd (if cmd 1 2))
+            (when delimiter
+              (put-text-property string-start (1+ string-start) 'syntax-table
+                                 '(15))
+              (forward-char)
+              (let* ((s (string delimiter))
+                     (search
+                      (or
+                       (and teco-atsign-use-braces
+                            (let ((match (string-search s "{<[(")))
+                              (and match
+                                   (string (aref "}>])" match)))))
+                       s)))
+                (when (search-forward search end t cmd)
+                  (put-text-property (1- (point)) (point) 'syntax-table
+                                     '(15)))))))))
+     ((match-beginning 3)
+      (put-text-property (match-beginning 3) (match-end 3) 'syntax-table
+                         '(1))))))
 
 (defun teco-fontify-extend-region (beg end _old-len)
   (let ((str-beg (car (get-text-property beg 'teco-delim-pair)))
@@ -240,9 +267,12 @@ TECO-64 looks for non whitespaces."
                              nil t nil nil
                              (font-lock-syntactic-face-function
                               . teco-font-lock-syntactic-face-function))
-        font-lock-multiline t)
+        font-lock-multiline t
+        tab-width 8)
   (setq-local comment-start "! "
               comment-end " !"
               syntax-propertize-function #'teco-mode-syntax-propertize
               font-lock-extend-after-change-region-function
-              #'teco-fontify-extend-region))
+              #'teco-fontify-extend-region
+              indent-line-function #'insert-tab
+              electric-indent-mode nil))

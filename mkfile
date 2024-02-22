@@ -11,5 +11,5 @@ redump:V:
 	mv ~/.emacs.d/Emacs.pdmp "${EMDUMPDIR}/Emacs.pdmp"
 
 split:V:
-	$EMDIR/Emacs --dump "${EMDUMPDIR}/Emacs.pdmp.bak"--batch --load $SCPT_DIR/split.el
+	$EMDIR/Emacs --dump "${EMDUMPDIR}/Emacs.pdmp.bak" --batch --load $SCPT_DIR/split.el
 
