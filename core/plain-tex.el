@@ -52,6 +52,8 @@ shared by all users of a site."
   "AUCTeX version.
 If not a regular release, the date of the last change.")
 
+(declare-function tex--prettify-symbols-compose-p "ext:tex-mode"
+                  (start end match))
 
 ;; Silence the compiler for variables:
 ;; tex.el: Variables defined somewhere in this file:
@@ -748,7 +750,7 @@ emacs 24.1 and is then later run by emacs 24.5."
     ;; could be used.  But this may make the byte compiler pop up.
     (when (memq var '(TeX-PDF-mode
                       TeX-source-correlate-mode TeX-interactive-mode
-                      TeX-fold-mode LaTeX-math-mode))
+                      TeX-fold-mode TeX-math-mode))
       (funcall var (if (symbol-value val) 1 0))))
 
 (defvar TeX-overlay-priority-step 16
@@ -974,7 +976,7 @@ If RESET is non-nil, `TeX-command-next' is reset to
         (let ((trailing-flags
                (concat
                 (and (boundp 'TeX-fold-mode) TeX-fold-mode "F")
-                (and (boundp 'LaTeX-math-mode) LaTeX-math-mode "M")
+                (and (boundp 'TeX-math-mode) TeX-math-mode "M")
                 (and TeX-PDF-mode "P")
                 (and TeX-interactive-mode "I")
                 (and TeX-source-correlate-mode "S"))))
@@ -5004,6 +5006,7 @@ Brace insertion is only done if point is in a math construct and
     (define-key map "\\"       #'TeX-insert-backslash)
     (define-key map "^"        #'TeX-insert-sub-or-superscript)
     (define-key map "_"        #'TeX-insert-sub-or-superscript)
+    (define-key map "\C-c~"    #'TeX-math-mode)
 
     (define-key map "\C-c'"    #'TeX-comment-or-uncomment-paragraph) ;*** Old way
     (define-key map "\C-c:"    #'comment-or-uncomment-region) ;*** Old way
