@@ -58,113 +58,56 @@
     (modify-syntax-entry ?\) ")(4n" st)
     st))
 
-(defconst rnc--keywords
-  ;; Taken from the grammar in http://relaxng.org/compact-20021121.html,
-  ;; by order of appearance.
-  '("namespace" "default" "datatypes" "element" "attribute"
-    "list" "mixed" "parent" "empty" "text" "notAllowed" "external"
-    "grammar" "div" "include" ;; "start"
-    "string" "token" "inherit"))
+(defconst xquery-mode-keywords
+  '(
+    ;; FLWOR
+    ;;"let" "for"
+    "at" "in"
+    "where"
+    "stable order by" "order by"
+    "ascending" "descending" "empty" "greatest" "least" "collation"
+    "return"
+    ;; XPath axes
+    "self" "child" "descendant" "descendant-or-self"
+    "parent" "ancestor" "ancestor-or-self"
+    "following" "following-sibling"
+    "preceding" "preceding-sibling"
+    ;; conditionals
+    "if" "then" "else"
+    "typeswitch" ;"case" "default"
+    ;; quantified expressions
+    "some" "every" "construction" "satisfies"
+    ;; schema
+    "schema-element" "schema-attribute" "validate"
+    ;; operators
+    "intersect" "union" "except" "to"
+    "is" "eq" "ne" "gt" "ge" "lt" "le"
+    "or" "and"
+    "div" "idiv" "mod"))
 
-(defconst rnc--operators
-  '("=" "&=" "|=" "*" "?" "+" "-" "~"))
+(defcustom xquery-mode-indent-width 2
+  "Indent width for `xquery-mode'."
+  :group 'xquery-mode
+  :type 'integer)
 
-(defconst rnc--delimiters '("&" "," "|")) 
-
-(defvar rnc-indent-level 2)
-
-(defvar rnc--treesit-font-lock-settings
+(defvar xquery--treesit-font-lock-settings
   (treesit-font-lock-rules
 
-   :language 'rnc
+   :language 'xquery
    :feature 'comment
    '((comment) @font-lock-comment-face)
 
-   :language 'rnc
+   :language 'xquery
    :feature 'keyword
-   `([,@rnc--keywords] @font-lock-keyword-face)
-
-   :language 'rnc
-   :feature 'string
-   '((literal_segment) @font-lock-string-face)
-
-   :language 'rnc
-   :feature 'definition
-   '((define
-      name: (identifier) @font-lock-function-name-face)
-
-     (param
-      name: (identifier) @font-lock-variable-name-face)
-
-     (annotation_attribute
-      name: (name) @font-lock-variable-name-face))
-
-   :language 'rnc
-   :feature 'namespace
-   :override t
-   '((declare
-      name: (identifier) @font-lock-constant-face)
-     (name
-      ns: (prefix) @font-lock-constant-face)
-     (datatype_name
-      ns: (prefix) @font-lock-constant-face))
-
-   :language 'rnc
-   :feature 'docstring
-   '((documentation) @font-lock-doc-face)
-
-   :language 'rnc
-   :feature 'operator
-   `([,@rnc--operators] @font-lock-operator-face)
-
-   :language 'rnc
-   :feature 'bracket
-   '((["(" ")" "[" "]" "{" "}"]) @font-lock-bracket-face)
-
-   :language 'rnc
-   :feature 'delimiter
-   `(([,@rnc--delimiters]) @font-lock-delimiter-face)))
-
-(defvar rnc--treesit-indent-rules
-  `((rnc
-     ((parent-is "declare") parent-bol 0)
-     ((node-is "}") grand-parent 0)
-     ((node-is ")") prev-sibling 0)
-     ((node-is "]") grand-parent 0)
-     ((node-is "literal_segment") parent-bol 0)
-     ((node-is "follow_annotation") prev-sibling 0)
-     ((node-is "define") parent 0)
-     ((node-is "declare") parent 0)
-     ((parent-is "comment") prev-adaptive-prefix 0)
-     ((parent-is ,(rx (seq (one-or-more alpha) "_name_class")))
-      first-sibling 0)
-     ((node-is "documentation") parent-bol 0)
-     ((parent-is ,(rx (seq (one-or-more alpha) "_pattern"))) first-sibling 0)
-     ((parent-is ,(rx (seq (one-or-more alpha) "_block")))
-      grand-parent rnc-indent-level)
-     ((parent-is "param") great-grand-parent rnc-indent-level)
-     ((parent-is "primary") great-grand-parent rnc-indent-level)
-     ((field-is "body") parent-bol rnc-indent-level)
-     ((field-is "except") parent-bol rnc-indent-level)
-     (no-node parent-bol rnc-indent-level)
-     )))
-
-(defun rnc--treesit-defun-name (node)
-  "Return the defun name of NODE.
-Return nil if there is no name or if NODE is not a defun node."
-  (treesit-node-text
-   (treesit-node-child-by-field-name
-    node
-    "name")
-   t))
+   `([,@xquery-mode-keywords] @font-lock-keyword-face)))
 
 ;;;###autoload
-(define-derived-mode rnc-ts-mode prog-mode "RNC"
-  "Major mode to edit Relax-NG Compact files."
-  :syntax-table rnc-mode-syntax-table
-  (when (treesit-ready-p 'rnc)
+(define-derived-mode xquery-ts-mode prog-mode "XQuery"
+  "A major mode for W3C XQuery 1.0"
+  :syntax-table xquery-mode-syntax-table
+  (when (treesit-ready-p 'xquery)
     (setq-local comment-start "#")
-    (treesit-parser-create 'rnc)
+    (treesit-parser-create 'xquery)
     (setq-local treesit-font-lock-settings rnc--treesit-font-lock-settings)
     (setq-local treesit-font-lock-feature-list
                 '((comment definition)
