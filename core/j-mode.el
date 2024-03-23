@@ -80,10 +80,11 @@
                        "try." "except." "catch." "catcht." "catchd."
                        "while." "whilst."
                        "for.")))
-                   (seq (or "for" "goto" "label")
-                        (regexp "_[a-zA-Z]+\\."))))
+                   (seq "for_"
+                        (+ (any "a-zA-Z"))
+                        ".")))
           (seq bol ":" eol)
-          (seq (regexp "[_a-zA-Z0-9]+") (? "'")
+          (seq (+ (any "_a-zA-Z0-9")) (? "'")
                (* "\s") "=" (or "." ":") (* "\s")
                (or "{{"
                    (seq (regexp
