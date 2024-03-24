@@ -80,7 +80,7 @@
                        "try." "except." "catch." "catcht." "catchd."
                        "while." "whilst."
                        "for.")))
-                   (seq "for_"
+                   (seq (or "for" "label") "_"
                         (+ (any "a-zA-Z"))
                         ".")))
           (seq bol ":" eol)
@@ -103,7 +103,8 @@
                                      "else." "elseif."
                                      "case." "fcase."
                                      "catch." "catcht." "catchd."
-                                     "except.")))))))
+                                     "except."
+                                     "label")))))))
 
 (defun j-thing-outside-string (thing-regexp)
   "Look for REGEXP from `point' til `point-at-eol' outside strings and
