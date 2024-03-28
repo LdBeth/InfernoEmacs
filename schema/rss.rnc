@@ -6,6 +6,13 @@
 namespace atom = "http://www.w3.org/2005/Atom"
 
 start = rss.element
+
+any.attribute = attribute * { text }
+any.element =
+  element * - atom:* {
+    (any.attribute | text | any.element)*
+  }
+
 rss.element =
   element rss {
     (attribute version { "2.0" } &
@@ -131,7 +138,8 @@ item.element =
     enclosure.element? &
     guid.element? &
     pubdate.element? &
-    source.element?
+    source.element? &
+    any.element*
   }
 
 author.element = element author { email.string }
