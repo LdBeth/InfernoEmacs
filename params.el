@@ -64,12 +64,8 @@
 ;; ERC
 (setq erc-server "irc.libera.chat"
       erc-nick "ldb"
-      erc-insert-timestamp-function 'erc-insert-timestamp-left
-      erc-timestamp-format "%H%M "
-      erc-autojoin-timing 'connect
       erc-autojoin-channels-alist
-      '(("libera.chat" "#emacs" "#jsoftware" "#commonlisp"))
-      )
+      '(("libera.chat" "#emacs" "#jsoftware" "#commonlisp")))
 
 ;; langtool
 (setq langtool-http-server-host "localhost"

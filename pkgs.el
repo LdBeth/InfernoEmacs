@@ -292,3 +292,15 @@
              (:eval (newsticker--buffer-get-item-title-at-point))))))
   (add-hook
    'newsticker-mode-hook 'newsticker-setup-mode-line))
+
+(use-package erc
+  :defer t
+  :init
+  (setq
+   erc-insert-timestamp-function 'erc-insert-timestamp-left
+   erc-timestamp-format "%H%M "
+   erc-autojoin-timing 'connect)
+  :custom
+  (erc-module '(autojoin button completion fill irccontrols
+                         list match move-to-prompt networks
+                         noncommands readonly stamp spelling track)))

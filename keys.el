@@ -124,6 +124,17 @@ end if")))
     (disable-theme 'spacemacs-dark)
     (enable-theme 'spacemacs-light)))
 
+(defun look-for-dm5-update (&optional url)
+  (interactive)
+  (let ((u (or url (thing-at-point-url-at-point))))
+    (url-retrieve u (lambda (&rest _)
+                      (if (search-forward
+                           (string-to-unibyte
+                            "\344\270\213\344\270\200\347\253\240")
+                           nil t)
+                          (browse-url u)
+                        (message "No updates."))))))
+
 (bind-keys
  :prefix "M-m"
  :prefix-map launchpad-keys
