@@ -124,16 +124,20 @@ end if")))
     (disable-theme 'spacemacs-dark)
     (enable-theme 'spacemacs-light)))
 
-(defun look-for-dm5-update (&optional url)
+(defun look-for-dm5-update ()
   (interactive)
-  (let ((u (or url (thing-at-point-url-at-point))))
-    (url-retrieve u (lambda (&rest _)
-                      (if (search-forward
-                           (string-to-unibyte
-                            "\344\270\213\344\270\200\347\253\240")
-                           nil t)
-                          (browse-url u)
-                        (message "No updates."))))))
+  (save-excursion
+    (goto-char 0)
+    (while (search-forward "dm5" nil t)
+      (let ((u (thing-at-point-url-at-point)))
+        (url-retrieve u (lambda (&rest _)
+                          (if (search-forward
+                               (string-to-unibyte
+                                "\344\270\213\344\270\200\347\253\240")
+                               nil t)
+                              (browse-url u)
+                            (message "No updates.")))))
+      (sleep-for 0.001))))
 
 (bind-keys
  :prefix "M-m"

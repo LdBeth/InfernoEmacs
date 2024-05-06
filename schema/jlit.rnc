@@ -1,0 +1,51 @@
+# Literate Programming tool
+
+default namespace shuffle = "https://ldbeth.sdf.org/shuffle"
+
+start =
+  element shuffle {
+    attribute version { "0.1" },
+    chunkElement+
+  }
+
+chunkElement =
+  element chunk {
+    (chunkVariantDef | chunkNamedDef),
+    chunkContent
+  }
+
+chunkVariantDef =
+  variantOffer,
+  nameAttr?,
+  override?,
+  chunkOptions
+
+chunkOptions =
+  attribute type { "text" | "code" | "html" | xsd:string }?
+
+chunkNamedDef = nameAttr
+
+override =
+  attribute variant { xsd:positiveInteger },
+  attribute override { xsd:string }
+  
+variantOffer =
+  attribute variant { xsd:positiveInteger },
+  attribute aspect { xsd:string }?
+  
+nameAttr = attribute xml:id { xsd:ID }
+
+chunkContent = mixed { (chunkRef | nestedChunk)* }
+
+chunkRef = element ref { refAttributes, chunkOptions }
+
+refAttributes =
+  attribute file { xsd:anyURI }? &
+  attribute variant { xsd:string }? &
+  attribute target { xsd:string }
+  
+nestedChunk =
+  element choose {
+    element chunk { variantOffer, chunkContent }+
+  } |
+  element chunk { variantOffer, chunkContent }

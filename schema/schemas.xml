@@ -11,6 +11,7 @@
   <namespace ns="http://www.w3.org/1998/Math/MathML" typeId="MathML"/>
   <namespace ns="http://www.w3.org/2005/Atom" typeId="Atom"/>
   <namespace ns="https://ldbeth.sdf.org/lsml" typeId="LsML"/>
+  <namespace ns="https://ldbeth.sdf.org/shuffle" typeId="JLit"/>
   <namespace ns="urn:speedata.de:2009/publisher/en" typeId="Layout"/>
   <namespace ns="http://symbulator.com/sydoc" typeId="SyDoc"/>
 
@@ -43,5 +44,6 @@
   <typeId id="TeX" uri="texml.rnc"/>
   <typeId id="Layout" uri="layoutschema.rnc"/>
   <typeId id="SyDoc" uri="symbulatordoc.rnc"/>
+  <typeId id="JLit" uri="jlit.rnc"/>
 
 </locatingRules>
