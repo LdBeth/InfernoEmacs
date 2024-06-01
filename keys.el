@@ -126,18 +126,39 @@ end if")))
 
 (defun look-for-dm5-update ()
   (interactive)
-  (save-excursion
-    (goto-char 0)
-    (while (search-forward "dm5" nil t)
-      (let ((u (thing-at-point-url-at-point)))
-        (url-retrieve u (lambda (&rest _)
-                          (if (search-forward
-                               (string-to-unibyte
-                                "\344\270\213\344\270\200\347\253\240")
-                               nil t)
-                              (browse-url u)
-                            (message "No updates.")))))
-      (sleep-for 0.001))))
+  (let ((b (current-buffer)))
+    (save-excursion
+      (goto-char 0)
+      (while (search-forward "dm5" nil t)
+        (let ((u (thing-at-point-url-at-point))
+              (bound (bounds-of-thing-at-point 'url)))
+          (url-retrieve u (lambda (&rest _)
+                            (if (search-forward
+                                 (string-to-unibyte
+                                  "\344\270\213\344\270\200\347\253\240")
+                                 nil t)
+                                (progn
+                                  (browse-url u)
+                                  (let ((o (make-overlay (car bound) (cdr bound) b))
+                                        (m (make-sparse-keymap)))
+                                    (define-key m (kbd "C-d")
+                                                (lambda ()
+                                                  (interactive)
+                                                  (delete-overlay o)))
+                                    (define-key m (kbd "C-y")
+                                                (lambda ()
+                                                  (interactive)
+                                                  (let ((u (now-browsing)))
+                                                    (save-excursion
+                                                      (goto-char (overlay-start o))
+                                                      (insert u)
+                                                      (delete-region (point)
+                                                                     (overlay-end o))))))
+                                    (overlay-put o 'face 'link)
+                                    (overlay-put o 'keymap m)
+                                    (overlay-put o 'help-echo "C-y to update, C-d to deactive.")))
+                              (message "No updates.")))))
+        (sleep-for 0.001)))))
 
 (bind-keys
  :prefix "M-m"
