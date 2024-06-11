@@ -195,7 +195,7 @@ contents of current line."
       (:one-liner (beginning-of-line 2) t)
       (:multi-liner (search-forward-regexp "^)") t)
       (:direct (search-forward-regexp
-                (rx "}}" (or eol (not (any ".:")))))
+                (rx bol "}}" (or eol symbol-end)))
                t))))
 
 (defun j-beginning-of-explicit-definition ()
