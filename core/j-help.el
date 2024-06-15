@@ -51,11 +51,12 @@
         (puthash len
                  (cons x (gethash len table))
                  table)))
-    (maphash (lambda (key l) (push
-                          (list key
-                               (regexp-opt (mapcar #'car l))
-                               l)
-                          res))
+    (maphash (lambda (key l)
+               (push
+                (list key
+                      (regexp-opt (mapcar #'car l))
+                      l)
+                res))
              table)
     res))
 
@@ -64,14 +65,17 @@
   :group 'applications
   :prefix "j-help-")
 
-(defcustom j-help-local-dictionary-url ""
+(defcustom j-help-local-dictionary-url nil
   "Path to the local instance of the j-dictionary"
-  :type 'string
+  :type '(choice (const :tag "Off" nil)
+                 string)
   :group 'j-help)
 
-(defcustom j-help-remote-dictionary-url "http://www.jsoftware.com/help/dictionary"
+(defcustom j-help-remote-dictionary-url
+  "http://www.jsoftware.com/help/dictionary"
   "Path to the remote instance of the j-dictionary"
-  :type 'string
+  :type '(choice (const :tag "Off" nil)
+                 string)
   :group 'j-help)
 
 (defcustom j-help-symbol-search-branch-limit 5
@@ -111,6 +115,22 @@
     ("p.." . "dpdotdot") ("_9:" . "dconsf") ("&.:" . "d631") ("NB." . "dnb"))
   "(string * string) alist")
 
+(defconst j-help-nuvoc-alist
+  '((?= . "eq") (?< . "lt") (?< . "gt") (?_ . "under")
+    (?+ . "plus") (?* . "star") (?- . "minus") (?% . "percent")
+    (?^ . "hat") (?$ . "dollar") (?~ . "tilde") (?| . "bar")
+    (?. . "dot") (?: "cor" "co")
+    (?, . "comma") (?\; . "semi") (?# . "number") (?! . "bang")
+    (?/ . "slash") (?\\ . "bslash") (?\[ . "squarelf") (?\] . "squarert")
+    (?\{ . "curlylf") (?\} . "curlyrt") (?\" "quote") (?` . "grave")
+    (?@ . "at") (?& "ampm" "amp") (?? . "query")
+    (?a . "a") (?A . "acap") (?b . "b") (?c . "c")
+    (?C . "ccap") (?e . "e") (?E . "ecap") (?f . "f") (?F . "fcap")
+    (?H . "hcap") (?i . "i") (?I . "icap") (?j . "j") (?L . "lcap")
+    (?m . "m") (?M . "mcap") (?o . "o") (?p . "p") (?q . "q")
+    (?r . "r") (?s . "s") (?S . "scap") (?t . "t") (?T . "T")
+    (?u . "u") (?x . "x") (?Z . "zcap")))
+
 (defconst j-help-dictionary-data-block
   (j-help--process-voc-list j-help-voc-alist)
   "(int * string * (string * string) alist) list")
@@ -119,18 +139,35 @@
   "Return best defined dictionary"
   (replace-regexp-in-string
    "/$" ""
-   (cond ((not (string= "" j-help-local-dictionary-url))
-          j-help-local-dictionary-url)
-         ((not (string= "" j-help-remote-dictionary-url))
-          j-help-remote-dictionary-url))))
+   (or j-help-local-dictionary-url
+       j-help-remote-dictionary-url)))
+
+(defun j-help-symbol--to-nuvoc (j-symbol)
+  (cond ((= 1 (length j-symbol))
+         (let ((result (cdr (assoc (aref j-symbol 0) j-help-nuvoc-alist))))
+           (if (atom result)
+               result
+             (car result))))
+        ((< 1 (length j-symbol))
+         (apply #'concat
+          (mapcar (lambda (c)
+                    (let ((result (cdr (assoc c j-help-nuvoc-alist))))
+                      (if (atom result)
+                          result
+                        (cadr result))))
+                  j-symbol)))
+        (t nil)))
 
 (defun j-help-symbol-pair-to-doc-url ( alist-data )
   (let ((dic (j-help-valid-dictionary)))
-    (if (or (not alist-data) (string= dic ""))
-        (error "%s" "No dictionary found. Please specify a dictionary.")
-      (let ((_name (car alist-data))
-            (doc-name (cdr alist-data)))
-        (format "%s/%s.%s" dic doc-name "htm")))))
+    (cond ((not dic)
+           (error "No dictionary found. Please specify a dictionary."))
+          ((not alist-data)
+           (error "No such symbol"))
+          (t
+           (let ((_name (car alist-data))
+                 (doc-name (cdr alist-data)))
+             (format "%s/%s.%s" dic doc-name "htm"))))))
 
 (defun j-help-symbol-to-doc-url ( j-symbol )
   "Convert J-SYMBOL into localtion URL"
