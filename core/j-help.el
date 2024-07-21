@@ -78,6 +78,12 @@
                  string)
   :group 'j-help)
 
+(defcustom j-help-jwiki-url
+  "https://code.jsoftware.com/wiki/Vocabulary"
+  "Path to JWiki NuVoc"
+  :type 'string
+  :group 'j-help)
+
 (defcustom j-help-symbol-search-branch-limit 5
   "Distance from initial point they system can search for a valid symbol."
   :type 'integer
@@ -172,6 +178,10 @@
 (defun j-help-symbol-to-doc-url ( j-symbol )
   "Convert J-SYMBOL into localtion URL"
   (j-help-symbol-pair-to-doc-url (assoc j-symbol j-help-voc-alist)))
+
+(defun j-help-symbol-to-jwiki-url (j-symbol)
+  "Convert J-SYMBOL into JWiki URL"
+  (format "%s/%s" j-help-jwiki-url (j-help-symbol--to-nuvoc j-symbol)))
 
 (defun j-help--determine-symbol ( s point )
   "Internal function to determine j symbols. Should not be called directly
