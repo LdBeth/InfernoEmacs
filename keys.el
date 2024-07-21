@@ -1,4 +1,4 @@
-;; -*- lexical-binding:t -*-
+;; -*- lexical-binding:t; -*-
 (defun find-buffer-or-recentf-candidates ()
   "Return candidates for `find-buffer-or-recentf'."
   (let ((buffers
@@ -129,7 +129,7 @@ end if")))
   (let ((b (current-buffer)))
     (save-excursion
       (goto-char 0)
-      (while (search-forward "dm5" nil t)
+      (while (search-forward "www.dm5" nil t)
         (let ((u (thing-at-point-url-at-point))
               (bound (bounds-of-thing-at-point 'url)))
           (url-retrieve u (lambda (&rest _)
