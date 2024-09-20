@@ -7,9 +7,12 @@ all:VQ:
 	echo "Run mk redump|split."
 
 redump:V:
-	$EMDIR/Emacs --dump "${EMDUMPDIR}/Emacs.pdmp.bak" -q --batch --load $SCPT_DIR/dump.el
+	u $EMDIR/Emacs --dump "${EMDUMPDIR}/Emacs.pdmp.bak" -q --batch --load $SCPT_DIR/dump.el
 	mv ~/.emacs.d/Emacs.pdmp "${EMDUMPDIR}/Emacs.pdmp"
 
+orig:V:
+	u $EMDIR/Emacs --dump "${EMDUMPDIR}/Emacs.pdmp.bak"
+
 split:V:
-	$EMDIR/Emacs --dump "${EMDUMPDIR}/Emacs.pdmp.bak" --batch --load $SCPT_DIR/split.el
+	u $EMDIR/Emacs --dump "${EMDUMPDIR}/Emacs.pdmp.bak" --batch --load $SCPT_DIR/split.el
 

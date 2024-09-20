@@ -26,15 +26,13 @@
   "Get line that point is on from the current buffer.
 Return a string containing the line, or nil if at end of buffer.
 As a side-effect set point to the start of the next line."
-  (cond ((eobp)
-         nil)
-        (t
-         (beginning-of-line)
-         (let ((start (point)))
-           (end-of-line)
-           (let ((line (buffer-substring-no-properties start (point))))
-             (forward-char)
-             line)))))
+  (unless (eobp)
+    (beginning-of-line)
+    (let ((start (point)))
+      (end-of-line)
+      (let ((line (buffer-substring-no-properties start (point))))
+        (forward-char)
+        line))))
 
 ;;; Parsing identifier lines
 ;;;
