@@ -230,6 +230,11 @@
   (setq frimacs-process-program "fricas -noht -noclef"))
 
 ;; Hyperbole
+(use-package hywiki
+  :defer t
+  :init
+  (setq hywiki-directory (concat user-emacs-directory "hywiki/")))
+
 (use-package hpath
   :defer t
   :config

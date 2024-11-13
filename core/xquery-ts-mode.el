@@ -25,6 +25,7 @@
 ;;; Commentary:
 
 (require 'treesit)
+(require 'rnc-ts-mode)
 (eval-when-compile
   (require 'rx))
 

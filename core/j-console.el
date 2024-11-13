@@ -125,12 +125,12 @@ the containing buffer"
   (when (= start end)
     (error "Region is empty"))
   (let ((region (buffer-substring-no-properties start end))
-        (session (j-console-ensure-session)))
-    (with-current-buffer (process-buffer session)
+        (buffer (process-buffer (j-console-ensure-session))))
+    (with-current-buffer buffer
       (goto-char (point-max))
       (insert (format "%s" region))
       (comint-send-input))
-    (display-buffer (process-buffer session))))
+    (display-buffer buffer)))
 
 (defun j-console-execute-line ()
   "Sends current line to the j-console-cmd session and exectues it"

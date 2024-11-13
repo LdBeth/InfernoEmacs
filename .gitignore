@@ -3,6 +3,7 @@
 *-autoloads.el
 *~
 *.css
+.org*
 .lsp-session*
 elpa/
 .DS_Store

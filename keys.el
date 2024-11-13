@@ -183,7 +183,7 @@ end if")))
 (unbind-key "C-h C-h" global-map)
 (unbind-key "C-h ?" global-map)
 
-(define-key key-translation-map (kbd "￥") (kbd "\\"))
+(define-key key-translation-map (kbd "¥") (kbd "\\"))
 
 ;(pixel-scroll-precision-mode 1)
 ;(setq pixel-scroll-precision-interpolate-page t)
@@ -328,3 +328,22 @@ end if")))
    process-send-region
    process-send-string
    ))
+
+(defconst ml1--keywords
+  '("MCWARN" "MCINS" "MCSKIP" "MCDEF"
+    "MCNOWARN" "MCNOINS" "MCNOSKIP" "MCNODEF"
+    "MCWARNG" "MCINSG" "MCSKIPG" "MCDEFG"
+    "MCSTOP" "MCALTER" "MCLEN" "MCSUB"
+    "MCSET" "MCNOTE" "MCGO" "MCPVAR" "MCCVAR"))
+
+(define-minor-mode ml1-mode
+  "Add highlighting for ML1 keywords"
+  :lighter "ML1"
+  (font-lock-add-keywords nil
+                          `((,(concat "\\<" (regexp-opt ml1--keywords t) "\\>")
+                             . 'font-lock-keyword-face)))
+
+  (if (fboundp 'font-lock-flush)
+      (font-lock-flush)
+    (when font-lock-mode
+      (with-no-warnings (font-lock-fontify-buffer)))))

@@ -1670,7 +1670,7 @@ it's called with the same value of KEY.  All other times, the cached
 (defun htmlize-ensure-fontified ()
   ;; If font-lock is being used, ensure that the "support" modes
   ;; actually fontify the buffer.  If font-lock is not in use, we
-  ;; don't care because, except in htmlize-file, we don't force
+  ;; don't care because, except in `htmlize-file', we don't force
   ;; font-lock on the user.
   (when font-lock-mode
     ;; In part taken from ps-print-ensure-fontified in GNU Emacs 21.
