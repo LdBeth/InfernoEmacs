@@ -90,7 +90,7 @@
       '((file (styles basic partial-completion))))
 
 ;; lisp
-(setq inferior-lisp-program "ccl"
+(setq inferior-lisp-program "sbcl"
       common-lisp-hyperspec-root "file:///usr/local/share/doc/HyperSpec/")
 
 ;;

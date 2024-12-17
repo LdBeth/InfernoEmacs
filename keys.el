@@ -308,26 +308,8 @@ end if")))
 
 (defun enable-acl2 ()
   (interactive)
-  (add-to-list 'load-path "/usr/local/etc/acl2-8.5/books/interface/emacs")
+  (add-to-list 'load-path "/usr/local/lib/acl2-8.6/books/interface/emacs")
   (require 'acl2-interface))
-
-;; Fix deadlock
-(defvar accept-process-output-mutex (make-mutex "APO-MUTEX"))
-(cl-macrolet ((advice-reentry (&rest fns)
-                `(progn ,@(cl-loop for fn in fns
-                                   collect `(define-advice ,fn
-	                                            (:around (oldfun &rest r)
-                                                         inhibit-reentry)
-	                                          (with-mutex accept-process-output-mutex
-	                                            (apply oldfun r)))))))
-  (advice-reentry
-   accept-process-output
-   ;; wait_reading_process_output users (not all users)
-   sleep-for
-   process-send-eof
-   process-send-region
-   process-send-string
-   ))
 
 (defconst ml1--keywords
   '("MCWARN" "MCINS" "MCSKIP" "MCDEF"
