@@ -1,4 +1,4 @@
-;;; txl-mode.el -- major mode for editing TXL programs and grammars.
+;;; txl-mode.el -- major mode for editing TXL programs and grammars. -*- lexical-binding: t; -*-
 ;; Markus Stoy (mstoy@gmx.de), Rostock (Germany), November/December 2003.
 
 ;; Installation (only tested under XEmacs-21.4 for Linux and WindowsXP):
@@ -78,7 +78,8 @@
                  "number" "stringlit" "charlit" "comment" "space" "newline"
                  "upperlowerid" "upperid" "lowerupperid" "lowerid"
                  "floatnumber" "decimalnumber" "integernumber"
-                 "empty" "key" "token" "any") t))
+                 "empty" "key" "token" "any")
+               'symbols))
      1 font-lock-builtin-face)
     ;; formatting tokens (without number)
     (,(concat "\\[\\(?:"
@@ -167,40 +168,24 @@
 (defvar txl-mode-options nil "The last options used for `txl-mode-run'")
 
 
-(defun txl-mode () ; -----------------------------------------------------------
+;;;###autoload
+(define-derived-mode txl-mode prog-mode "TXL"
   "Major mode for editing TXL programs and grammars.
 \\{txl-mode-map}
 Turning on TXL mode runs the normal hook `txl-mode-hook'."
-  (interactive)
-  (kill-all-local-variables)
+  :abbrev-table txl-mode-abbrev-table
+  :syntax-table txl-mode-syntax-table
   (make-local-variable 'txl-mode-input-file)
-  (make-local-variable 'indent-line-function)
-  (setq indent-line-function 'txl-mode-indent-line)
-  (make-local-variable 'comment-start)
-  (setq comment-start "%")
-  (make-local-variable 'comment-end)
-  (setq comment-end "")
-  (set-syntax-table txl-mode-syntax-table)
-  (if (featurep 'xemacs)
-      (setq font-lock-keywords txl-mode-keywords) ;; XEmacs
-    (setq font-lock-defaults                      ;; Emacs
-          `(txl-mode-keywords
-            nil nil
-            ,txl-mode-font-lock-syntax-alist
-            nil
-            (font-lock-syntactic-keywords
-             . ,txl-mode-font-lock-syntactic-keywords))))
-  (setq local-abbrev-table txl-mode-abbrev-table)
-  (setq abbrev-mode t)
-  (use-local-map txl-mode-map)
-  (setq major-mode 'txl-mode
-	mode-name "TXL")
-  (if (and (featurep 'menubar)
-           current-menubar)
-      (progn
-	(set-buffer-menubar current-menubar)
-	(add-submenu nil txl-mode-menubar-menu)))
-  (run-hooks 'txl-mode-hook))
+  (setq-local indent-line-function 'txl-mode-indent-line
+              comment-start "%"
+              comment-end ""
+              font-lock-defaults                      ;; Emacs
+              `(txl-mode-keywords
+                nil nil
+                ,txl-mode-font-lock-syntax-alist
+                nil
+                (font-lock-syntactic-keywords
+                 . ,txl-mode-font-lock-syntactic-keywords))))
 
 ; code templates ---------------------------------------------------------------
 
@@ -248,7 +233,7 @@ Turning on TXL mode runs the normal hook `txl-mode-hook'."
   (setq txl-mode-input-file input-file)
   (shell-command (concat "txldb " input-file " " (txl-mode-get-name t) " &") "*TXL Debug*")
   (other-window 1)
-  (end-of-buffer))
+  (goto-char (point-max)))
 
 (defun txl-mode-run (input-file &optional options)
   "Ask input file from user and run TXL program. With prefix arg
@@ -345,12 +330,15 @@ If there is none, return 8 or 0, depending whether currently inside block."
     (end-of-line 0)
     (let ((eol (point)))
       (beginning-of-line)
-      (skip-chars-forward "^\[" eol)
+      (skip-chars-forward "^\\[" eol)
       (if (eolp)
 	  (progn
 	    (end-of-line 2)
 	    (if (txl-mode-block) 8 0))
 	(current-column)))))
+
+;;;###autoload
+(add-to-list 'auto-mode-alist '("\\.\\([tT]xl\\|[gG]rm\\|[gG]rammar\\|[rR]ul\\(es\\)?\\|[mM]od\\(ule\\)?\\)$" . txl-mode))
 
 (provide 'txl-mode)
 ;;; txl-mode.el ends here
