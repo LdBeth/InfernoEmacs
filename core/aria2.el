@@ -774,7 +774,7 @@ With prefix remove all applicable downloads."
 (defun aria2-terminate ()
   "Stop aria2c process and kill buffers."
   (interactive)
-  (when (y-or-n-p "Are you sure yo want to terminate aria2 process? ")
+  (when (y-or-n-p "Are you sure you want to terminate aria2 process? ")
     (shutdown aria2--cc)
     (kill-buffer aria2-list-buffer-name)
     (aria2--stop-timer)))

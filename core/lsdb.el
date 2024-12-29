@@ -594,13 +594,12 @@ Overrides `temp-buffer-show-function'.")
                                 'notes))
                      (code (nth 2 (assq entry lsdb-entry-type-alist))))
                 (push (cons entry
-                            (if (eql ?. code)
-                                (car bodies)
-                              (if (eql ?0 code)
-                                  (mapcar (lambda (s)
+                            (cl-case code
+                              (?. (car bodies))
+                              (?0 (mapcar (lambda (s)
                                             (replace-regexp-in-string "[ \t\r\n]+" "" s t t))
-                                          bodies)
-                                bodies)))
+                                          bodies))
+                              (t bodies)))
                       interesting)))))))
     (when save
       (setq senders
@@ -820,10 +819,10 @@ Overrides `temp-buffer-show-function'.")
       (setq lsdb-last-candidates
             (sort lsdb-last-candidates
                   (lambda (cand1 cand2)
-                    (< (if (string-match pattern cand1)
-                           (match-beginning 0))
-                       (if (string-match pattern cand2)
-                           (match-beginning 0)))))))
+                    (< (and (string-match pattern cand1)
+                            (match-beginning 0))
+                       (and (string-match pattern cand2)
+                            (match-beginning 0)))))))
     (unless lsdb-last-candidates-pointer
       (setq lsdb-last-candidates-pointer lsdb-last-candidates))
     (when lsdb-last-candidates-pointer
@@ -901,8 +900,8 @@ Modify whole identification by side effect."
 (define-derived-mode lsdb-mode fundamental-mode "LSDB"
   "Major mode for browsing LSDB records."
   (setq buffer-read-only t)
-  (set (make-local-variable 'font-lock-defaults)
-       '(lsdb-font-lock-keywords t))
+  (setq-local font-lock-defaults
+              '(lsdb-font-lock-keywords t))
   (add-hook 'post-command-hook 'lsdb-modeline-update nil t)
   (make-local-variable 'lsdb-modeline-string)
   (setq mode-line-buffer-identification
