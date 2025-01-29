@@ -329,3 +329,8 @@ end if")))
       (font-lock-flush)
     (when font-lock-mode
       (with-no-warnings (font-lock-fontify-buffer)))))
+
+;; GPGTools still using 2.2.44
+(defun fix-epg-advice (old &rest args)
+  (cl-letf (((symbol-function 'epg-wait-for-status) 'ignore))
+    (apply old args)))
