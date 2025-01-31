@@ -334,3 +334,6 @@ end if")))
 (defun fix-epg-advice (old &rest args)
   (cl-letf (((symbol-function 'epg-wait-for-status) 'ignore))
     (apply old args)))
+
+(advice-add 'epa-encrypt-region :around
+            'fix-epg-advice)
