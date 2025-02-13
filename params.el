@@ -70,7 +70,8 @@
 
 ;; langtool
 (setq langtool-http-server-host "localhost"
-      langtool-http-server-port 8080)
+      langtool-http-server-port 8080
+      gptel-directives #'nekomimi-agent-generate-directives)
 
 ;; Newsticker
 (setq newsticker-url-list

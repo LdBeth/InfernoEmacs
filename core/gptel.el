@@ -452,7 +452,7 @@ gptel's idea of the directive is more general.  A directive in
   :safe #'always
   :type '(alist :key-type symbol :value-type string))
 
-(defcustom gptel-max-tokens nil
+(defcustom gptel-max-tokens 2000
   "Max tokens per response.
 
 This is roughly the number of words in the response.  100-300 is a
@@ -615,7 +615,7 @@ sources:
 - <https://openai.com/pricing>
 - <https://platform.openai.com/docs/models>")
 
-(defcustom gptel-model 'gpt-4o-mini
+(defcustom gptel-model 'gpt-4o
   (concat
    "GPT Model for chat.
 
@@ -1038,7 +1038,9 @@ MODE-SYM is typically a major-mode symbol."
 
 
 (defvar gptel--system-message
-  (or (alist-get 'default gptel-directives)
+  (or (and (functionp gptel-directives)
+           (funcall gptel-directives 'default))
+      (alist-get 'default gptel-directives)
       "You are a large language model living in Emacs and a helpful assistant. Respond concisely.")
   "The system message used by gptel.")
 (put 'gptel--system-message 'safe-local-variable #'always)
@@ -1211,7 +1213,9 @@ file."
                                (propertize
                                 (buttonize
                                  (format "[Prompt: %s]"
-                                  (or (car-safe (rassoc gptel--system-message gptel-directives))
+                                  (or (and (functionp gptel-directives)
+                                           (funcall gptel-directives gptel--system-message))
+                                      (car-safe (rassoc gptel--system-message gptel-directives))
                                    (gptel--describe-directive gptel--system-message 15)))
                                  (lambda (&rest _) (gptel-system-prompt)))
                                 'mouse-face 'highlight

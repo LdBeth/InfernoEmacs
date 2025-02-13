@@ -281,11 +281,13 @@ end if")))
 
 (defun enable-hol ()
   (interactive)
-  (load "/usr/local/etc/HOL/tools/hol-input")
-  (load "/usr/local/etc/HOL/tools/holscript-mode")
-  (load "/usr/local/etc/HOL/tools/hol-mode")
-  (load "/usr/local/etc/HOL/tools/hol-unicode")
+  (progn
+    (load "/usr/local/etc/HOL/tools/hol-input" t)
+    (load "/usr/local/etc/HOL/tools/holscript-mode" t)
+    (load "/usr/local/etc/HOL/tools/hol-mode" t)
+    (load "/usr/local/etc/HOL/tools/hol-unicode" t))
   (use-package holscript-mode
+    :disabled t
     :custom-face
     (hol-free-variable
      ((t (:inherit font-lock-variable-name-face))))
