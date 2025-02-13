@@ -87,18 +87,17 @@
   "Return current VC branch if any."
   (if vc-mode
       (let ((backend (vc-backend buffer-file-name)))
-        (concat ", #"
+        (format "%%], #%s "
                 (substring-no-properties
                  vc-mode
-                 (+ (if (eq backend 'Hg) 2 3) 2))
-                " "))
-    " "))
+                 (+ (if (eq backend 'Hg) 2 3) 2))))
+    "%] "))
 
 (defun nano-modeline-default-mode ()
   (let ((position '((-3 "%p") " %l:%c " modeline-misc-info)))
     (nano-modeline-compose '(:eval (nano-modeline-status))
                            'mode-line-buffer-identification
-                           '(" " mode-name
+                           '(" %[" mode-name
                              (:eval (nano-modeline-vc-branch)))
                            position)))
 

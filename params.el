@@ -12,6 +12,7 @@
 (tool-bar-mode -1)
 (tooltip-mode -1)
 (blink-cursor-mode -1)
+(mac-auto-ascii-mode 1)
 ;; (prefer-coding-system 'utf-8)
 
 (setq inhibit-startup-screen t)
@@ -76,6 +77,7 @@
       '(("xkcd" "https://xkcd.com/rss.xml")
         ("williamlong" "http://feed.williamlong.info/rss.xml")
         ("ldbeth" "https://ldbeth.sdf.org/rss.xml")
+        ("RnE" "https://kekkan.org/atom.xml")
         ;;("ACG" "http://www.acgpiping.net/feed/")
         ("XML" "https://www.xml.com/feed/all/")
         ("ndw" "https://so.nwalsh.com/feed/fulltext.xml")

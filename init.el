@@ -1,7 +1,6 @@
 ;; Simple config
 
 ;;(package-initialize)
-
 (setq gc-cons-threshold 402653184 gc-cons-percentage 0.6)
 
 (load (concat user-emacs-directory "params"))

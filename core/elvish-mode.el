@@ -48,8 +48,8 @@
 
 (defcustom elvish-keywords
   '("fn" "elif" "if" "else" "try" "catch" "finally" "use" "return"
-    "while" "for" "break" "continue" "var" "tmp" "set" "del"
-    "and" "or" "coalesce" "fail" "multi-error")
+    "while" "for" "break" "continue" "var" "tmp" "set" "del" "with"
+    "and" "or" "coalesce" "fail" "multi-error" "pragma")
   "Elvish keyword list."
   :type 'list
   :group 'elvish-mode)
@@ -147,9 +147,9 @@ the syntax table, so `forward-word' works as expected.")
     ;; Bytes output
     "print" "echo" "pprint" "repr"
     ;; Bytes to value
-    "slurp" "from-lines" "from-json"
+    "slurp" "from-lines" "from-json" "from-terminated"
     ;; Value to bytes
-    "to-lines" "to-json"
+    "to-lines" "to-json" "to-terminated"
     ;; Misc functional
     "constantly"
     ;; Misc shell basic
@@ -159,7 +159,7 @@ the syntax table, so `forward-word' works as expected.")
     ;; Container primitives.
     "assoc"
     ;; Sequence primitives
-    "explode" "take" "drop" "range" "count" "has-key" "has-value"
+    "explode" "take" "drop" "range" "count" "has-key" "has-value" "conj"
     ;; String
     "joins" "splits" "replaces"
     ;; String operations
@@ -171,7 +171,7 @@ the syntax table, so `forward-word' works as expected.")
     ;; String comparison
     "<s" "<=s" "==s" "!=s" ">s" ">=s"
     ;; eawk
-    "eawk"
+    ;; "eawk"
     ;; Directory
     "cd" "dir-history"
     ;; Path
