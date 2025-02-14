@@ -32,6 +32,7 @@
 (defvar gptel-use-curl)
 (defvar gptel-backend)
 (defvar gptel-temperature)
+(defvar gptel-topp)
 (defvar gptel-max-tokens)
 (defvar gptel--system-message)
 (defvar json-object-type)
@@ -275,6 +276,8 @@ Mutate state INFO with response metadata."
          (memq gptel-model '(o1 o1-preview o1-mini o3-mini o3))))
     (when (and gptel-temperature (not reasoning-model-p))
       (plist-put prompts-plist :temperature gptel-temperature))
+    (when (and gptel-topp (not reasoning-model-p))
+      (plist-put prompts-plist :top_p gptel-topp))
     (when gptel-use-tools
       (when (eq gptel-use-tools 'force)
         (plist-put prompts-plist :tool_choice "required"))

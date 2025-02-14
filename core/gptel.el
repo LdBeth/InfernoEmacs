@@ -465,7 +465,7 @@ call `gptel-send' with a prefix argument."
   :type '(choice (natnum :tag "Specify Token count")
                  (const :tag "Default" nil)))
 
-(defcustom gptel-temperature 1.0
+(defcustom gptel-temperature 1.2
   "\"Temperature\" of the LLM response.
 
 This is a number between 0.0 and 2.0 that controls the randomness
@@ -473,6 +473,11 @@ of the response, with 2.0 being the most random.
 
 To set the temperature for a chat session interactively call
 `gptel-send' with a prefix argument."
+  :safe #'always
+  :type 'number)
+
+(defcustom gptel-topp 0.7
+  "Diversity control"
   :safe #'always
   :type 'number)
 

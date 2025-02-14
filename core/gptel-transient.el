@@ -554,7 +554,7 @@ Also format its value in the Transient menu."
     "Instructions"
     ("s" "Set system message" gptel-system-prompt :transient t)
     (gptel--infix-add-directive)]
-   [:pad-keys t ""
+   [:pad-keys t ;; ""
     ;;(:info #'gptel--describe-infix-context
     ;; :face 'transient-heading :format "%d")
     (gptel--infix-context-add-region)
@@ -564,7 +564,7 @@ Also format its value in the Transient menu."
     (gptel--suffix-context-buffer)]
    [:pad-keys t
     :if (lambda () (and gptel-use-tools gptel--known-tools))
-    "" ;; (:info
+    ;; "" ;; (:info
        ;;  (lambda ()
        ;;    (concat
        ;;     "Tools" (and gptel-tools
