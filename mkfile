@@ -1,6 +1,6 @@
 # -*- mode: mkfile -*-
 EMDIR=/Applications/Emacs.app/Contents/MacOS
-EMDUMPDIR=$EMDIR/libexec/aarch64-apple-darwin24.1.0
+EMDUMPDIR=$EMDIR/libexec/aarch64-apple-darwin24.4.0
 SCPT_DIR=~/.emacs.d/script
 
 all:VQ:
