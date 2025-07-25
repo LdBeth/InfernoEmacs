@@ -92,11 +92,14 @@
 
    :language 'xquery
    :feature 'variable
-   `((variable ncname: (identifier) @font-lock-variable-name-face))
+   `((variable ncname: (identifier) @font-lock-variable-name-face)
+     (let_binding _ ncname: (identifier) @font-lock-variable-name-face)
+     (param_list ncname: (_) @font-lock-variable-name-face)
+     ["$" "as" ":="] @font-lock-operator-face)
 
    :language 'xquery
    :feature 'definition
-   `((function_call ncname: (identifier) @font-lock-function-call-face)
+   `((function_call ncname: (identifier) @font-lock-builtin-face)
      (function_declaration local: (identifier)
                            @font-lock-function-name-face))
 
