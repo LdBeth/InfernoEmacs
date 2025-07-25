@@ -25,7 +25,6 @@
 ;;; Commentary:
 
 (require 'treesit)
-(require 'rnc-ts-mode)
 (eval-when-compile
   (require 'rx))
 
@@ -59,32 +58,13 @@
     (modify-syntax-entry ?\) ")(4n" st)
     st))
 
-(defconst xquery-mode-keywords
+(defconst xquery-mode--keywords
   '(
     ;; FLWOR
-    ;;"let" "for"
+    "let" "for"
     "at" "in"
     "where"
-    "stable order by" "order by"
-    "ascending" "descending" "empty" "greatest" "least" "collation"
-    "return"
-    ;; XPath axes
-    "self" "child" "descendant" "descendant-or-self"
-    "parent" "ancestor" "ancestor-or-self"
-    "following" "following-sibling"
-    "preceding" "preceding-sibling"
-    ;; conditionals
-    "if" "then" "else"
-    "typeswitch" ;"case" "default"
-    ;; quantified expressions
-    "some" "every" "construction" "satisfies"
-    ;; schema
-    "schema-element" "schema-attribute" "validate"
-    ;; operators
-    "intersect" "union" "except" "to"
-    "is" "eq" "ne" "gt" "ge" "lt" "le"
-    "or" "and"
-    "div" "idiv" "mod"))
+    "return"))
 
 (defcustom xquery-mode-indent-width 2
   "Indent width for `xquery-mode'."
@@ -95,34 +75,37 @@
   (treesit-font-lock-rules
 
    :language 'xquery
+   :feature 'string
+   '((string_literal) @font-lock-string-face)
+
+   :language 'xquery
    :feature 'comment
    '((comment) @font-lock-comment-face)
 
    :language 'xquery
    :feature 'keyword
-   `([,@xquery-mode-keywords] @font-lock-keyword-face)))
+   `([,@xquery-mode--keywords] @font-lock-keyword-face)))
 
 ;;;###autoload
 (define-derived-mode xquery-ts-mode prog-mode "XQuery"
-  "A major mode for W3C XQuery 1.0"
+  "A major mode for W3C XQuery 3.1"
   :syntax-table xquery-mode-syntax-table
   (when (treesit-ready-p 'xquery)
-    (setq-local comment-start "#")
+    (setq-local comment-start "(:"
+                comment-end "):")
     (treesit-parser-create 'xquery)
-    (setq-local treesit-font-lock-settings rnc--treesit-font-lock-settings)
+    (setq-local treesit-font-lock-settings xquery--treesit-font-lock-settings)
     (setq-local treesit-font-lock-feature-list
-                '((comment definition)
-                  (keyword string)
-                  (delimiter docstring namespace)))
-    (setq-local treesit-defun-type-regexp (rx bos (or "define" "declare") eos))
-    (setq-local treesit-defun-name-function #'rnc--treesit-defun-name)
-    (setq-local treesit-simple-indent-rules rnc--treesit-indent-rules)
-    (setq-local treesit-simple-imenu-settings
-                `(("Definition" ,(rx bos "define" eos) nil nil)
-                  ("Namespace" ,(rx bos "declare" eos)
-                   nil nil)))
+                '((comment keyword string)))
+    ;;(setq-local treesit-defun-type-regexp (rx bos (or "define" "declare") eos))
+    ;;(setq-local treesit-defun-name-function #'rnc--treesit-defun-name)
+    ;;(setq-local treesit-simple-indent-rules rnc--treesit-indent-rules)
+    ;; (setq-local treesit-simple-imenu-settings
+    ;;             `(("Definition" ,(rx bos "define" eos) nil nil)
+    ;;               ("Namespace" ,(rx bos "declare" eos)
+    ;;                nil nil)))
     (treesit-major-mode-setup)))
 
 
 (provide 'xquery-ts-mode)
-;;; rnc-ts-mode.el ends here
+;;; xquery-ts-mode.el ends here
