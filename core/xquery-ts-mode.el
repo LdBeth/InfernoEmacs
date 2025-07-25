@@ -64,7 +64,11 @@
     "let" "for"
     "at" "in"
     "where"
-    "return"))
+    "return"
+    ;; if
+    "if" "then" "else"
+    ;; declare
+    "declare" "option" "namespace"))
 
 (defcustom xquery-mode-indent-width 2
   "Indent width for `xquery-mode'."
@@ -84,7 +88,21 @@
 
    :language 'xquery
    :feature 'keyword
-   `([,@xquery-mode--keywords] @font-lock-keyword-face)))
+   `([,@xquery-mode--keywords] @font-lock-keyword-face)
+
+   :language 'xquery
+   :feature 'variable
+   `((variable ncname: (identifier) @font-lock-variable-name-face))
+
+   :language 'xquery
+   :feature 'definition
+   `((function_call ncname: (identifier) @font-lock-function-call-face)
+     (function_declaration local: (identifier)
+                           @font-lock-function-name-face))
+
+   :language 'xquery
+   :feature 'type
+   `((type_declaration _ (_) @font-lock-type-face))))
 
 ;;;###autoload
 (define-derived-mode xquery-ts-mode prog-mode "XQuery"
@@ -96,7 +114,8 @@
     (treesit-parser-create 'xquery)
     (setq-local treesit-font-lock-settings xquery--treesit-font-lock-settings)
     (setq-local treesit-font-lock-feature-list
-                '((comment keyword string)))
+                '((comment keyword string)
+                  (variable definition type)))
     ;;(setq-local treesit-defun-type-regexp (rx bos (or "define" "declare") eos))
     ;;(setq-local treesit-defun-name-function #'rnc--treesit-defun-name)
     ;;(setq-local treesit-simple-indent-rules rnc--treesit-indent-rules)
