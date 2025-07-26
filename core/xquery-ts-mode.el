@@ -59,8 +59,7 @@
     st))
 
 (defconst xquery-mode--keywords
-  '(
-    ;; FLWOR
+  '(;; FLWOR
     "let" "for"
     "at" "in"
     "where"
@@ -68,7 +67,7 @@
     ;; if
     "if" "then" "else"
     ;; declare
-    "declare" "option" "namespace"))
+    "xquery" "declare"))
 
 (defcustom xquery-mode-indent-width 2
   "Indent width for `xquery-mode'."
@@ -92,20 +91,28 @@
 
    :language 'xquery
    :feature 'variable
-   `((variable ncname: (identifier) @font-lock-variable-name-face)
+   '((variable ncname: (identifier) @font-lock-variable-name-face)
      (let_binding _ ncname: (identifier) @font-lock-variable-name-face)
      (param_list ncname: (_) @font-lock-variable-name-face)
      ["$" "as" ":="] @font-lock-operator-face)
 
    :language 'xquery
    :feature 'definition
-   `((function_call ncname: (identifier) @font-lock-builtin-face)
+   '((function_call ncname: (identifier) @font-lock-builtin-face)
      (function_declaration local: (identifier)
                            @font-lock-function-name-face))
 
    :language 'xquery
    :feature 'type
-   `((type_declaration _ (_) @font-lock-type-face))))
+   '((type_declaration _ (_) @font-lock-type-face))))
+
+
+(defvar xquery-mode--treesit-indent-rules
+  `((xquery
+     ((parent-is "module") parent-bol 0)
+     ((field-is "body") parent-bol xquery-mode-indent-width)
+     (no-node parent-bol xquery-mode-indent-width)
+     )))
 
 ;;;###autoload
 (define-derived-mode xquery-ts-mode prog-mode "XQuery"
@@ -121,7 +128,7 @@
                   (variable definition type)))
     ;;(setq-local treesit-defun-type-regexp (rx bos (or "define" "declare") eos))
     ;;(setq-local treesit-defun-name-function #'rnc--treesit-defun-name)
-    ;;(setq-local treesit-simple-indent-rules rnc--treesit-indent-rules)
+    (setq-local treesit-simple-indent-rules xquery-mode--treesit-indent-rules)
     ;; (setq-local treesit-simple-imenu-settings
     ;;             `(("Definition" ,(rx bos "define" eos) nil nil)
     ;;               ("Namespace" ,(rx bos "declare" eos)
