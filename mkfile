@@ -1,14 +1,19 @@
 # -*- mode: mkfile -*-
 EMDIR=/Applications/Emacs.app/Contents/MacOS
-EMDUMPDIR=$EMDIR/libexec/aarch64-apple-darwin24.5.0
+EMDUMPDIR=$EMDIR/libexec
 SCPT_DIR=~/.emacs.d/script
 
 all:VQ:
 	echo "Run mk redump|split."
 
-redump:V:
-	u $EMDIR/Emacs --dump "${EMDUMPDIR}/Emacs.pdmp.bak" -q --batch --load $SCPT_DIR/dump.el
-	mv ~/.emacs.d/Emacs.pdmp "${EMDUMPDIR}/Emacs.pdmp"
+# $EMDUMPDIR/Emacs.pdmp.bak:Psh -c 'test -f "$0"': $EMDUMPDIR/Emacs.pdmp
+# 	cp $prereq $target
+
+# redump:V: $EMDUMPDIR/Emacs.pdmp.bak
+# 	u $EMDIR/Emacs --dump "${EMDUMPDIR}/Emacs.pdmp.bak" -q --batch --load $SCPT_DIR/dump.el
+# 	mv ~/.emacs.d/Emacs.pdmp "${EMDUMPDIR}/Emacs.pdmp"
+redump:VQ:
+	echo "Native lisp cannot redump"
 
 orig:V:
 	u $EMDIR/Emacs --dump "${EMDUMPDIR}/Emacs.pdmp.bak"
