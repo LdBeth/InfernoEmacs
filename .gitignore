@@ -25,3 +25,4 @@ emacs-gc-stats.eld
 tree-sitter/
 transient/
 multisession/
+eln-cache/

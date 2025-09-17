@@ -1,10 +1,11 @@
-;; (let ((paths
-;;        (eval-when-compile
-;;          (with-temp-buffer
-;;            (call-process-shell-command "cat /etc/paths /etc/paths.d/*" nil t)
-;;            (split-string (buffer-string))))))
-;;   (setenv "PATH" (mapconcat #'identity paths ":"))
-;;   (setq exec-path (append paths (list exec-directory))))
+;; -*- lexical-binding:t -*-
+(let ((paths
+       (eval-when-compile
+         (with-temp-buffer
+           (call-process-shell-command "cat /etc/paths /etc/paths.d/*" nil t)
+           (split-string (buffer-string))))))
+  (setenv "PATH" (mapconcat #'identity paths ":"))
+  (setq exec-path (append paths (list exec-directory))))
 
 (setq ad-redefinition-action 'accept)
 ;; Visuals
@@ -12,8 +13,12 @@
 (tool-bar-mode -1)
 (tooltip-mode -1)
 (blink-cursor-mode -1)
-(mac-auto-ascii-mode 1)
+;; (mac-auto-ascii-mode 1)
 ;; (prefer-coding-system 'utf-8)
+
+(when (boundp 'mac-command-modifier)
+  (setq mac-command-modifier 'meta)
+  (setq mac-option-modifier 'super))
 
 (setq inhibit-startup-screen t)
 (setq make-backup-files nil

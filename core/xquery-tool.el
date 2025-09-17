@@ -1,4 +1,4 @@
-;;; xquery-tool.el --- A simple interface to saxonb's xquery. -*- lexical-binding:t -*-
+;;; xquery-tool.el --- A simple interface to saxon's xquery. -*- lexical-binding:t -*-
 
 ;; Copyright (C) 2015--2020 Patrick McAllister
 
