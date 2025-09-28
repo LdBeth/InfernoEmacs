@@ -106,7 +106,7 @@
       '("/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/"))
 ;; elpa
 (add-to-list 'package-archives
-             '("melpa" . "https://melpa.org/packages/"))
+             '("melpa" . "https://mirrors.ustc.edu.cn/elpa/melpa/"))
 
 (setq tramp-auto-save-directory (concat temporary-file-directory
                                         "tramp/")

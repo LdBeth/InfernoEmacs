@@ -201,6 +201,11 @@ end if")))
 (unbind-key "C-h ?" global-map)
 
 (define-key key-translation-map (kbd "¥") (kbd "\\"))
+(defun quail-input-method-translate (fn key)
+  (if (eql key ?¥)
+      (funcall fn ?\\)
+    (funcall fn key)))
+(advice-add 'quail-input-method :around #'quail-input-method-translate)
 
 (pixel-scroll-precision-mode 1)
 (setq pixel-scroll-precision-interpolate-page t)
@@ -278,5 +283,9 @@ end if")))
   (cl-letf (((symbol-function 'epg-wait-for-status) 'ignore))
     (apply old args)))
 
-(advice-add 'epa-encrypt-region :around
-            'fix-epg-advice)
+(advice-add 'epa-encrypt-region :around 'fix-epg-advice)
+
+(defun fix-epg-encrypt-always-trust (old context plain recipients &optional sign always-trust)
+  (funcall old context plain recipients sign t))
+
+(advice-add 'epg-start-encrypt :around 'fix-epg-encrypt-always-trust)

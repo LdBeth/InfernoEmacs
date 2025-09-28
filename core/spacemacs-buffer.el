@@ -144,6 +144,7 @@ If MESSAGEBUF is not nil then MSG is also written in message buffer."
       (when messagebuf
         (message "(Spacemacs) %s" msg)))))
 
+(eval-and-compile
 (defun spacemacs-buffer//startup-list-jump-func-name (str)
   "Given a string, return a spacemacs-buffer function name.
 
@@ -156,7 +157,7 @@ Given:           Return:
       (setq s (substring s nil (1- (length s)))))
     ;; replace any spaces with a dash
     (setq s (replace-regexp-in-string " " "-" s))
-    (concat "spacemacs-buffer/jump-to-" s)))
+    (concat "spacemacs-buffer/jump-to-" s))))
 
 (defmacro spacemacs-buffer||add-shortcut
     (shortcut-char search-label &optional no-next-line)
