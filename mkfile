@@ -2,6 +2,7 @@
 EMDIR=/Applications/Emacs.app/Contents/MacOS
 EMDUMPDIR=$EMDIR/libexec
 SCPT_DIR=~/.emacs.d/script
+DEFSGEN=$EMDIR/Emacs -q --batch -f loaddefs-generate-batch
 
 all:VQ:
 	echo "Run mk redump|split."
@@ -21,3 +22,11 @@ orig:V:
 split:V:
 	u $EMDIR/Emacs --dump "${EMDUMPDIR}/Emacs.pdmp.bak" --batch --load $SCPT_DIR/split.el
 
+
+autoloads:V: core/core-autoloads.el core/spacemacs-theme/spacemacs-theme-autoloads.el
+
+core/core-autoloads.el:
+	u $DEFSGEN $target core/
+
+core/spacemacs-theme/spacemacs-theme-autoloads.el:
+	u $DEFSGEN $target core/spacemacs-theme/
