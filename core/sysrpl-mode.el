@@ -24,7 +24,7 @@
 ;;
 (defcustom sysrpl-default-calculator :HP50G
   "Default calculator type for SysRPL mode."
-  :type '(radio :HP48G :HP49G :HP50G)
+  :type '(radio (const :HP48G) (const :HP49G) (const :HP50G))
   :group 'rpl)
 
 (defcustom sysrpl-compiler-program "rplcomp"

@@ -2288,25 +2288,25 @@ record."
 		(message "%sdone" msg))
 	      (kill-buffer buffer))))))))
 
-(let (current-load-list)
-  (defadvice bbdb-display-records-1
-    (around show-x-face-images-in-the-bbdb-buffer activate compile)
-    "Advised by X-Face-E21.  Show X-Faces images in the BBDB buffer."
-    (let ((silent (or (and (boundp 'bbdb-gag-messages)
-			   (symbol-value 'bbdb-gag-messages))
-		      (and (boundp 'bbdb-silent-running)
-			   (symbol-value 'bbdb-silent-running)))))
-      (unless silent
-	(message "Formatting..."))
-      (let ((bbdb-silent-running t)
-	    (bbdb-list-hook bbdb-list-hook))
-	(remove-hook 'bbdb-list-hook 'x-face-energize-bbdb-buffer)
-	ad-do-it)
-      (x-face-energize-bbdb-buffer 'all silent)
-      (unless silent
-	(message "Formatting...done")))))
+;; (let (current-load-list)
+;;   (define-advice bbdb-display-records-1
+;;       (:around (old) show-x-face-images-in-the-bbdb-buffer)
+;;     "Advised by X-Face-E21.  Show X-Faces images in the BBDB buffer."
+;;     (let ((silent (or (and (boundp 'bbdb-gag-messages)
+;; 			               (symbol-value 'bbdb-gag-messages))
+;; 		              (and (boundp 'bbdb-silent-running)
+;; 			               (symbol-value 'bbdb-silent-running)))))
+;;       (unless silent
+;; 	    (message "Formatting..."))
+;;       (let ((bbdb-silent-running t)
+;; 	        (bbdb-list-hook bbdb-list-hook))
+;; 	    (remove-hook 'bbdb-list-hook 'x-face-energize-bbdb-buffer)
+;; 	    (funcall old))
+;;       (x-face-energize-bbdb-buffer 'all silent)
+;;       (unless silent
+;; 	    (message "Formatting...done")))))
 
-(add-hook 'bbdb-list-hook 'x-face-energize-bbdb-buffer)
+;; (add-hook 'bbdb-list-hook 'x-face-energize-bbdb-buffer)
 
 (provide 'x-face-e21)
 

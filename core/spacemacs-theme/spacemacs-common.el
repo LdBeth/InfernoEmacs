@@ -1,4 +1,4 @@
-;;; spacemacs-common.el --- Color theme with a dark and light versions.
+;;; spacemacs-common.el --- Color theme with a dark and light versions.  -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2015-2018 Nasser Alshammari
 

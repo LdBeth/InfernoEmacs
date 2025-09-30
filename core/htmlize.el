@@ -1340,7 +1340,7 @@ overlays that specify `face'."
 That means that GENERATOR will be evaluated and returned the first time
 it's called with the same value of KEY.  All other times, the cached
 \(memoized) value will be returned."
-  (let ((value (cl-gensym)))
+  (let ((value (gensym)))
     `(let ((,value (gethash ,key htmlize-memoization-table)))
        (unless ,value
          (setq ,value ,generator)
@@ -1548,7 +1548,7 @@ it's called with the same value of KEY.  All other times, the cached
           (let* ((buffer-faces (htmlize-faces-in-buffer))
                  (face-map (htmlize-make-face-map
                             (cl-adjoin 'default buffer-faces)))
-                 (places (cl-gensym))
+                 (places (gensym))
                  (title (if (buffer-file-name)
                             (file-name-nondirectory (buffer-file-name))
                           (buffer-name))))

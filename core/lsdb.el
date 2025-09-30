@@ -113,7 +113,8 @@ The format of elements of this list should be
      (FIELD-NAME REGEXP ENTRY STRING)
 where the last three elements are optional."
   :group 'lsdb
-  :type 'list)
+  :type '(alist :key-type string :value-type (list (choice regexp (const nil))
+                                                   symbol)))
 
 (defcustom lsdb-entry-type-alist
   '((net 5 ?,)
@@ -140,7 +141,7 @@ the stored values are normalize.
 If the fourth element READ-ONLY is non-nil, it is assumed that the
 entry cannot be modified."
   :group 'lsdb
-  :type 'list)
+  :type '(alist :key-type symbol :value-type (group integer character)))
 
 (defcustom lsdb-name-filter-regexp
   "[[:print:]]+@[[:print:]]+\\|\s+via\s+"
@@ -154,7 +155,7 @@ via\" feature from mailing lists."
   "no.?reply\\|news\\|support\\|sale\\|\\+\\|notifi\\|info"
   "Match senders that are not worth to save the record."
   :group 'lsdb
-  :type 'list)
+  :type 'regexp)
 
 (defcustom lsdb-decode-field-body-function #'lsdb-decode-field-body
   "Field body decoder."
@@ -192,7 +193,7 @@ The removed record is passed to each function as the argument."
   '(lsdb-address-cache)
   "List of the hash tables for reverse lookup"
   :group 'lsdb
-  :type 'list)
+  :type '(group variable))
 
 (defcustom lsdb-window-max-height 7
   "Maximum number of lines used to display LSDB record."
@@ -1522,11 +1523,11 @@ always hide."
   (cond
    ;; Mew 3
    ((fboundp 'mew-summary-visit-folder)
-    (defadvice mew-summary-visit-folder (before lsdb-hide-buffer activate)
+    (define-advice mew-summary-visit-folder (:before ())
       (lsdb-hide-buffer)))
    ;; Mew 2
    ((fboundp 'mew-summary-switch-to-folder)
-    (defadvice mew-summary-switch-to-folder (before lsdb-hide-buffer activate)
+    (define-advice mew-summary-switch-to-folder (:before ())
       (lsdb-hide-buffer)))))
 
 (defun lsdb-mew-update-record ()
@@ -1638,12 +1639,11 @@ the user wants it."
 (defun lsdb-expose-x-face ()
   (let* ((record (get-text-property (point-min) 'lsdb-record))
          (x-face (cdr (assq 'x-face (cdr record))))
-         (delimiter "\r "))
+         (delimiter #("\r " 0 1 (invisible t))))
     (when (and lsdb-insert-x-face-function
                x-face)
       (goto-char (point-min))
       (end-of-line)
-      (put-text-property 0 1 'invisible t delimiter) ;hide "\r"
       (put-text-property
        (point)
        (progn
@@ -1656,12 +1656,12 @@ the user wants it."
 (defun lsdb-expose-face ()
   (let* ((record (get-text-property (point-min) 'lsdb-record))
          (face (cdr (assq 'face (cdr record))))
-         (delimiter "\r "))
+         (delimiter #("\r " 0 1 (invisible t)) ;hide "\r"
+                    ))
     (when (and lsdb-insert-face-function
                face)
       (goto-char (point-min))
       (end-of-line)
-      (put-text-property 0 1 'invisible t delimiter) ;hide "\r"
       (put-text-property
        (point)
        (progn

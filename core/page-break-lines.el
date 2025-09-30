@@ -161,7 +161,7 @@ When `major-mode' is listed in `page-break-lines-modes', then
       (page-break-lines-mode 1)))
 
 ;;;###autoload
-(define-global-minor-mode global-page-break-lines-mode
+(define-globalized-minor-mode global-page-break-lines-mode
   page-break-lines-mode page-break-lines-mode-maybe
   :require 'page-break-lines
   :group 'page-break-lines)

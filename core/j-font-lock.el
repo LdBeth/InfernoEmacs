@@ -340,13 +340,13 @@ this in emacs and it poses problems"
                (j-font-lock-docstring-p state))
               ;; J Lab command
               (eql (char-after start-pos) ?N))
-          font-lock-doc-face
-        font-lock-string-face))
+          'font-lock-doc-face
+        'font-lock-string-face))
      ((and (<= (+ start-pos 3) (point-max))
            (eql (char-after start-pos) ?N)
            (string= (buffer-substring-no-properties
                      start-pos (+ start-pos 3))
                     "NB."))
-      font-lock-comment-face))))
+      'font-lock-comment-face))))
 
 (provide 'j-font-lock)

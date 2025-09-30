@@ -862,7 +862,6 @@ With prefix remove all applicable downloads."
     (condition-case nil
         (setq aria2--cc (eieio-persistent-read aria2--cc-file 'aria2-controller))
       (error (setq aria2--cc (make-instance 'aria2-controller
-                                            "aria2-controller"
                                             :file aria2--cc-file)))))
   ;; kill process or save state on exit
   (if aria2-kill-process-on-emacs-exit

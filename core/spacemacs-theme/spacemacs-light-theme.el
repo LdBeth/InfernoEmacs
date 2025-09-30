@@ -1,3 +1,4 @@
+;; -*- lexical-binding: t; -*-
 (eval-when-compile
   (load "spacemacs-common.el" nil t t))
 

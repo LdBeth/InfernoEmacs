@@ -112,7 +112,7 @@ TECO-64 looks for non whitespaces."
     (unless (eql (char-after (1- beg)) ?^)
       (unless (nth 4 ppss)
         (compose-region beg end ?$ 'decompose-region))
-      font-lock-keyword-face)))
+      'font-lock-keyword-face)))
 
 (defmacro teco-font-lock-define-matcher (fn cmds delim)
   `(defalias ',fn
@@ -250,10 +250,10 @@ TECO-64 looks for non whitespaces."
             (goto-char start-pos)
             (search-backward "@" nil t)
             (looking-at-p (rx teco-rx-atsign-prefix "!")))
-          font-lock-comment-face
-        font-lock-string-face))
+          'font-lock-comment-face
+        'font-lock-string-face))
      (t
-      font-lock-comment-face))))
+      'font-lock-comment-face))))
 
 ;;;###autoload
 (add-to-list 'auto-mode-alist '("\\.te[sc]\\'"  . teco-mode))

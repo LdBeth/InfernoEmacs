@@ -1,4 +1,4 @@
-;; Simple config
+;; Simple config  -*- lexical-binding: t; -*-
 
 ;;(package-initialize)
 (setq gc-cons-threshold 402653184 gc-cons-percentage 0.6)
