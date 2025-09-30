@@ -277,15 +277,3 @@ end if")))
       (font-lock-flush)
     (when font-lock-mode
       (with-no-warnings (font-lock-fontify-buffer)))))
-
-;; GPGTools still using 2.2.44
-(defun fix-epg-advice (old &rest args)
-  (cl-letf (((symbol-function 'epg-wait-for-status) 'ignore))
-    (apply old args)))
-
-(advice-add 'epa-encrypt-region :around 'fix-epg-advice)
-
-(defun fix-epg-encrypt-always-trust (old context plain recipients &optional sign always-trust)
-  (funcall old context plain recipients sign t))
-
-(advice-add 'epg-start-encrypt :around 'fix-epg-encrypt-always-trust)
