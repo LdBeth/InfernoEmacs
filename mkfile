@@ -25,8 +25,7 @@ split:V:
 
 autoloads:V: core/core-autoloads.el core/spacemacs-theme/spacemacs-theme-autoloads.el
 
-core/core-autoloads.el:
-	u $DEFSGEN $target core/
+%-autoloads.el:U:
+	u $DEFSGEN $target `dirname $target`
 
-core/spacemacs-theme/spacemacs-theme-autoloads.el:
-	u $DEFSGEN $target core/spacemacs-theme/
+

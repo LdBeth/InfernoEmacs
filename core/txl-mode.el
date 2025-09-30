@@ -265,7 +265,7 @@ is included or not."
 
 ; automatic indentation --------------------------------------------------------
 
-(defun txl-mode-indent-line (&optional whole-exp)
+(defun txl-mode-indent-line (&optional _whole-exp)
   "Indent current line as TXL code.
 With argument, indent any additional lines of the same clause
 rigidly along with this one (not yet)."
