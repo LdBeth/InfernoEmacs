@@ -102,7 +102,7 @@ end if")))
     (with-current-buffer result-buffer
       (shell-command-on-region
        (point-min) (point-max)
-       "ssh ma tidy -utf8 -q -asxhtml --doctype strict --show-comments=no"
+       "/opt/pkg/bin/tidy -utf8 -q -asxhtml --doctype strict --show-comments=no"
        t t error-buffer))
     (switch-to-buffer result-buffer)))
 

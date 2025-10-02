@@ -1,4 +1,4 @@
-;; -*- lexical-binding:t -*-
+;; -*- lexical-binding:nil -*-
 (let ((paths
        (eval-when-compile
          (with-temp-buffer

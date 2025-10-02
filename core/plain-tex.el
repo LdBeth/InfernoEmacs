@@ -3555,11 +3555,10 @@ argument OPTIONAL is ignored."
   '((t :inherit font-lock-string-face))
   "Face used to highlight TeX math expressions."
   :group 'tex)
-(defvar tex-math-face 'tex-math-face)
 
 ;; Use string syntax but math face for $...$.
 (defun tex-font-lock-syntactic-face-function (state)
-  (if (nth 3 state) tex-math-face font-lock-comment-face))
+  (if (nth 3 state) 'tex-math-face 'font-lock-comment-face))
 
 ;;;###autoload
 (defun tex-font-setup ()

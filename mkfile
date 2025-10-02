@@ -16,16 +16,14 @@ all:VQ:
 redump:VQ:
 	echo "Native lisp cannot redump"
 
-orig:V:
-	u $EMDIR/Emacs --dump "${EMDUMPDIR}/Emacs.pdmp.bak"
+# orig:V:
+# 	u $EMDIR/Emacs --dump "${EMDUMPDIR}/Emacs.pdmp.bak"
 
 split:V:
-	u $EMDIR/Emacs --dump "${EMDUMPDIR}/Emacs.pdmp.bak" --batch --load $SCPT_DIR/split.el
+	u $EMDIR/Emacs --batch --load $SCPT_DIR/split.el
 
 
 autoloads:V: core/core-autoloads.el core/spacemacs-theme/spacemacs-theme-autoloads.el
 
 %-autoloads.el:U:
 	u $DEFSGEN $target `dirname $target`
-
-

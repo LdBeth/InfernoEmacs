@@ -51,7 +51,7 @@
     "while" "for" "break" "continue" "var" "tmp" "set" "del" "with"
     "and" "or" "coalesce" "fail" "multi-error" "pragma")
   "Elvish keyword list."
-  :type 'list
+  :type '(group string)
   :group 'elvish-mode)
 
 (defconst elvish-symbol (rx (one-or-more (or (syntax word) (syntax symbol))))
@@ -85,7 +85,7 @@ the syntax table, so `forward-word' works as expected.")
 (defcustom elvish-auto-variables
   '("_" "pid" "ok" "true" "false" "paths" "pwd")
   "Elvish special variable names."
-  :type 'list
+  :type '(group string)
   :group 'elvish-mode)
 
 (defconst elvish-auto-variables-pattern
@@ -195,7 +195,7 @@ the syntax table, so `forward-word' works as expected.")
     ;; Debugging
     "-gc" "-stack" "-log" "-ifaddrs")
   "List of Elvish built-in functions."
-  :type 'list
+  :type '(group string)
   :group 'elvish-mode)
 
 (defconst elvish-builtin-functions-pattern

@@ -1,3 +1,4 @@
+;; -*- lexical-binding: t; -*-
 (package-initialize)
 (load (concat user-emacs-directory "pkgs"))
 (require 'wl)
