@@ -2,12 +2,12 @@
 ;;; j-font-lock.el --- font-lock extension for j-mode
 
 ;; Copyright (C) 2012 Zachary Elliott
-;; Copyright (C) 2023, 2024 LdBeth
+;; Copyright (C) 2023-2025 LdBeth
 ;;
 ;; Authors: Zachary Elliott <ZacharyElliott1@gmail.com>
 ;; URL: http://github.com/zellio/j-mode
-;; Version: 2.0.1
-;; Keywords: J, Langauges
+;; Version: 2.0.2
+;; Keywords: J, Languages
 
 ;; This file is not part of GNU Emacs.
 

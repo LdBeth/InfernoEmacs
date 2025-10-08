@@ -277,3 +277,9 @@ end if")))
       (font-lock-flush)
     (when font-lock-mode
       (with-no-warnings (font-lock-fontify-buffer)))))
+
+(define-advice newsticker--unxml (:override (node) unxml-fix-escape)
+  (cond ((not node) node)
+        ((stringp node) (xml-escape-string node))
+        (t
+         (newsticker--unxml-node node))))

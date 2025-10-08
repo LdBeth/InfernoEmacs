@@ -1243,7 +1243,7 @@ will be ignored."
 /* XPM */
 static char * "
 	      (if filename
-		  (replace-regexp-in-string "[\000-/:-\?[-^`{-\377]" "_"
+		  (replace-regexp-in-string "[\000-/:-\\?[-^`{-\377]" "_"
 					    filename)
 		"X_Face")
 	      "[] = {

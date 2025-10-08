@@ -2,12 +2,12 @@
 ;;; j-mode.el --- Major mode for editing J programs
 
 ;; Copyright (C) 2012 Zachary Elliott
-;; Copyright (C) 2023, 2024 LdBeth
+;; Copyright (C) 2023-2025 LdBeth
 ;;
 ;; Authors: Zachary Elliott <ZacharyElliott1@gmail.com>
 ;; URL: http://github.com/zellio/j-mode
-;; Version: 2.0.1
-;; Keywords: J, Langauges
+;; Version: 2.0.2
+;; Keywords: J, Languages
 
 ;; This file is not part of GNU Emacs.
 
@@ -43,7 +43,8 @@
   :group 'j
   :prefix "j-console-")
 
-(defcustom j-console-cmd "jc"
+(defcustom j-console-cmd (or (executable-find "jc")
+                             (executable-find "jconsole.sh"))
   "Name of the executable used for the J REPL session"
   :type 'string
   :group 'j-console)

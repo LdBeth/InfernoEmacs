@@ -112,6 +112,8 @@
                                         "tramp/")
       tramp-use-ssh-controlmaster-options nil)
 
+(setq j-help-use-jwiki t)
+
 (defvar dumped-load-path)
 (if (not (boundp 'dumped-load-path))
     (load (concat user-emacs-directory "pkgs"))
