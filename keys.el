@@ -278,8 +278,10 @@ end if")))
     (when font-lock-mode
       (with-no-warnings (font-lock-fontify-buffer)))))
 
-(define-advice newsticker--unxml (:override (node) unxml-fix-escape)
-  (cond ((not node) node)
-        ((stringp node) (xml-escape-string node))
-        (t
-         (newsticker--unxml-node node))))
+(static-if (< emacs-major-version 31)
+    (define-advice newsticker--unxml (:override (node) unxml-fix-escape)
+      (cond ((not node) node)
+            ((stringp node) (xml-escape-string node))
+            (t
+             (newsticker--unxml-node node)))))
+

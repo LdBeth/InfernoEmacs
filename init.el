@@ -25,11 +25,12 @@
      default))
  '(org-fold-core-style 'overlays)
  '(package-selected-packages
-   '(avy corfu ctrlf dash dyalog-mode elpher emmet-mode filladapt
-         flyspell-correct frimacs geiser-chez gnu-elpa-keyring-update
-         hyperbole langtool lsp-mode magit-section maude-mode mwim
-         orderless pinentry sly sudo-edit unfill vertico wanderlust
-         which-key xquery-mode yasnippet z3-mode))
+   '(auctex avy corfu ctrlf dash dyalog-mode elpher emmet-mode filladapt
+            flyspell-correct frimacs geiser-chez
+            gnu-elpa-keyring-update hyperbole langtool lsp-mode
+            magit-section maude-mode mwim orderless pinentry sly
+            sudo-edit unfill vertico wanderlust which-key xquery-mode
+            yasnippet z3-mode))
  '(safe-local-variable-values
    '((xquery-tool-xml-catalog-file
       . "/Users/ldbeth/Public/Projects/symbdoc/catalog.xml")

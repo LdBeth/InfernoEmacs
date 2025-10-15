@@ -105,8 +105,10 @@
 (setq smart-c-cpp-include-path
       '("/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/"))
 ;; elpa
-(add-to-list 'package-archives
-             '("melpa" . "https://mirrors.ustc.edu.cn/elpa/melpa/"))
+(setq package-archives
+      '(("gnu" . "https://mirrors.tuna.tsinghua.edu.cn/elpa/gnu/")
+        ("nongnu" . "https://mirrors.tuna.tsinghua.edu.cn/elpa/nongnu/")
+        ("melpa" . "https://mirrors.ustc.edu.cn/elpa/melpa/")))
 
 (setq tramp-auto-save-directory (concat temporary-file-directory
                                         "tramp/")
