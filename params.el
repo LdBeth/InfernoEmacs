@@ -119,9 +119,8 @@
 (defvar dumped-load-path)
 (if (not (boundp 'dumped-load-path))
     (load (concat user-emacs-directory "pkgs"))
-  (setq load-path dumped-load-path)
-  (setq native-comp-eln-load-path
-        "/Applications/Emacs.app/Contents/Frameworks/native-lisp/")
+  (setq load-path dumped-load-path
+        native-comp-eln-load-path dumped-eln-path)
   (global-font-lock-mode t)
   (transient-mark-mode t)
   (set-face-foreground 'homoglyph "#686868"))

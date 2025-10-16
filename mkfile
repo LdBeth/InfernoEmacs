@@ -13,8 +13,6 @@ $EMDUMPDIR/Emacs.pdmp.bak:Psh -c 'test -f "$0"': $EMDUMPDIR/Emacs.pdmp
 redump:V: $EMDUMPDIR/Emacs.pdmp.bak
 	u $EMDIR/Emacs --dump "${EMDUMPDIR}/Emacs.pdmp.bak" -q --batch --load $SCPT_DIR/dump.el
 	mv ~/.emacs.d/Emacs.pdmp "${EMDUMPDIR}/Emacs.pdmp"
-# redump:VQ:
-# 	echo "Native lisp cannot redump"
 
 orig:V:
 	u $EMDIR/Emacs --dump "${EMDUMPDIR}/Emacs.pdmp.bak"
