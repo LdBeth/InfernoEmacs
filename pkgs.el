@@ -190,6 +190,17 @@
   (add-to-list 'eglot-server-programs
                '(objc-mode . ("clangd"))))
 
+(use-package tex
+  :defer t
+  :init
+  (setq TeX-engine-alist
+        '((aptex "pTeX-ng" "ptex-ng" "platex-ng" nil))))
+
+(use-package preview
+  :defer t
+  :custom
+  (preview-image-type 'tiff))
+
 (use-package dyalog-mode
   :defer t
   :init

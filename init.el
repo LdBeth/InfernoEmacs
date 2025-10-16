@@ -32,7 +32,8 @@
             sudo-edit unfill vertico wanderlust which-key xquery-mode
             yasnippet z3-mode))
  '(safe-local-variable-values
-   '((xquery-tool-xml-catalog-file
+   '((TeX-engine . aptex)
+     (xquery-tool-xml-catalog-file
       . "/Users/ldbeth/Public/Projects/symbdoc/catalog.xml")
      (xquery-tool-resolve-xincludes . t)))
  '(warning-suppress-types '((lsp-mode) (auto-save))))
