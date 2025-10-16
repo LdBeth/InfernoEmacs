@@ -169,7 +169,6 @@
 
 ;; Programming
 (use-package lsp-mode
-  :disabled
   :defer t
   :init
   (setq lsp-completion-provider :none) ;; we use Corfu!

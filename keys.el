@@ -44,15 +44,18 @@ if prefix argument ARG is given, switch to it in an other, possibly new window."
 (eval-when-compile (require 'static))
 
 (eval-when-compile
-  (defmacro do-applescript (text)
-    (cond
-     ((functionp 'ns-do-applescript)
-      `(ns-do-applescript, text))
-     ((functionp 'mac-osa-script)
-      `(read (mac-osa-script (eval-when-compile
-                               (mac-osa-compile ,text))
-                             t nil)))
-     (t `(error "Not a mac"))))
+  (defmacro applescript (&rest code)
+    (let ((text (mapconcat (lambda (o) (if (eq o :cr) "\n" (format "%S" o)))
+                           code
+                           " ")))
+      (cond
+       ((functionp 'ns-do-applescript)
+        `(ns-do-applescript, text))
+       ((functionp 'mac-osa-script)
+        `(read (mac-osa-script (eval-when-compile
+                                 (mac-osa-compile ,text))
+                               t nil)))
+       (t `(error "Not a mac")))))
   (defmacro call-applescript (file)
     (cond
      ((functionp 'ns-do-applescript)
@@ -70,13 +73,13 @@ if prefix argument ARG is given, switch to it in an other, possibly new window."
 
 (defun now-browsing ()
   (interactive)
-  (let ((url (do-applescript "if application \"Safari\" is running then
-  tell application \"Safari\"
-    set display to URL of front document
-  end tell
-else
-  set display to \"No opened document.\"
-end if")))
+  (let ((url (applescript if application "Safari" is running then :cr
+                          tell application "Safari" :cr
+                          set display to URL of front document :cr
+                          end tell :cr
+                          else :cr
+                          set display to "No opened document." :cr
+                          end if)))
     (when (called-interactively-p 'interactive)
       (kill-new url)
       (message "%s" url))
