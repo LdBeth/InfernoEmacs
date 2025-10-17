@@ -6,16 +6,19 @@
                         which-key bind-key))
   (require package))
 
-(dolist (file '("keys" "which-key" "tecoline" "set"
-                "spacemacs-buffer" "filladapt" "pkgs" "hact" "hhist"
+(dolist (file '("keys" "which-key" "tecoline"
+                "spacemacs-buffer" "filladapt" "pkgs"
                 "page-break-lines" "tex-site"
                 "dim-paren" "ctrlf"))
-  (copy-file (let ((default-directory
-                    (concat "~/.emacs.d/eln-cache/" comp-native-version-dir)))
-               (car (file-expand-wildcards (concat file "-*") t)))
-             (concat "/Applications/Emacs.app/Contents/Frameworks/native-lisp/"
-                     comp-native-version-dir "/")
-             t))
+  (let* ((default-directory
+          (concat "~/.emacs.d/eln-cache/" comp-native-version-dir))
+         (filename (car (file-expand-wildcards (concat file "-*") t))))
+    (if filename
+        (copy-file filename
+                   (concat "/Applications/Emacs.app/Contents/Frameworks/native-lisp/"
+                           comp-native-version-dir "/")
+                   t)
+      (error "file: %s not exists!" file))))
 
 (defconst dumped-load-path load-path)
 (defconst dumped-eln-path native-comp-eln-load-path)

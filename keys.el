@@ -200,6 +200,13 @@ if prefix argument ARG is given, switch to it in an other, possibly new window."
  ("l" . enable-lean4)
  ("a" . enable-acl2))
 
+(bind-keys
+ :prefix "M-m a"
+ :prefix-map avy-map
+ ("c" . avy-goto-char)
+ ("l" . avy-goto-line)
+ ("w" . avy-goto-word-1))
+
 (unbind-key "C-h C-h" global-map)
 (unbind-key "C-h ?" global-map)
 
@@ -248,11 +255,12 @@ if prefix argument ARG is given, switch to it in an other, possibly new window."
      ((t (:inherit font-lock-type-face))))
     (holscript-quoted-material
      ((t (:inherit font-lock-string-face))))))
-    
+
 (defun enable-lean4 ()
   (interactive)
   (add-to-list 'exec-path "~/.elan/bin")
   (add-to-list 'load-path "~/.elan/lean4-mode")
+  (defvar lsp-file-watch-ignored-directories)
   (with-eval-after-load 'lsp-mode
     (add-to-list 'lsp-file-watch-ignored-directories "[/\\\\]\\.lake\\'"))
   (require 'lean4-mode))
