@@ -314,8 +314,12 @@
   (setq
    erc-insert-timestamp-function 'erc-insert-timestamp-left
    erc-timestamp-format "%H%M "
+   erc-sasl-mechanism 'external
+   erc-sasl-user :nick
    erc-autojoin-timing 'connect)
   :custom
-  (erc-module '(autojoin button completion fill irccontrols
-                         list match move-to-prompt networks
-                         noncommands readonly stamp spelling track)))
+  (erc-modules '(autojoin button completion fill irccontrols
+                          list match move-to-prompt networks
+                          sasl
+                          noncommands readonly stamp spelling track)))
+

@@ -3,6 +3,8 @@
 *-autoloads.el
 *~
 *.css
+*.crt
+*.key
 .org*
 .lsp-session*
 elpa/

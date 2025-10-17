@@ -76,6 +76,8 @@ Internal use, do not set this variable.")
       map))
   "Keymap for spacemacs buffer mode.")
 
+(defvar erc-sasl-libera-cert)
+
 (defun spacemacs//redisplay ()
   "`redisplay' wrapper."
   (force-window-update)
@@ -233,7 +235,9 @@ REAL-WIDTH: the real width of the line.  If the line contains an image, the size
                  "Start ERC."
                  :action (lambda (&rest _)
                            (erc-tls :server "irc.libera.chat"
-                                    :port "6697"))
+                                    :port 6697
+                                    :client-certificate
+                                    erc-sasl-libera-cert))
                  :mouse-face 'highlight
                  :follow-link "\C-m"
                  (propertize "Libera Chat"

@@ -51,7 +51,7 @@
       shr-width 72
       gamegrid-glyph-height-mm 3.0)
 
-(setq auth-sources '(macos-keychain-internet macos-keychain-generic)
+(setq auth-sources '(:macos-keychain-internet :macos-keychain-generic)
       track-eol t
       kill-whole-line t)
 
@@ -70,6 +70,10 @@
 ;; ERC
 (setq erc-server "irc.libera.chat"
       erc-nick "ldb"
+      erc-sasl-libera-cert (eval-when-compile
+                             (mapcar (lambda (p)
+                                       (expand-file-name (concat user-emacs-directory p)))
+                                     '("libera.key" "libera.crt")))
       erc-autojoin-channels-alist
       '(("libera.chat" "#emacs" "#jsoftware" "#commonlisp")))
 
@@ -117,9 +121,11 @@
 (setq j-help-use-jwiki t)
 
 (defvar dumped-load-path)
+(defvar dumped-eln-path)
 (if (not (boundp 'dumped-load-path))
     (load (concat user-emacs-directory "pkgs"))
   (setq load-path dumped-load-path
+        native-comp-jit-compilation t
         native-comp-eln-load-path dumped-eln-path)
   (global-font-lock-mode t)
   (transient-mark-mode t)
