@@ -91,15 +91,15 @@
   :type 'string)
 
 (defcustom lsdb-interesting-predicate-regexp
-  "^List-Id:[ \t]"
+  "^\\(?:List-Id\\|Cc\\):[ \t]"
   "If set, only emails with matching header would be recorded."
   :group 'lsdb
   :type 'string)
 
 (defcustom lsdb-interesting-header-alist
   `(("Organization" nil organization)
-    ("\\(X-\\)?User-Agent\\|X-Mailer\\|X-Newsreader" nil user-agent)
-    ("\\(X-\\)?ML-Name" nil mailing-list)
+    ("\\(?:X-\\)?User-Agent\\|X-Mailer\\|X-Newsreader" nil user-agent)
+    ("\\(?:X-\\)?ML-Name" nil mailing-list)
     ("List-Id" "\\(.*\\)[ \t]+<[^>]+>\\'" mailing-list "\\1")
     ("X-Sequence" "\\(.*\\)[ \t]+[0-9]+\\'" mailing-list "\\1")
     ("Delivered-To" "mailing list[ \t]+\\([^@]+\\)@.*" mailing-list "\\1")
