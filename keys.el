@@ -263,7 +263,8 @@ if prefix argument ARG is given, switch to it in an other, possibly new window."
   (defvar lsp-file-watch-ignored-directories)
   (with-eval-after-load 'lsp-mode
     (add-to-list 'lsp-file-watch-ignored-directories "[/\\\\]\\.lake\\'"))
-  (require 'lean4-mode))
+  (require 'lean4-mode)
+  (add-hook 'lean4-mode-hook (lambda () (setq require-final-newline t))))
 
 (defun enable-acl2 ()
   (interactive)

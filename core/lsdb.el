@@ -91,7 +91,7 @@
   :type 'string)
 
 (defcustom lsdb-interesting-predicate-regexp
-  "^\\(?:List-Id\\|Cc\\):[ \t]"
+  "^\\(?:List-Id\\|Cc\\|X-Face\\):[ \t]"
   "If set, only emails with matching header would be recorded."
   :group 'lsdb
   :type 'string)

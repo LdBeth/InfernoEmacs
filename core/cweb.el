@@ -27,6 +27,7 @@
 ; old CTL-Z, you might rather bind it to CTL-X CTL-Z.
 ; CTL-\ is normally undefined.
 ; ESC-\ is normally "delete space", but ESC-space DEL does that easily too.
+(require 'tex)
 
 (defvar pending-list nil
  "List of strings (usually WEB module names) still pending.")
@@ -123,19 +124,19 @@ otherwise do an ordinary Meta-y."
 ; Otherwise TeX mode remains as it was before.
 
 ;; (setq TeX-mode-map (make-sparse-keymap))
-(define-key tex-mode-map "\C-c\C-k" 'tex-kill-job)
-(define-key tex-mode-map "\C-c\C-l" 'tex-recenter-output-buffer)
-(define-key tex-mode-map "\C-c\C-q" 'tex-show-print-queue)
-(define-key tex-mode-map "\C-c\C-p" 'tex-print)
-(define-key tex-mode-map "\"" 'tex-insert-quote)
-(define-key tex-mode-map "\e}" 'up-list)
-(define-key tex-mode-map "\e{" 'tex-insert-braces)
-(define-key tex-mode-map "\C-c\C-r" 'tex-region)
-(define-key tex-mode-map "\C-c\C-b" 'tex-buffer)
-(define-key tex-mode-map "\C-c\C-f" 'tex-close-latex-block)
-(define-key tex-mode-map "\r" 'tex-newline)
-(define-key tex-mode-map "\t" 'indent-relative)
-(add-to-list 'tex-mode-hook
+(define-key TeX-mode-map "\C-c\C-k" 'tex-kill-job)
+(define-key TeX-mode-map "\C-c\C-l" 'tex-recenter-output-buffer)
+(define-key TeX-mode-map "\C-c\C-q" 'tex-show-print-queue)
+(define-key TeX-mode-map "\C-c\C-p" 'tex-print)
+(define-key TeX-mode-map "\"" 'tex-insert-quote)
+(define-key TeX-mode-map "\e}" 'up-list)
+(define-key TeX-mode-map "\e{" 'tex-insert-braces)
+(define-key TeX-mode-map "\C-c\C-r" 'tex-region)
+(define-key TeX-mode-map "\C-c\C-b" 'tex-buffer)
+(define-key TeX-mode-map "\C-c\C-f" 'tex-close-latex-block)
+(define-key TeX-mode-map "\r" 'tex-newline)
+(define-key TeX-mode-map "\t" 'indent-relative)
+(add-to-list 'TeX-mode-hook
              (lambda ()
                (make-local-variable 'indent-line-function)
                (setq indent-line-function 'indent-relative-maybe)))

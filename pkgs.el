@@ -1,4 +1,4 @@
-;; -*- lexical-binding:t -*-
+;; -*- lexical-binding:t  coding: utf-8 -*-
 (require 'bind-key)
 (eval-when-compile
   (require 'use-package)
@@ -47,6 +47,19 @@
         ivy-do-completion-in-region nil)
   :config
   (ivy-mode))
+
+(use-package gptel
+  :defer t
+  :config
+  (setq gptel-backend (gptel-make-openai "GPT-OSS"
+                        :stream t
+                        :protocol "http"
+                        :host "localhost:8080"
+                        :models '(gpt-oss-20b))
+        gptel-model 'gpt-oss-20b)
+  (setf (cdr (assoc 'default gptel-directives))
+        (nekomimi-agent-generate-directives 'default))
+  (nekomimi-agent-reset-system-message))
 
 (use-package vertico-directory
   :after vertico
@@ -193,7 +206,7 @@
   :defer t
   :init
   (setq TeX-engine-alist
-        '((aptex "pTeX-ng" "ptex-ng" "platex-ng" nil))))
+        '((aptex "pTeX-ng" "aptex" "aplatex" nil))))
 
 (use-package preview
   :defer t
@@ -323,3 +336,9 @@
                           sasl
                           noncommands readonly stamp spelling track)))
 
+
+(use-package dyalog-mode
+  :defer t
+  :custom
+  (setq dyalog-keyword-chars
+        "×≤≥≠∨∧÷∊⍴↑↓⍳○←→⌈⌊∘⍎⍕⊂⊃⊆⊇∩∪⊥⊤⍨⍒⍋⌽⍉⊖⍟⍱⍲⍬⌹≡≢⍪⌿⍀⍺⍵⎕⍞⋄⍷⍸⌷⍣⊣⊢⌶⌺⍥⍠⌸⍤"))

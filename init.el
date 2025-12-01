@@ -23,14 +23,15 @@
      "512fe37090a702098710d2a33ab1aad365d7f7e0063fe6afb75b20df25f16903"
      "4f87934838378e5bdd9a85a8ef46eb75e55a68b0a400a44ea45a3fd3c9167562"
      default))
+ '(hsys-org-enable-smart-keys t)
  '(org-fold-core-style 'overlays)
  '(package-selected-packages
    '(auctex avy corfu ctrlf dash dyalog-mode elpher emmet-mode filladapt
             flyspell-correct frimacs geiser-chez
-            gnu-elpa-keyring-update hyperbole langtool lsp-mode
+            gnu-elpa-keyring-update gptel hyperbole langtool lsp-mode
             magit-section maude-mode mwim orderless sly sudo-edit
-            unfill vertico wanderlust which-key xquery-mode yasnippet
-            z3-mode))
+            swift-mode unfill vertico wanderlust which-key xquery-mode
+            yasnippet z3-mode))
  '(safe-local-variable-values
    '((TeX-engine . aptex)
      (xquery-tool-xml-catalog-file

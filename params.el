@@ -63,8 +63,8 @@
       enable-recursive-minibuffers t
       help-enable-completion-autoload nil)
 
-(setq recentf-exclude '("mime-example$" "HYPB$"
-                        "\\.emacs\\.d/\\([a-z]\\|-\\)*$" "[0a-f]+\\.plstore$")
+(setq recentf-exclude '("mime-example$" "HYPB$" "\\.[a-z]+\\.eld$"
+                        "\\.emacs\\.d/\\(?:[a-z]\\|-\\)*$" "[0a-f]+\\.plstore$")
       dired-use-ls-dired nil)
 
 ;; ERC
@@ -79,8 +79,7 @@
 
 ;; langtool
 (setq langtool-http-server-host "localhost"
-      langtool-http-server-port 8080
-      gptel-directives #'nekomimi-agent-generate-directives)
+      langtool-http-server-port 8080)
 
 ;; Newsticker
 (setq newsticker-url-list
@@ -91,6 +90,7 @@
         ;;("ACG" "http://www.acgpiping.net/feed/")
         ("XML" "https://www.xml.com/feed/all/")
         ("ndw" "https://so.nwalsh.com/feed/fulltext.xml")
+        ;; ("plemacs" "https://planet.emacslife.com/atom.xml")
         ))
 
 (setq corfu-auto t
@@ -124,9 +124,10 @@
 (defvar dumped-eln-path)
 (if (not (boundp 'dumped-load-path))
     (load (concat user-emacs-directory "pkgs"))
-  (setq load-path dumped-load-path
-        native-comp-jit-compilation t
-        native-comp-eln-load-path dumped-eln-path)
+  (setq load-path dumped-load-path)
+  (when (native-comp-available-p)
+   (setq native-comp-jit-compilation t
+         native-comp-eln-load-path dumped-eln-path))
   (global-font-lock-mode t)
   (transient-mark-mode t)
   (set-face-foreground 'homoglyph "#686868"))
