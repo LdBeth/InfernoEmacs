@@ -64,7 +64,7 @@ translator:
   enable_completion: true
   enable_charset_filter: true
   enable_sentence: false
-  # sentence_over_completion: true
+  sentence_over_completion: false
   enable_encoder: false
   encode_commit_history: true
   enable_user_dict: false

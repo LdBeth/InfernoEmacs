@@ -19,7 +19,7 @@
 ---
 name: "cangjie5"
 version: "0.18"
-sort: by_weight
+sort: default
 use_preset_vocabulary: false
 max_phrase_length: 7
 min_phrase_weight: 100
@@ -15212,8 +15212,8 @@ encoder:
 毒	qmwyi	qmwy'i
 挽	qnau
 捔	qnbg	qnb'g
-換	qnbk
 换	qnbk
+換	qnbk
 捔	qnbq	qnb'q
 擔	qncr
 搎	qndf
