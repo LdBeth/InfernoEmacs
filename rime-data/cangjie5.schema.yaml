@@ -20,8 +20,8 @@ switches:
     states: [ 中文, 西文 ]
   - name: full_shape
     states: [ 半角, 全角 ]
-  - name: simplification
-    states: [ 漢字, 汉字 ]
+  # - name: simplification
+  #   states: [ 漢字, 汉字 ]
   - name: extended_charset
     states: [ 常用, 增廣 ]
   - name: ascii_punct
@@ -48,8 +48,8 @@ engine:
     - reverse_lookup_translator
     - table_translator
   filters:
-    - simplifier
-    - uniquifier
+    # - simplifier
+    # - uniquifier
     - single_char_filter
 
 speller:
@@ -59,6 +59,7 @@ speller:
 
 translator:
   dictionary: cangjie5
+  enable_completion: true
   enable_charset_filter: true
   enable_sentence: true
   enable_encoder: true
@@ -72,6 +73,7 @@ translator:
   disable_user_dict_for_patterns:
     - "^z.*$"
     - "^yyy.*$"
+  initial_quality: 0.75
 
 abc_segmentor:
   extra_tags:
