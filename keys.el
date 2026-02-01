@@ -211,6 +211,8 @@ if prefix argument ARG is given, switch to it in an other, possibly new window."
 (unbind-key "C-h ?" global-map)
 
 (define-key key-translation-map (kbd "¥") (kbd "\\"))
+(define-key key-translation-map (kbd "C-¥") (kbd "C-\\"))
+
 (defun quail-input-method-translate (fn key)
   (if (eql key ?¥)
       (funcall fn ?\\)

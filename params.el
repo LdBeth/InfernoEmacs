@@ -57,7 +57,7 @@
 
 (setq-default indent-tabs-mode nil
               tab-width 4)
-(setq ring-bell-function 'ignore
+(setq ring-bell-function #'ignore
       use-short-answers t
       tab-always-indent 'complete
       enable-recursive-minibuffers t

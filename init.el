@@ -1,17 +1,15 @@
 ;; Simple config  -*- lexical-binding: t; -*-
 
-;;(package-initialize)
-(setq gc-cons-threshold 402653184 gc-cons-percentage 0.6)
+(let ((gc-cons-threshold 402653184)
+      (gc-cons-percentage 0.6))
 
-(load (concat user-emacs-directory "params"))
-(load (concat user-emacs-directory "keys"))
+  (load (concat user-emacs-directory "params"))
+  (load (concat user-emacs-directory "keys")))
 
 (spacemacs-buffer/goto-buffer)
 (spacemacs-buffer//startup-hook)
 
 (setq spacemacs-initialized t)
-(setq gc-cons-threshold 10485760
-      gc-cons-percentage 0.1)
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
@@ -29,7 +27,7 @@
    '(auctex avy corfu ctrlf dash dyalog-mode elpher emmet-mode filladapt
             flyspell-correct frimacs geiser-chez
             gnu-elpa-keyring-update gptel hyperbole langtool lsp-mode
-            magit-section maude-mode mwim orderless sly sudo-edit
+            magit-section maude-mode mwim orderless rime sly sudo-edit
             swift-mode unfill vertico wanderlust which-key xquery-mode
             yasnippet z3-mode))
  '(safe-local-variable-values
