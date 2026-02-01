@@ -11,6 +11,8 @@ schema:
     第五代倉頡輸入法
     碼表源自倉頡之友發佈的《五倉世紀版》
     www.chinesecj.com
+  dependencies:
+    - luna_pinyin
 
 switches:
   - name: ascii_mode
