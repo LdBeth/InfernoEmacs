@@ -11,8 +11,6 @@ schema:
     第五代倉頡輸入法
     碼表源自倉頡之友發佈的《五倉世紀版》
     www.chinesecj.com
-  dependencies:
-    - luna_quanpin
 
 switches:
   - name: ascii_mode
@@ -41,16 +39,19 @@ engine:
     - ascii_segmentor
     - matcher
     - abc_segmentor
+    - affix_segmentor@pinyin_lookup
     - punct_segmentor
     - fallback_segmentor
   translators:
     - punct_translator
-    - reverse_lookup_translator
+    # - reverse_lookup_translator
     - table_translator
+    - script_translator@pinyin_lookup
   filters:
     # - simplifier
     # - uniquifier
     - single_char_filter
+    - reverse_lookup_filter@pinyin_reverse_lookup
 
 speller:
   alphabet: zyxwvutsrqponmlkjihgfedcba
@@ -58,7 +59,7 @@ speller:
   #max_code_length: 5  # 五碼頂字上屏
 
 translator:
-  dictionary: cangjie5
+  dictionary: &dict cangjie5
   enable_completion: true
   enable_charset_filter: true
   enable_sentence: true
@@ -79,18 +80,41 @@ abc_segmentor:
   extra_tags:
     - reverse_lookup  # 與拼音（反查碼）混打
 
-reverse_lookup:
-  dictionary: 8105
-  prism: luna_quanpin
+# reverse_lookup:
+#   dictionary: 8105
+#   prism: luna_quanpin
+#   prefix: "`"
+#   suffix: "'"
+#   tips: 〔拼音〕
+#   preedit_format:
+#     - xform/([nl])v/$1ü/
+#     - xform/([nl])ue/$1üe/
+#     - xform/([jqxy])v/$1u/
+#   comment_format:
+#     - "xlit|abcdefghijklmnopqrstuvwxyz|日月金木水火土竹戈十大中一弓人心手口尸廿山女田難卜符|"
+
+pinyin_lookup:
+  tag: pinyin_lookup
   prefix: "`"
+# 獨用漢語拼音反查在反查鍵「`」之後再鍵入〔大寫〕「P」
   suffix: "'"
-  tips: 〔拼音〕
+  dictionary: 8105
   preedit_format:
     - xform/([nl])v/$1ü/
     - xform/([nl])ue/$1üe/
     - xform/([jqxy])v/$1u/
+  tips: 〔拼音〕
+  closing_tips: 〔苍颉〕
+  initial_quality: 1	# 調整該編譯器出字優先度
+
+pinyin_reverse_lookup:
+  tags: [ pinyin_lookup ]
+  dictionary: *dict
+  overwrite_comment: true  # 覆蓋其他提示
   comment_format:
-    - "xlit|abcdefghijklmnopqrstuvwxyz|日月金木水火土竹戈十大中一弓人心手口尸廿山女田難卜符|"
+    - xform/$/〕/
+    - xform/^/〔/
+    - xlit|abcdefghijklmnopqrstuvwxyz |日月金木水火土竹戈十大中一弓人心手口尸廿山女田止卜片、|
 
 simplifier:
   tips: all  # 簡化字模式下提示對應的傳統漢字
@@ -105,4 +129,4 @@ recognizer:
   import_preset: default
   patterns:
     punct: '^/([0-9]0?|[A-Za-z]+)$'
-    reverse_lookup: "`[a-z]*'?$|[a-z]+'$"
+    pinyin_lookup: "`[a-z]*'?$"

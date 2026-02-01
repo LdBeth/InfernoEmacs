@@ -137,6 +137,7 @@
   :init
   (setq rime-disable-predicates '(rime-predicate-prog-in-code-p
                                   rime-predicate-punctuation-after-ascii-p)
+        rime-posframe-style 'vertical
         rime-show-candidate 'posframe
         rime-share-data-dir "~/.emacs.d/rime-data"
         rime-librime-root "/opt/pkg"
