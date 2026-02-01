@@ -63,7 +63,8 @@ speller:
       - pinyin:/key_correction
 
 translator:
-  dictionary: luna_pinyin
+# 用《通用规范汉字表》8105 字字表
+  dictionary: 8105
   preedit_format:
     - xform/([nl])v/$1ü/
     - xform/([nl])ue/$1üe/

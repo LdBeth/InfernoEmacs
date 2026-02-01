@@ -1,0 +1,4 @@
+patch:
+  schema_list:
+    - schema: cangjie5
+  menu/page_size: 10

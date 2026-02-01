@@ -135,7 +135,9 @@
 (use-package rime
   :defer t
   :init
-  (setq rime-show-candidate 'posframe
+  (setq rime-disable-predicates '(rime-predicate-prog-in-code-p
+                                  rime-predicate-punctuation-after-ascii-p)
+        rime-show-candidate 'posframe
         rime-share-data-dir "~/.emacs.d/rime-data"
         rime-librime-root "/opt/pkg"
         rime-emacs-module-header-root "/Applications/Emacs.app/Contents/Resources/include")

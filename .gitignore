@@ -29,3 +29,5 @@ tree-sitter/
 transient/
 multisession/
 eln-cache/
+rime/*
+!rime/default.custom.yaml

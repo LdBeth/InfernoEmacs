@@ -78,7 +78,7 @@ abc_segmentor:
     - reverse_lookup  # 與拼音（反查碼）混打
 
 reverse_lookup:
-  dictionary: luna_pinyin
+  dictionary: 8105
   prism: luna_quanpin
   prefix: "`"
   suffix: "'"
