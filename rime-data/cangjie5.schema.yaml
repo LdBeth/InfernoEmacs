@@ -50,21 +50,24 @@ engine:
   filters:
     # - simplifier
     # - uniquifier
+    - charset_filter
     - single_char_filter
     - reverse_lookup_filter@pinyin_reverse_lookup
 
 speller:
   alphabet: zyxwvutsrqponmlkjihgfedcba
-  delimiter: " ;"
+  delimiter: " '"
   #max_code_length: 5  # 五碼頂字上屏
 
 translator:
   dictionary: &dict cangjie5
   enable_completion: true
   enable_charset_filter: true
-  enable_sentence: true
-  enable_encoder: true
+  enable_sentence: false
+  # sentence_over_completion: true
+  enable_encoder: false
   encode_commit_history: true
+  enable_user_dict: false
   max_phrase_length: 5
   preedit_format:
     - 'xform/^([a-z]*)$/$1\t（\U$1\E）/'
@@ -74,11 +77,11 @@ translator:
   disable_user_dict_for_patterns:
     - "^z.*$"
     - "^yyy.*$"
-  initial_quality: 0.75
+  initial_quality: 1.2
 
 abc_segmentor:
-  extra_tags:
-    - reverse_lookup  # 與拼音（反查碼）混打
+#  extra_tags:
+#    - reverse_lookup  # 與拼音（反查碼）混打
 
 # reverse_lookup:
 #   dictionary: 8105
@@ -96,8 +99,7 @@ abc_segmentor:
 pinyin_lookup:
   tag: pinyin_lookup
   prefix: "`"
-# 獨用漢語拼音反查在反查鍵「`」之後再鍵入〔大寫〕「P」
-  suffix: "'"
+  suffix: ;
   dictionary: 8105
   preedit_format:
     - xform/([nl])v/$1ü/
@@ -105,7 +107,7 @@ pinyin_lookup:
     - xform/([jqxy])v/$1u/
   tips: 〔拼音〕
   closing_tips: 〔苍颉〕
-  initial_quality: 1	# 調整該編譯器出字優先度
+  initial_quality: 0.2	# 調整該編譯器出字優先度
 
 pinyin_reverse_lookup:
   tags: [ pinyin_lookup ]
@@ -129,4 +131,4 @@ recognizer:
   import_preset: default
   patterns:
     punct: '^/([0-9]0?|[A-Za-z]+)$'
-    pinyin_lookup: "`[a-z]*'?$"
+    pinyin_lookup: "`[a-z]*;?$"
