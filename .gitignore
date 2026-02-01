@@ -5,6 +5,7 @@
 *.css
 *.crt
 *.key
+*.scpt
 .org*
 .lsp-session*
 elpa/

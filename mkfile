@@ -4,6 +4,8 @@ EMDUMPDIR=$EMDIR/libexec
 SCPT_DIR=~/.emacs.d/script
 DEFSGEN=$EMDIR/Emacs -q --batch -f loaddefs-generate-batch
 ORIGDMP=--dump $EMDUMPDIR/Emacs.pdmp.bak
+scripts =U= `{ls script/*.applescript}
+SCPT = ${scripts:%.applescript=%.scpt}
 all:VQ:
 	echo "Run mk redump|split."
 
@@ -25,3 +27,8 @@ autoloads:V: core/core-autoloads.el core/spacemacs-theme/spacemacs-theme-autoloa
 
 %-autoloads.el:U:
 	u $DEFSGEN $target `dirname $target`
+
+script:V: $SCPT
+
+%.scpt: %.applescript
+	osacompile -o $target $prereq
