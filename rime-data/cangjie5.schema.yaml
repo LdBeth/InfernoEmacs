@@ -7,6 +7,7 @@ schema:
   version: "0.30"
   author:
     - 發明人 朱邦復先生
+    - LdBeth <ldbeth@sdf.org>
   description: |
     第五代倉頡輸入法
     碼表源自倉頡之友發佈的《五倉世紀版》
@@ -42,12 +43,14 @@ engine:
     - matcher
     - abc_segmentor
     - affix_segmentor@pinyin_lookup
+    - affix_segmentor@wildcard_lookup
     - punct_segmentor
     - fallback_segmentor
   translators:
     - punct_translator
     # - reverse_lookup_translator
     - table_translator
+    # - table_translator@wildcard_lookup
     - script_translator@pinyin_lookup
   filters:
     # - simplifier
@@ -55,10 +58,17 @@ engine:
     - charset_filter
     - single_char_filter
     - reverse_lookup_filter@pinyin_reverse_lookup
+    - reverse_lookup_filter@wildcard_lookup
 
 speller:
   alphabet: zyxwvutsrqponmlkjihgfedcba
   delimiter: " '"
+  algebra:
+    - 'derive/^([^z]?)[^z]([^z])$/$1z$2/'
+    - 'derive/^([^z]?)[^z]([^z][^z])$/$1z$2/'
+    - 'derive/^([^z]?)[^z]([^z][^z][^z])$/$1z$2/'
+    - 'derive/^[^z]([^z][^z][^z][^z])$/z$1/'
+    - 'derive/^([^z]+)[^z]$/$1z/'
   #max_code_length: 5  # 五碼頂字上屏
 
 translator:
@@ -73,7 +83,7 @@ translator:
   max_phrase_length: 5
   preedit_format:
     - 'xform/^([a-z]*)$/\U$1\E\t($1)/'
-    - "xlit|ABCDEFGHIJKLMNOPQRSTUVWXYZ|日月金木水火土竹戈十大中一弓人心手口尸廿山女田難卜符|"
+    - "xlit|ABCDEFGHIJKLMNOPQRSTUVWXYZ|日月金木水火土竹戈十大中一弓人心手口尸廿山女田難卜重|"
   comment_format:
     - "xlit|abcdefghijklmnopqrstuvwxyz~|日月金木水火土竹戈十大中一弓人心手口尸廿山女田難卜符～|"
   disable_user_dict_for_patterns:
@@ -82,8 +92,7 @@ translator:
   initial_quality: 1.2
 
 abc_segmentor:
-#  extra_tags:
-#    - reverse_lookup  # 與拼音（反查碼）混打
+#  extra_tags: [ wildcard_lookup ]
 
 # reverse_lookup:
 #   dictionary: 8105
@@ -120,6 +129,15 @@ pinyin_reverse_lookup:
     - xform/^/〔/
     - xlit|abcdefghijklmnopqrstuvwxyz |日月金木水火土竹戈十大中一弓人心手口尸廿山女田難卜片、|
 
+wildcard_lookup:
+  tag:  wildcard_lookup
+  tags: [ wildcard_lookup ]
+  dictionary: *dict
+  # overwrite_comment: true  # 覆蓋其他提示
+  comment_format:
+    - xform/$/\t★/
+    - xlit|abcdefghijklmnopqrstuvwxyz |日月金木水火土竹戈十大中一弓人心手口尸廿山女田難卜重、|
+
 simplifier:
   tips: all  # 簡化字模式下提示對應的傳統漢字
 
@@ -134,3 +152,4 @@ recognizer:
   patterns:
     punct: '^/([0-9]0?|[A-Za-z]+)$'
     pinyin_lookup: "`[a-z]*;?$"
+    wildcard_lookup: "^[^z]*z[^z]*$"
