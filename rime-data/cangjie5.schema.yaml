@@ -64,10 +64,10 @@ speller:
   alphabet: zyxwvutsrqponmlkjihgfedcba
   delimiter: " '"
   algebra:
-    - 'derive/^([^z]?)[^z]([^z])$/$1z$2/'
-    - 'derive/^([^z]?)[^z]([^z][^z])$/$1z$2/'
-    - 'derive/^([^z]?)[^z]([^z][^z][^z])$/$1z$2/'
-    - 'derive/^[^z]([^z][^z][^z][^z])$/z$1/'
+    - 'derive/^([^z]+)[^z]([^z])$/$1z$2/'
+    - 'derive/^([^z]+)[^z]([^z][^z])$/$1z$2/'
+    - 'derive/^([^z]+)[^z]([^z][^z][^z])$/$1z$2/'
+    - 'derive/^[^z]([^xz][^z]*)$/z$1/'
     - 'derive/^([^z]+)[^z]$/$1z/'
   #max_code_length: 5  # 五碼頂字上屏
 
@@ -152,4 +152,4 @@ recognizer:
   patterns:
     punct: '^/([0-9]0?|[A-Za-z]+)$'
     pinyin_lookup: "`[a-z]*;?$"
-    wildcard_lookup: "^[^z]*z[^z]*$"
+    wildcard_lookup: "^[^z]*z[^z0-9]*$"
