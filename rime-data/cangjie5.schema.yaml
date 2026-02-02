@@ -82,6 +82,7 @@ translator:
   enable_user_dict: false
   max_phrase_length: 5
   preedit_format:
+    - 'xform/^zx([a-z]*)$/〔符〕\U$1/'
     - 'xform/^([a-z]*)$/\U$1\E\t($1)/'
     - "xlit|ABCDEFGHIJKLMNOPQRSTUVWXYZ|日月金木水火土竹戈十大中一弓人心手口尸廿山女田難卜重|"
   comment_format:
@@ -152,4 +153,4 @@ recognizer:
   patterns:
     punct: '^/([0-9]0?|[A-Za-z]+)$'
     pinyin_lookup: "`[a-z]*;?$"
-    wildcard_lookup: "^[^z]*z[^z0-9]*$"
+    wildcard_lookup: "^([^z]+z|z[^xz])[^z0-9]*$"
