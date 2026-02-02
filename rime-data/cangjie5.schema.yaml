@@ -3,7 +3,7 @@
 
 schema:
   schema_id: cangjie5
-  name: 倉頡五代
+  name: 五仓世纪
   version: "0.30"
   author:
     - 發明人 朱邦復先生
@@ -61,14 +61,14 @@ engine:
     - reverse_lookup_filter@wildcard_lookup
 
 speller:
-  alphabet: zyxwvutsrqponmlkjihgfedcba
+  alphabet: zyxwvutsrqponmlkjihgfedcba*
   delimiter: " '"
   algebra:
-    - 'derive/^([^z]+)[^z]([^z])$/$1z$2/'
-    - 'derive/^([^z]+)[^z]([^z][^z])$/$1z$2/'
-    - 'derive/^([^z]+)[^z]([^z][^z][^z])$/$1z$2/'
-    - 'derive/^[^z]([^xz][^z]*)$/z$1/'
-    - 'derive/^([^z]+)[^z]$/$1z/'
+    - 'derive/^[^*z]([^*]*)$/*$1/'
+    - 'derive/^([^*z][^*]*)[^*]$/$1*/'
+    - 'derive/^([^*z][^*]*)[^*][^*]$/$1*/'
+    - 'derive/^([^*z])[^*][^*]?([^*])$/$1*$2/'
+    - 'derive/^([^*z][^*])[^*][^*]?([^*])$/$1*$2/'
   #max_code_length: 5  # 五碼頂字上屏
 
 translator:
@@ -82,9 +82,10 @@ translator:
   enable_user_dict: false
   max_phrase_length: 5
   preedit_format:
-    - 'xform/^zx([a-z]*)$/〔符〕\U$1/'
-    - 'xform/^([a-z]*)$/\U$1\E\t($1)/'
-    - "xlit|ABCDEFGHIJKLMNOPQRSTUVWXYZ|日月金木水火土竹戈十大中一弓人心手口尸廿山女田難卜重|"
+    - 'xform/^zx([a-z]*)$/〔符〕$1/'
+    - 'xform/^([*a-z]*)$/\U$1\E\t($1)/'
+    - 'xform/\*(?=[^()]*\()/重/'
+    - "xlit|ABCDEFGHIJKLMNOPQRSTUVWXYZ|日月金木水火土竹戈十大中一弓人心手口尸廿山女田難卜符|"
   comment_format:
     - "xlit|abcdefghijklmnopqrstuvwxyz~|日月金木水火土竹戈十大中一弓人心手口尸廿山女田難卜符～|"
   disable_user_dict_for_patterns:
@@ -153,4 +154,4 @@ recognizer:
   patterns:
     punct: '^/([0-9]0?|[A-Za-z]+)$'
     pinyin_lookup: "`[a-z]*;?$"
-    wildcard_lookup: "^([^z]+z|z[^xz])[^z0-9]*$"
+    wildcard_lookup: "^[^*]*\\*[^0-9]*$"
