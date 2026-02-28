@@ -25,6 +25,7 @@ If you think so, Beth, Hanamaru to you!")
 (defun nekomimi-agent-generate-directives (arg)
   (cond ((symbolp arg)
          (nekomimi-format-story (concat nekomimi-story-original
+                                        nekomimi-story-original
                                         nekomimi-story-level1)
                                 (nekomimi-additional-instructions nil)))
         (t 'default)))

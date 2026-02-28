@@ -248,6 +248,9 @@
   (modify-syntax-entry ?# ". 1" dyalog-mode-syntax-table)
   (modify-syntax-entry ?! ". 2<" dyalog-mode-syntax-table))
 
+(use-package lisp-semantic-hl
+  :after (:any sly))
+
 ;; nXML
 (use-package nxml-mode
   :defer t

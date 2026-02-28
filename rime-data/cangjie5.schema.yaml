@@ -67,9 +67,10 @@ speller:
     - 'derive/^[^*z]([^*]*)$/*$1/'
     - 'derive/^([^*z][^*]*)[^*]$/$1*/'
     - 'derive/^([^*z][^*]*)[^*][^*]$/$1*/'
-    - 'derive/^([^*z])[^*][^*]?([^*])$/$1*$2/'
-    - 'derive/^([^*z][^*])[^*][^*]?([^*])$/$1*$2/'
-  #max_code_length: 5  # 五碼頂字上屏
+    - 'derive/^([^*z])[^*]{1,2}([^*])$/$1*$2/'
+    - 'derive/^([^*z][^*])[^*]{1,2}([^*])$/$1*$2/'
+    - 'xform/(.+)\*/$1z/'
+  # max_code_length: 5  # 五碼頂字上屏
 
 translator:
   dictionary: &dict cangjie5
@@ -82,11 +83,12 @@ translator:
   enable_user_dict: false
   max_phrase_length: 5
   preedit_format:
-    - 'xform/^zx([a-z]*)$/〔符〕$1/'
+    - 'xform/^z(.?)([a-z]*)$/〔符\u$1〕$2/'
     - 'xform/^([*a-z]*)$/\U$1\E\t($1)/'
     - 'xform/\*(?=[^()]*\()/重/'
-    - "xlit|ABCDEFGHIJKLMNOPQRSTUVWXYZ|日月金木水火土竹戈十大中一弓人心手口尸廿山女田難卜符|"
+    - "xlit|ABCDEFGHIJKLMNOPQRSTUVWXYZ|日月金木水火土竹戈十大中一弓人心手口尸廿山女田難卜重|"
   comment_format:
+    - 'xform/^(z[a-z]*)$/\U$1\E/'
     - "xlit|abcdefghijklmnopqrstuvwxyz~|日月金木水火土竹戈十大中一弓人心手口尸廿山女田難卜符～|"
   disable_user_dict_for_patterns:
     - "^z.*$"
@@ -154,4 +156,4 @@ recognizer:
   patterns:
     punct: '^/([0-9]0?|[A-Za-z]+)$'
     pinyin_lookup: "`[a-z]*;?$"
-    wildcard_lookup: "^[^*]*\\*[^0-9]*$"
+    wildcard_lookup: "^([^z]+z|\\*)[^0-9]*$"

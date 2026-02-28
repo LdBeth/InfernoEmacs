@@ -26,10 +26,11 @@
  '(package-selected-packages
    '(auctex avy corfu ctrlf dash dyalog-mode elpher emmet-mode filladapt
             flyspell-correct frimacs geiser-chez
-            gnu-elpa-keyring-update gptel hyperbole langtool lsp-mode
-            magit-section maude-mode mwim orderless rime sly sudo-edit
-            swift-mode unfill vertico wanderlust which-key xquery-mode
-            yasnippet z3-mode))
+            gnu-elpa-keyring-update gptel hyperbole langtool
+            lisp-semantic-hl lsp-mode magit-section maude-mode mwim
+            orderless rime sly sudo-edit swift-mode unfill vertico
+            wanderlust webdriver which-key xquery-mode yasnippet
+            z3-mode))
  '(safe-local-variable-values
    '((TeX-engine . aptex)
      (xquery-tool-xml-catalog-file

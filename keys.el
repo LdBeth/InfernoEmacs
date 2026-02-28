@@ -71,6 +71,23 @@ if prefix argument ARG is given, switch to it in an other, possibly new window."
               "AppleScript" t)))
      (t `(error "Not a mac")))))
 
+(defun now-browsing-source ()
+  (let ((url (applescript if application "Safari" is running then :cr
+                          tell application "Safari" :cr
+                          set display to source of document 1 :cr
+                          end tell :cr
+                          else :cr
+                          set display to "No opened document." :cr
+                          end if)))
+    url))
+
+(defun close-all-browser-windows ()
+  (applescript tell application "Safari" :cr
+               close every window :cr
+               end tell))
+
+;; (now-browsing-source)
+
 (defun now-browsing ()
   (interactive)
   (let ((url (applescript if application "Safari" is running then :cr
@@ -96,13 +113,9 @@ if prefix argument ARG is given, switch to it in an other, possibly new window."
   (interactive)
   (let ((result-buffer (generate-new-buffer "*result*"))
         (error-buffer (generate-new-buffer "*errors*")))
-    (with-current-buffer (url-retrieve-synchronously (now-browsing))
-      (goto-char (point-min))
-      (re-search-forward "\n\n" nil 'move)
-      (delete-region (point-min) (point))
-      (decode-coding-region (point-min) (point-max)
-                            'euc-jp result-buffer))
     (with-current-buffer result-buffer
+      (goto-char (point-min))
+      (insert (now-browsing-source))
       (shell-command-on-region
        (point-min) (point-max)
        "/opt/pkg/bin/tidy -utf8 -q -asxhtml --doctype strict --show-comments=no"
