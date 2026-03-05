@@ -216,8 +216,17 @@
 (use-package eglot
   :defer t
   :config
+  (defclass eglot-deno (eglot-lsp-server) ()
+    :documentation "A custom class for deno lsp.")
+  (cl-defmethod eglot-initialization-options ((server eglot-deno))
+    "Passes through required deno initialization options"
+    '(:enable t :unstable t))
   (add-to-list 'eglot-server-programs
-               '(objc-mode . ("clangd"))))
+               '(objc-mode . ("clangd")))
+  (add-to-list 'eglot-server-programs
+               '((js-mode typescript-mode
+                          (typescript-ts-base-mode :language-id "typescript"))
+                 . (eglot-deno "deno" "lsp"))))
 
 (use-package tex
   :defer t

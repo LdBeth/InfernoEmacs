@@ -24,8 +24,8 @@
  '(hsys-org-enable-smart-keys t)
  '(org-fold-core-style 'overlays)
  '(package-selected-packages
-   '(auctex avy corfu ctrlf dash deno-ts-mode dyalog-mode elpher
-            emmet-mode filladapt flyspell-correct frimacs geiser-chez
+   '(auctex avy corfu ctrlf dash dyalog-mode elpher emmet-mode filladapt
+            flyspell-correct frimacs geiser-chez
             gnu-elpa-keyring-update gptel hyperbole langtool
             lisp-semantic-hl lsp-mode magit-section maude-mode mwim
             orderless rime sly sudo-edit swift-mode unfill vertico
