@@ -26,8 +26,8 @@ move_by_word_with_tab:
 
 paging_with_minus_equal:
   __append:
-    - { when: has_menu, accept: minus, send: Page_Up }
-    - { when: has_menu, accept: equal, send: Page_Down }
+    - { when: has_menu, accept: bracketleft, send: Page_Up }
+    - { when: has_menu, accept: bracketright, send: Page_Down }
 
 paging_with_comma_period:
   __append:
