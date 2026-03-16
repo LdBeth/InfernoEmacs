@@ -327,6 +327,13 @@
   (add-to-list 'major-mode-remap-alist
                '(plain-tex-mode . plain-TeX-mode)))
 
+(use-package org
+  :defer t
+  :config
+  (setq org-preview-latex-default-process 'dvisvgm)
+  (setf (plist-get org-format-latex-options :scale) 1.5))
+
+
 ;; Net
 (use-package newst-plainview
   :defer t

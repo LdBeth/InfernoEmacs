@@ -4,8 +4,9 @@
          (with-temp-buffer
            (call-process-shell-command "cat /etc/paths /etc/paths.d/*" nil t)
            (split-string (buffer-string))))))
-  (setenv "PATH" (mapconcat #'identity paths ":"))
-  (setq exec-path (append paths (list exec-directory))))
+  (unless (getenv "EDITOR")
+    (setenv "PATH" (mapconcat #'identity paths ":"))
+    (setq exec-path (append paths (list exec-directory)))))
 
 (setq ad-redefinition-action 'accept)
 ;; Visuals
@@ -111,7 +112,7 @@
 ;; elpa
 (setq package-archives
       '(("gnu" . "https://mirrors.tuna.tsinghua.edu.cn/elpa/gnu/")
-        ("nongnu" . "https://mirrors.tuna.tsinghua.edu.cn/elpa/nongnu/")
+        ("nongnu" . "https://elpa.nongnu.org/nongnu/")
         ("melpa" . "https://mirrors.ustc.edu.cn/elpa/melpa/")))
 
 (setq tramp-auto-save-directory (concat temporary-file-directory

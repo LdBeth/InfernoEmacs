@@ -193,10 +193,16 @@ if prefix argument ARG is given, switch to it in an other, possibly new window."
                               (message "No updates.")))))
         (sleep-for 0.001)))))
 
+(defun code-agent-ready ()
+  (interactive)
+  (server-start)
+  (global-auto-revert-mode 1))
+
 (bind-keys
  :prefix "M-m"
  :prefix-map launchpad-keys
  ("h" . spacemacs/home)
+ ("c" . code-agent-ready)
  ("s" . switch-to-scratch-buffer)
  ("r" . find-buffer-or-recentf)
  ("i" . ibuffer)
@@ -206,6 +212,7 @@ if prefix argument ARG is given, switch to it in an other, possibly new window."
  ("g" . gopher-club)
  ("t" . todo-show)
  ("l" . toggle-theme-dark-light))
+
 (bind-keys
  :prefix "M-m p"
  :prefix-map prover-loader
