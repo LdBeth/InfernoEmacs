@@ -31,7 +31,7 @@
       large-hscroll-threshold 1000
       syntax-wholeline-max 1000)
 
-(set-frame-font (font-spec :name "SF Mono" :size 13
+(set-frame-font (font-spec :name "MD IO" :size 13
 			               :weight 'normal
                            :width 'normal)
                 nil t)
