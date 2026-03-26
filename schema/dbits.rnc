@@ -8,11 +8,12 @@ namespace mml = "http://www.w3.org/1998/Math/MathML"
 namespace rng = "http://relaxng.org/ns/structure/1.0"
 namespace s = "http://purl.oclc.org/dsdl/schematron"
 namespace svg = "http://www.w3.org/2000/svg"
+namespace trans = "http://docbook.org/ns/transclusion"
 namespace xlink = "http://www.w3.org/1999/xlink"
 
-# This file is part of DocBook ITS V5.2b09
+# This file is part of DocBook ITS V5.2.1
 # 
-# Copyright 2007-2015 HaL Computer Systems, Inc.,
+# Copyright 2007-2020 HaL Computer Systems, Inc.,
 # O'Reilly & Associates, Inc., ArborText, Inc., Fujitsu Software
 # Corporation, Norman Walsh, Jirka Kosek, Sun Microsystems, Inc.,
 # and the Organization for the Advancement of Structured Information
@@ -28,28 +29,29 @@ namespace xlink = "http://www.w3.org/1999/xlink"
 # 
 # If you modify the DocBook schema in any way, label your schema as a
 # variant of DocBook. See the reference documentation
-# (http://docbook.org/tdg5/en/html/ch05.html#s-notdocbook)
+# (https://tdg.docbook.org/tdg/5.2/ch05.html#s-notdocbook)
 # for more information.
 # 
 # Please direct all questions, bug reports, or suggestions for changes
-# to the docbook-comment@lists.oasis-open.org mailing list. For more
-# information, see http://www.oasis-open.org/docbook/.
+# to the docbook@lists.docbook.org mailing list. For more
+# information, see https://docbook.org/.
 # 
 # ======================================================================
 
-s:ns [ prefix = "rng" uri = "http://relaxng.org/ns/structure/1.0" ]
-s:ns [ prefix = "s" uri = "http://purl.oclc.org/dsdl/schematron" ]
-s:ns [ prefix = "db" uri = "http://docbook.org/ns/docbook" ]
 s:ns [
   prefix = "a"
   uri = "http://relaxng.org/ns/compatibility/annotations/1.0"
 ]
 s:ns [ prefix = "ctrl" uri = "http://nwalsh.com/xmlns/schema-control/" ]
+s:ns [ prefix = "db" uri = "http://docbook.org/ns/docbook" ]
 s:ns [ prefix = "html" uri = "http://www.w3.org/1999/xhtml" ]
-s:ns [ prefix = "xlink" uri = "http://www.w3.org/1999/xlink" ]
-s:ns [ prefix = "mml" uri = "http://www.w3.org/1998/Math/MathML" ]
-s:ns [ prefix = "svg" uri = "http://www.w3.org/2000/svg" ]
 s:ns [ prefix = "its" uri = "http://www.w3.org/2005/11/its" ]
+s:ns [ prefix = "mml" uri = "http://www.w3.org/1998/Math/MathML" ]
+s:ns [ prefix = "rng" uri = "http://relaxng.org/ns/structure/1.0" ]
+s:ns [ prefix = "s" uri = "http://purl.oclc.org/dsdl/schematron" ]
+s:ns [ prefix = "svg" uri = "http://www.w3.org/2000/svg" ]
+s:ns [ prefix = "trans" uri = "http://docbook.org/ns/transclusion" ]
+s:ns [ prefix = "xlink" uri = "http://www.w3.org/1999/xlink" ]
 start =
   (db.set
    | db.book
@@ -79,8 +81,9 @@ start =
      | db.revhistory
      | db.simpara
      | db.step
-     | db.stepalternatives)
-  | (db.partintro | db.simplesect | db.legalsection)
+     | db.stepalternatives
+     | db.info)
+  | (db.partintro | db.simplesect)
   | db.annotation
   | (db.sect1 | db.sect2 | db.sect3 | db.sect4 | db.sect5)
   | (db.refentry | db.refsection | db.refsynopsisdiv)
@@ -104,16 +107,13 @@ start =
   | (db.qandadiv | db.qandaentry | db.qandaset)
   | (db.equation | db.informalequation)
   | db.cmdsynopsis
-  | (db.synopsis.blocks
-     | db.funcsynopsisinfo
-     | db.classsynopsisinfo
-     | db.programmingsynopsis)
+  | (db.synopsis.blocks | db.funcsynopsisinfo | db.classsynopsisinfo)
   | db.admonition.blocks
   | db.topic
 div {
   db._any.attribute =
     
-    ## Any attribute, including any attribute in any namespace.
+    ## Any attribute, including any attribute in any namespace
     attribute * { text }
 }
 db.arch.attribute =
@@ -126,7 +126,7 @@ db.audience.attribute =
   attribute audience { text }
 db.condition.attribute =
   
-  ## provides a standard place for application-specific effectivity
+  ## Provides a standard place for application-specific effectivity
   attribute condition { text }
 db.conformance.attribute =
   
@@ -150,7 +150,7 @@ db.userlevel.attribute =
   attribute userlevel { text }
 db.vendor.attribute =
   
-  ## Indicates the computer vendor to which the element applies.
+  ## Indicates the computer vendor to which the element applies
   attribute vendor { text }
 db.wordsize.attribute =
   
@@ -348,6 +348,57 @@ db.rdfalite.attributes =
   & db.rdfalite.property?
   & db.rdfalite.resource?
   & db.rdfalite.prefix?
+db.trans.idfixup.enumeration =
+  
+  ## No ID fixup strategy
+  "none"
+  | 
+    ## ID fixup by concatenating suffixes
+    "suffix"
+  | 
+    ## ID fixup by creating unique values
+    "auto"
+db.trans.idfixup.attribute =
+  
+  ## The transclusion ID fixup strategy
+  attribute trans:idfixup { db.trans.idfixup.enumeration }
+db.trans.suffix.attribute =
+  
+  ## The transclusion suffix to use when the suffix ID fixup strategy is employed
+  [
+    s:pattern [
+      s:title [ "Suffix fixup must be specified" ]
+      s:rule [
+        context = "db:*[@trans:suffix]"
+        s:assert [
+          test = "@trans:idfixup = 'suffix'"
+          "If a suffix is specified, suffix ID fixup must also be specified."
+        ]
+      ]
+    ]
+  ]
+  attribute trans:suffix { text }
+db.trans.linkscope.enumeration =
+  
+  ## No link scope adjustments are made
+  "user"
+  | 
+    ## The link scopes are adjusted with the suffix property
+    "local"
+  | 
+    ## The link scopes are adjusted based on proximity
+    "near"
+  | 
+    ## The link scopes are adjusted based on document order
+    "global"
+db.trans.linkscope.attribute =
+  
+  ## The transclusion link scope adjustment
+  attribute trans:linkscope { db.trans.linkscope.enumeration }
+db.common.transclusion.attributes =
+  db.trans.idfixup.attribute?
+  & db.trans.suffix.attribute?
+  & db.trans.linkscope.attribute?
 db.common.base.attributes =
   db.version.attribute?
   & db.xml.lang.attribute?
@@ -358,6 +409,8 @@ db.common.base.attributes =
   & db.dir.attribute?
   & db.effectivity.attributes
   & db.rdfalite.attributes
+  & db.common.transclusion.attributes
+  & db._any_other.attribute*
   & (its-local.attributes & its-attribute.version?)
 db.common.attributes =
   db.xml.id.attribute?
@@ -390,7 +443,7 @@ db.verbatim.continuation.enumeration =
     "restarts"
 db.verbatim.continuation.attribute =
   
-  ## Determines whether line numbering continues from the previous element or restarts.
+  ## Determines whether line numbering continues from the previous element or restarts
   attribute continuation { db.verbatim.continuation.enumeration }
 db.verbatim.linenumbering.enumeration =
   
@@ -401,19 +454,19 @@ db.verbatim.linenumbering.enumeration =
     "unnumbered"
 db.verbatim.linenumbering.attribute =
   
-  ## Determines whether lines are numbered.
+  ## Determines whether lines are numbered
   attribute linenumbering { db.verbatim.linenumbering.enumeration }
 db.verbatim.startinglinenumber.attribute =
   
-  ## Specifies the initial line number.
+  ## Specifies the initial line number
   attribute startinglinenumber { xsd:integer }
 db.verbatim.language.attribute =
   
-  ## Identifies the language (i.e. programming language) of the verbatim content.
+  ## Identifies the language (i.e. programming language) of the verbatim content
   attribute language { text }
 db.verbatim.xml.space.attribute =
   
-  ## Can be used to indicate explicitly that whitespace in the verbatim environment is preserved. Whitespace must always be preserved in verbatim environments whether this attribute is specified or not.
+  ## Can be used to indicate explicitly that whitespace in the verbatim environment is preserved. Whitespace must always be preserved in verbatim environments whether this attribute is specified or not
   attribute xml:space {
     
     ## Whitespace must be preserved.
@@ -458,7 +511,7 @@ db.pgwide.attribute =
   attribute pgwide { db.pgwide.enumeration }
 db.language.attribute =
   
-  ## Identifies the language (i.e. programming language) of the content.
+  ## Identifies the language (i.e. programming language) of the content
   attribute language { text }
 db.performance.enumeration =
   
@@ -469,7 +522,7 @@ db.performance.enumeration =
     "required"
 db.performance.attribute =
   
-  ## Specifies if the content is required or optional.
+  ## Specifies if the content is required or optional
   attribute performance { db.performance.enumeration }
 db.floatstyle.attribute =
   
@@ -580,6 +633,84 @@ db.biblio.class-other.attributes =
   & db.biblio.class-other.attribute
 db.biblio.class.attribute =
   db.biblio.class-enum.attribute | db.biblio.class-other.attributes
+db.pubwork.enumeration =
+  
+  ## An article
+  "article"
+  | 
+    ## A bulletin board system
+    "bbs"
+  | 
+    ## A book
+    "book"
+  | 
+    ## A CD-ROM
+    "cdrom"
+  | 
+    ## A chapter (as of a book)
+    "chapter"
+  | 
+    ## A DVD
+    "dvd"
+  | 
+    ## An email message
+    "emailmessage"
+  | 
+    ## A gopher page
+    "gopher"
+  | 
+    ## A journal
+    "journal"
+  | 
+    ## A manuscript
+    "manuscript"
+  | 
+    ## A posting to a newsgroup
+    "newsposting"
+  | 
+    ## A part (as of a book)
+    "part"
+  | 
+    ## A reference entry
+    "refentry"
+  | 
+    ## A section (as of a book or article)
+    "section"
+  | 
+    ## A series
+    "series"
+  | 
+    ## A set (as of books)
+    "set"
+  | 
+    ## A web page
+    "webpage"
+  | 
+    ## A wiki page
+    "wiki"
+  | 
+    ## Some other kind of work
+    "other"
+db.biblio.pubwork.enumeration = db.pubwork.enumeration
+db.biblio.pubwork-enum.attribute =
+  
+  ## Identifies the nature of the published work
+  attribute pubwork { db.biblio.pubwork.enumeration }?
+db.biblio.pubwork-other.attribute =
+  
+  ## Identifies the nature of some other kind of published work
+  attribute otherpubwork { xsd:NMTOKEN }
+db.biblio.pubwork-other.attributes =
+  
+  ## Identifies that this is some other kind of published work
+  attribute pubwork {
+    
+    ## Indicates that the published work is some 'other' kind.
+    "other"
+  }
+  & db.biblio.pubwork-other.attribute
+db.biblio.pubwork.attribute =
+  db.biblio.pubwork-enum.attribute | db.biblio.pubwork-other.attributes
 db.ubiq.inlines =
   (db.inlinemediaobject
    | db.remark
@@ -617,7 +748,11 @@ db._info.title.onlyreq =
   (db._title.onlyreq, db.titleforbidden.info?) | db.titleonlyreq.info
 db._info.title.forbidden = db.titleforbidden.info?
 db.all.inlines =
-  text | db.ubiq.inlines | db.general.inlines | db.domain.inlines
+  text
+  | db.ubiq.inlines
+  | db.general.inlines
+  | db.domain.inlines
+  | db.extension.inlines
 db.general.inlines =
   db.publishing.inlines
   | db.product.inlines
@@ -678,6 +813,7 @@ db.graphic.inlines = db.inlinemediaobject
 db.indexing.inlines = notAllowed | db.indexterm
 db.link.inlines =
   (db.xref | db.link | db.olink | db.anchor) | db.biblioref
+db.extension.inlines = notAllowed
 db.nopara.blocks =
   (db.list.blocks
    | db.wrapper.blocks
@@ -694,7 +830,9 @@ db.nopara.blocks =
   | db.synopsis.blocks
   | db.admonition.blocks
 db.para.blocks = db.anchor | db.para | db.formalpara | db.simpara
-db.all.blocks = (db.nopara.blocks | db.para.blocks) | db.annotation
+db.all.blocks =
+  (db.nopara.blocks | db.para.blocks | db.extension.blocks)
+  | db.annotation
 db.wrapper.blocks = db.formalgroup
 db.formal.blocks = (db.example | db.figure | db.table) | db.equation
 db.informal.blocks =
@@ -723,6 +861,7 @@ db.verbatim.blocks =
   (db.screen | db.literallayout)
   | (db.programlistingco | db.screenco)
   | (db.programlisting | db.synopsis)
+db.extension.blocks = notAllowed
 db.info.extension = db._any | (its-rules | its-standoff)
 db.info.elements =
   (db.abstract
@@ -760,6 +899,7 @@ db.info.elements =
    | db.seriesvolnums
    | db.subjectset
    | db.volumenum
+   | db.meta
    | db.info.extension)
   | db.annotation
   | db.extendedlink
@@ -817,6 +957,18 @@ div {
   db.info =
     
     ## A wrapper for information about a component or other block
+    [
+      s:pattern [
+        s:title [ "Root must have version" ]
+        s:rule [
+          context = "/db:info"
+          s:assert [
+            test = "@version"
+            "If this element is the root element, it must have a version attribute."
+          ]
+        ]
+      ]
+    ]
     element info { db.info.attlist, (db._title & db.info.elements*) }
 }
 div {
@@ -826,6 +978,18 @@ div {
   db.titlereq.info =
     
     ## A wrapper for information about a component or other block with a required title
+    [
+      s:pattern [
+        s:title [ "Root must have version" ]
+        s:rule [
+          context = "/db:info"
+          s:assert [
+            test = "@version"
+            "If this element is the root element, it must have a version attribute."
+          ]
+        ]
+      ]
+    ]
     element info {
       db.titlereq.info.attlist, (db._title.req & db.info.elements*)
     }
@@ -837,6 +1001,18 @@ div {
   db.titleonly.info =
     
     ## A wrapper for information about a component or other block with only a title
+    [
+      s:pattern [
+        s:title [ "Root must have version" ]
+        s:rule [
+          context = "/db:info"
+          s:assert [
+            test = "@version"
+            "If this element is the root element, it must have a version attribute."
+          ]
+        ]
+      ]
+    ]
     element info {
       db.titleonly.info.attlist, (db._title.only & db.info.elements*)
     }
@@ -848,6 +1024,18 @@ div {
   db.titleonlyreq.info =
     
     ## A wrapper for information about a component or other block with only a required title
+    [
+      s:pattern [
+        s:title [ "Root must have version" ]
+        s:rule [
+          context = "/db:info"
+          s:assert [
+            test = "@version"
+            "If this element is the root element, it must have a version attribute."
+          ]
+        ]
+      ]
+    ]
     element info {
       db.titleonlyreq.info.attlist,
       (db._title.onlyreq & db.info.elements*)
@@ -860,6 +1048,18 @@ div {
   db.titleforbidden.info =
     
     ## A wrapper for information about a component or other block without a title
+    [
+      s:pattern [
+        s:title [ "Root must have version" ]
+        s:rule [
+          context = "/db:info"
+          s:assert [
+            test = "@version"
+            "If this element is the root element, it must have a version attribute."
+          ]
+        ]
+      ]
+    ]
     element info { db.titleforbidden.info.attlist, db.info.elements* }
 }
 div {
@@ -934,8 +1134,13 @@ db.table = db.table.choice
 db.informaltable = db.informaltable.choice
 div {
   db.procedure.role.attribute = attribute role { text }
+  db.procedure.type.attribute =
+    
+    ## Identifies the type of procedure
+    attribute type { text }?
   db.procedure.attlist =
     db.procedure.role.attribute?
+    & db.procedure.type.attribute?
     & db.common.attributes
     & db.common.linking.attributes
   db.procedure.info = db._info.title.only
@@ -1564,7 +1769,7 @@ div {
     attribute continuation { db.orderedlist.continuation.enumeration }
   db.orderedlist.startingnumber.attribute =
     
-    ## Specifies the initial line number.
+    ## Specifies the initial line number
     attribute startingnumber { xsd:integer }
   db.orderedlist.inheritnum.enumeration =
     
@@ -1737,7 +1942,7 @@ div {
       "inline"
   db.simplelist.type.attribute =
     
-    ## Specifies the type of list presentation.
+    ## Specifies the type of list presentation
     [ a:defaultValue = "vert" ]
     attribute type { db.simplelist.type.enumeration }
   db.simplelist.columns.attribute =
@@ -1843,8 +2048,13 @@ div {
   db.example.width.attribute = db.width.characters.attribute
   db.example.pgwide.attribute = db.pgwide.attribute
   db.example.floatstyle.attribute = db.floatstyle.attribute
+  db.example.type.attribute =
+    
+    ## Identifies the type of example
+    attribute type { text }?
   db.example.attlist =
     db.example.role.attribute?
+    & db.example.type.attribute?
     & db.common.attributes
     & db.common.linking.attributes
     & db.example.label.attribute?
@@ -1915,8 +2125,13 @@ div {
   db.informalexample.width.attribute = db.width.characters.attribute
   db.informalexample.pgwide.attribute = db.pgwide.attribute
   db.informalexample.floatstyle.attribute = db.floatstyle.attribute
+  db.informalexample.type.attribute =
+    
+    ## Identifies the type of example
+    attribute type { text }?
   db.informalexample.attlist =
     db.informalexample.role.attribute?
+    & db.informalexample.type.attribute?
     & db.common.attributes
     & db.common.linking.attributes
     & db.informalexample.floatstyle.attribute?
@@ -2043,8 +2258,13 @@ div {
   db.figure.label.attribute = db.label.attribute
   db.figure.pgwide.attribute = db.pgwide.attribute
   db.figure.floatstyle.attribute = db.floatstyle.attribute
+  db.figure.type.attribute =
+    
+    ## Identifies the type of figure
+    attribute type { text }?
   db.figure.attlist =
     db.figure.role.attribute?
+    & db.figure.type.attribute?
     & db.common.attributes
     & db.common.linking.attributes
     & db.figure.label.attribute?
@@ -2115,8 +2335,13 @@ div {
   db.informalfigure.label.attribute = db.label.attribute
   db.informalfigure.pgwide.attribute = db.pgwide.attribute
   db.informalfigure.floatstyle.attribute = db.floatstyle.attribute
+  db.informalfigure.type.attribute =
+    
+    ## Identifies the type of figure
+    attribute type { text }?
   db.informalfigure.attlist =
     db.informalfigure.role.attribute?
+    & db.informalfigure.type.attribute?
     & db.common.attributes
     & db.common.linking.attributes
     & db.informalfigure.label.attribute?
@@ -3173,6 +3398,7 @@ div {
 }
 db.cover.contentmodel =
   (db.para.blocks
+   | db.extension.blocks
    | db.list.blocks
    | db.informal.blocks
    | db.publishing.blocks
@@ -3427,10 +3653,7 @@ div {
       ]
     ]
     element legalnotice {
-      db.legalnotice.attlist,
-      db.legalnotice.info,
-      db.all.blocks+,
-      db.legalsection*
+      db.legalnotice.attlist, db.legalnotice.info, db.all.blocks+
     }
 }
 div {
@@ -3762,6 +3985,34 @@ div {
     element issuenum { db.issuenum.attlist, db._text }
 }
 div {
+  db.meta.role.attribute = attribute role { text }
+  db.meta.name.attribute =
+    
+    ## A name for the metadata element
+    attribute name { text }
+  db.meta.content.attribute =
+    
+    ## The metadata content
+    attribute content { text }
+  db.meta.attlist =
+    db.meta.name.attribute?
+    & db.meta.role.attribute?
+    & db.common.attributes
+    & db.common.linking.attributes
+  db.meta.empty =
+    
+    ## A generic metadata element
+    element meta { db.meta.attlist, db.meta.content.attribute, empty }
+  db.meta.content =
+    
+    ## A generic metadata element
+    element meta {
+      db.meta.attlist,
+      (text | db._any | db.all.inlines | db.all.blocks)*
+    }
+  db.meta = db.meta.empty | db.meta.content
+}
+div {
   db.package.role.attribute = attribute role { text }
   db.package.attlist =
     db.package.role.attribute?
@@ -3943,65 +4194,27 @@ div {
     element manvolnum { db.manvolnum.attlist, db._text }
 }
 div {
-  db.citetitle.pubwork.enumeration =
-    
-    ## An article
-    "article"
-    | 
-      ## A bulletin board system
-      "bbs"
-    | 
-      ## A book
-      "book"
-    | 
-      ## A CD-ROM
-      "cdrom"
-    | 
-      ## A chapter (as of a book)
-      "chapter"
-    | 
-      ## A DVD
-      "dvd"
-    | 
-      ## An email message
-      "emailmessage"
-    | 
-      ## A gopher page
-      "gopher"
-    | 
-      ## A journal
-      "journal"
-    | 
-      ## A manuscript
-      "manuscript"
-    | 
-      ## A posting to a newsgroup
-      "newsposting"
-    | 
-      ## A part (as of a book)
-      "part"
-    | 
-      ## A reference entry
-      "refentry"
-    | 
-      ## A section (as of a book or article)
-      "section"
-    | 
-      ## A series
-      "series"
-    | 
-      ## A set (as of books)
-      "set"
-    | 
-      ## A web page
-      "webpage"
-    | 
-      ## A wiki page
-      "wiki"
-  db.citetitle.pubwork.attribute =
+  db.citetitle.pubwork.enumeration = db.pubwork.enumeration
+  db.citetitle.pubwork-enum.attribute =
     
     ## Identifies the nature of the publication being cited
     attribute pubwork { db.citetitle.pubwork.enumeration }
+  db.citetitle.pubwork-other.attribute =
+    
+    ## Identifies the nature of some other kind of publication being cited
+    attribute otherpubwork { xsd:NMTOKEN }
+  db.citetitle.pubwork-other.attributes =
+    
+    ## Identifies that this is some other kind of publication being cited
+    attribute pubwork {
+      
+      ## Indicates that the published work is some 'other' kind.
+      "other"
+    }
+    & db.citetitle.pubwork-other.attribute
+  db.citetitle.pubwork.attribute =
+    db.citetitle.pubwork-enum.attribute
+    | db.citetitle.pubwork-other.attributes
   db.citetitle.role.attribute = attribute role { text }
   db.citetitle.attlist =
     db.citetitle.role.attribute?
@@ -4302,15 +4515,13 @@ db.status.attribute =
   ## Identifies the editorial or publication status of the element on which it occurs
   attribute status { text }
 db.toplevel.sections =
-  (((db.section | db.legalsection)+, db.simplesect*)
-   | db.simplesect+)
+  ((db.section+, db.simplesect*) | db.simplesect+)
   | (db.sect1+, db.simplesect*)
   | db.refentry+
 db.toplevel.blocks.or.sections =
   (db.all.blocks+, db.toplevel.sections?) | db.toplevel.sections
 db.recursive.sections =
-  (((db.section | db.legalsection)+, db.simplesect*)
-   | db.simplesect+)
+  ((db.section+, db.simplesect*) | db.simplesect+)
   | db.refentry+
 db.recursive.blocks.or.sections =
   (db.all.blocks+, db.recursive.sections?) | db.recursive.sections
@@ -4644,6 +4855,29 @@ div {
 }
 div {
   db.section.status.attribute = db.status.attribute
+  db.section.class.enumeration =
+    
+    ## A section of legal obligations or requirements
+    "legal"
+  db.section.class-enum.attribute =
+    
+    ## Identifies the nature of the section
+    attribute class { db.section.class.enumeration }
+  db.section.class-other.attribute =
+    
+    ## Identifies a non-standard section class
+    attribute otherclass { xsd:NMTOKEN }
+  db.section.class-other.attributes =
+    
+    ## Indicates that a non-standard section class is applied
+    attribute class {
+      
+      ## Indicates that the identifier is some 'other' kind.
+      "other"
+    }
+    & db.section.class-other.attribute
+  db.section.class.attribute =
+    db.section.class-enum.attribute | db.section.class-other.attributes
   db.section.role.attribute = attribute role { text }
   db.section.attlist =
     db.section.role.attribute?
@@ -4651,6 +4885,7 @@ div {
     & db.common.linking.attributes
     & db.label.attribute?
     & db.section.status.attribute?
+    & db.section.class.attribute?
   db.section.info = db._info.title.req
   db.section =
     
@@ -4702,36 +4937,6 @@ div {
     ]
     element simplesect {
       db.simplesect.attlist, db.simplesect.info, db.all.blocks*
-    }
-}
-div {
-  db.legalsection.role.attribute = attribute role { text }
-  db.legalsection.attlist =
-    db.legalsection.role.attribute?
-    & db.common.attributes
-    & db.common.linking.attributes
-    & db.label.attribute?
-  db.legalsection.info = db._info.title.req
-  db.legalsection =
-    
-    ## A recursive section of legal obligations or requirements.
-    [
-      s:pattern [
-        s:title [ "Root must have version" ]
-        s:rule [
-          context = "/db:legalsection"
-          s:assert [
-            test = "@version"
-            "If this element is the root element, it must have a version attribute."
-          ]
-        ]
-      ]
-    ]
-    element legalsection {
-      db.legalsection.attlist,
-      db.legalsection.info,
-      db.all.blocks*,
-      db.legalsection*
     }
 }
 db.article.components = db.toplevel.sections
@@ -4822,7 +5027,7 @@ div {
   db.annotation.role.attribute = attribute role { text }
   db.annotation.annotates.attribute =
     
-    ## Identifies one ore more elements to which this annotation applies
+    ## Identifies one or more elements to which this annotation applies
     attribute annotates { text }
   db.annotation.attlist =
     db.annotation.role.attribute?
@@ -5068,6 +5273,7 @@ db.sect1.sections =
   | db.refentry+
 div {
   db.sect1.status.attribute = db.status.attribute
+  db.sect1.class.attribute = db.section.class.attribute
   db.sect1.role.attribute = attribute role { text }
   db.sect1.attlist =
     db.sect1.role.attribute?
@@ -5075,6 +5281,7 @@ div {
     & db.common.linking.attributes
     & db.label.attribute?
     & db.sect1.status.attribute?
+    & db.sect1.class.attribute?
   db.sect1.info = db._info.title.req
   db.sect1 =
     
@@ -5104,6 +5311,7 @@ db.sect2.sections =
   | db.refentry+
 div {
   db.sect2.status.attribute = db.status.attribute
+  db.sect2.class.attribute = db.section.class.attribute
   db.sect2.role.attribute = attribute role { text }
   db.sect2.attlist =
     db.sect2.role.attribute?
@@ -5111,6 +5319,7 @@ div {
     & db.common.linking.attributes
     & db.label.attribute?
     & db.sect2.status.attribute?
+    & db.sect2.class.attribute?
   db.sect2.info = db._info.title.req
   db.sect2 =
     
@@ -5140,6 +5349,7 @@ db.sect3.sections =
   | db.refentry+
 div {
   db.sect3.status.attribute = db.status.attribute
+  db.sect3.class.attribute = db.section.class.attribute
   db.sect3.role.attribute = attribute role { text }
   db.sect3.attlist =
     db.sect3.role.attribute?
@@ -5147,6 +5357,7 @@ div {
     & db.common.linking.attributes
     & db.label.attribute?
     & db.sect3.status.attribute?
+    & db.sect3.class.attribute?
   db.sect3.info = db._info.title.req
   db.sect3 =
     
@@ -5176,6 +5387,7 @@ db.sect4.sections =
   | db.refentry+
 div {
   db.sect4.status.attribute = db.status.attribute
+  db.sect4.class.attribute = db.section.class.attribute
   db.sect4.role.attribute = attribute role { text }
   db.sect4.attlist =
     db.sect4.role.attribute?
@@ -5183,6 +5395,7 @@ div {
     & db.common.linking.attributes
     & db.label.attribute?
     & db.sect4.status.attribute?
+    & db.sect4.class.attribute?
   db.sect4.info = db._info.title.req
   db.sect4 =
     
@@ -5210,6 +5423,7 @@ div {
 db.sect5.sections = db.simplesect+ | db.refentry+
 div {
   db.sect5.status.attribute = db.status.attribute
+  db.sect5.class.attribute = db.section.class.attribute
   db.sect5.role.attribute = attribute role { text }
   db.sect5.attlist =
     db.sect5.role.attribute?
@@ -5217,6 +5431,7 @@ div {
     & db.common.linking.attributes
     & db.label.attribute?
     & db.sect5.status.attribute?
+    & db.sect5.class.attribute?
   db.sect5.info = db._info.title.req
   db.sect5 =
     
@@ -5922,8 +6137,10 @@ db.relation.attribute =
   attribute relation { text }
 div {
   db.biblioentry.role.attribute = attribute role { text }
+  db.biblioentry.pubwork.attribute = db.biblio.pubwork.attribute
   db.biblioentry.attlist =
     db.biblioentry.role.attribute?
+    & db.biblioentry.pubwork.attribute?
     & db.common.attributes
     & db.common.linking.attributes
   db.biblioentry =
@@ -5935,8 +6152,10 @@ div {
 }
 div {
   db.bibliomixed.role.attribute = attribute role { text }
+  db.bibliomixed.pubwork.attribute = db.biblio.pubwork.attribute
   db.bibliomixed.attlist =
     db.bibliomixed.role.attribute?
+    & db.bibliomixed.pubwork.attribute?
     & db.common.attributes
     & db.common.linking.attributes
   db.bibliomixed =
@@ -6821,10 +7040,35 @@ div {
     db.callout.role.attribute?
     & db.common.attributes
     & db.callout.arearefs.attribute
+  # This requires an XPath 2.0 compatible Schematron processor
   db.callout =
     
     ## A called out
     ##  description of a marked area
+    [
+      s:pattern [
+        s:title [ "Callout cross reference idref constraint" ]
+        s:rule [
+          context = "db:callout[@arearefs]"
+          s:assert [
+            test =
+              "every $id in tokenize(current()/@arearefs) satisfies exists(//*[@xml:id = $id])"
+            "Each token in @arearefs must be an idref to an element in the document."
+          ]
+        ]
+      ]
+      s:pattern [
+        s:title [ "Callout cross reference constraint" ]
+        s:rule [
+          context = "db:callout[@arearefs]"
+          s:assert [
+            test =
+              "every $id in tokenize(current()/@arearefs) satisfies (every $ar in //*[@xml:id = $id] satisfies (local-name($ar) = ('areaset', 'area', 'co') and namespace-uri($ar) = 'http://docbook.org/ns/docbook'))"
+            "@arearefs on callout must point to a areaset, area, or co."
+          ]
+        ]
+      ]
+    ]
     element callout { db.callout.attlist, db.all.blocks+ }
 }
 div {
@@ -7011,6 +7255,29 @@ div {
   db.coref =
     
     ## A cross reference to a co
+    [
+      s:pattern [
+        s:title [ "Coref cross reference idref constraint" ]
+        s:rule [
+          context = "db:coref[@linkend]"
+          s:assert [
+            test = "exists(//*[@xml:id=current()/@linkend])"
+            "@linkend on coref must point to an xml:id"
+          ]
+        ]
+      ]
+      s:pattern [
+        s:title [ "Coref cross reference constraint" ]
+        s:rule [
+          context = "db:coref[@linkend]"
+          s:assert [
+            test =
+              "every $id in @linkend satisfies (every $ar in //*[@xml:id = $id] satisfies (local-name($ar) = 'co') and namespace-uri($ar) = 'http://docbook.org/ns/docbook')"
+            "@linkend on coref must point to a co."
+          ]
+        ]
+      ]
+    ]
     element coref { db.coref.attlist, empty }
 }
 div {
@@ -7106,6 +7373,19 @@ div {
   db.constraint =
     
     ## A constraint in an EBNF production
+    [
+      s:pattern [
+        s:title [ "Constraint cross reference constraint" ]
+        s:rule [
+          context = "db:constraint[@linkend]"
+          s:assert [
+            test =
+              "local-name(//*[@xml:id=current()/@linkend]) = 'constraintdef' and namespace-uri(//*[@xml:id=current()/@linkend]) = 'http://docbook.org/ns/docbook'"
+            "@linkend on constraint must point to a constraintdef."
+          ]
+        ]
+      ]
+    ]
     element constraint { db.constraint.attlist, empty }
 }
 div {
@@ -7117,6 +7397,19 @@ div {
   db.productionrecap =
     
     ## A cross-reference to an EBNF production
+    [
+      s:pattern [
+        s:title [ "Production recap cross reference constraint" ]
+        s:rule [
+          context = "db:productionrecap[@linkend]"
+          s:assert [
+            test =
+              "local-name(//*[@xml:id=current()/@linkend]) = 'production' and namespace-uri(//*[@xml:id=current()/@linkend]) = 'http://docbook.org/ns/docbook'"
+            "@linkend on productionrecap must point to a production."
+          ]
+        ]
+      ]
+    ]
     element productionrecap { db.productionrecap.attlist, empty }
 }
 div {
@@ -7537,7 +7830,7 @@ div {
     & db.charoff.attribute?
     & db.column-spec.attributes?
     & db.entrytbl.tgroupstyle.attribute?
-    & db.entrytbl.cols.attribute?
+    & db.entrytbl.cols.attribute
     & db.colsep.attribute?
     & db.rowsep.attribute?
     & db.align.attribute?
@@ -7594,8 +7887,13 @@ div {
 div {
   db.cals.table.role.attribute = attribute role { text }
   db.cals.table.label.attribute = db.label.attribute
+  db.cals.table.type.attribute =
+    
+    ## Identifies the type of table
+    attribute type { text }?
   db.cals.table.attlist =
     db.cals.table.role.attribute?
+    & db.cals.table.type.attribute?
     & db.cals.table.label.attribute?
     & db.common.attributes
     & db.common.linking.attributes
@@ -7683,8 +7981,13 @@ div {
 }
 div {
   db.cals.informaltable.role.attribute = attribute role { text }
+  db.cals.informaltable.type.attribute =
+    
+    ## Identifies the type of table
+    attribute type { text }?
   db.cals.informaltable.attlist =
     db.cals.informaltable.role.attribute?
+    & db.cals.informaltable.type.attribute?
     & db.common.attributes
     & db.common.linking.attributes
     & db.tabstyle.attribute?
@@ -7952,10 +8255,15 @@ db.html.informaltable.model =
 div {
   db.html.table.role.attribute = attribute role { text }
   db.html.table.label.attribute = db.label.attribute
+  db.html.table.type.attribute =
+    
+    ## Identifies the type of table
+    attribute type { text }?
   db.html.table.attlist =
     db.html.attrs
     & db.html.table.attributes
     & db.html.table.role.attribute?
+    & db.html.table.type.attribute?
     & db.html.table.label.attribute?
     & db.orient.attribute?
     & db.pgwide.attribute?
@@ -8011,10 +8319,15 @@ div {
 div {
   db.html.informaltable.role.attribute = attribute role { text }
   db.html.informaltable.label.attribute = db.label.attribute
+  db.html.informaltable.type.attribute =
+    
+    ## Identifies the type of table
+    attribute type { text }?
   db.html.informaltable.attlist =
     db.html.attrs
     & db.html.table.attributes
     & db.html.informaltable.role.attribute?
+    & db.html.informaltable.type.attribute?
     & db.html.informaltable.label.attribute?
     & db.orient.attribute?
     & db.pgwide.attribute?
@@ -8671,8 +8984,13 @@ db.inlineequation.content =
 div {
   db.equation.role.attribute = attribute role { text }
   db.equation.label.attribute = db.label.attribute
+  db.equation.type.attribute =
+    
+    ## Identifies the type of equation
+    attribute type { text }?
   db.equation.attlist =
     db.equation.role.attribute?
+    & db.equation.type.attribute?
     & db.common.attributes
     & db.common.linking.attributes
     & db.equation.label.attribute?
@@ -8744,8 +9062,13 @@ div {
 }
 div {
   db.informalequation.role.attribute = attribute role { text }
+  db.informalequation.type.attribute =
+    
+    ## Identifies the type of equation
+    attribute type { text }?
   db.informalequation.attlist =
     db.informalequation.role.attribute?
+    & db.informalequation.type.attribute?
     & db.common.attributes
     & db.common.linking.attributes
     & db.pgwide.attribute?
@@ -9672,6 +9995,10 @@ div {
     ## Indicates the displayed length of the command; this information may be used to intelligently indent command synopses which extend beyond one line
     attribute cmdlength { text }
   db.cmdsynopsis.label.attribute = db.label.attribute
+  db.cmdsynopsis.packageref.attribute =
+    
+    ## Identifies the package to which this synopsis (logically) belongs
+    attribute packageref { text }
   db.cmdsynopsis.attlist =
     db.cmdsynopsis.role.attribute?
     & db.common.attributes
@@ -9679,6 +10006,7 @@ div {
     & db.cmdsynopsis.sepchar.attribute?
     & db.cmdsynopsis.cmdlength.attribute?
     & db.cmdsynopsis.label.attribute?
+    & db.cmdsynopsis.packageref.attribute?
   db.cmdsynopsis.info = db._info.title.forbidden
   db.cmdsynopsis =
     
@@ -9836,9 +10164,7 @@ db.programming.inlines =
   | db.initializer
   | db.buildtarget
   | db.oo.inlines
-  | db.templateid
-  | db.namespace
-  | db.namespacename
+  | db.templatename
   | db.macroname
   | db.unionname
   | db.enumname
@@ -9855,17 +10181,10 @@ db.synopsis.blocks =
    | db.fieldsynopsis
    | db.enumsynopsis
    | db.typedefsynopsis
-   | db.namespacesynopsis
+   | db.packagesynopsis
    | db.macrosynopsis
-   | db.unionsynopsis
-   | db.enumsynopsis
-   | db.typedefsynopsis)
+   | db.unionsynopsis)
   | db.cmdsynopsis
-db.programmingsynopsis =
-  db.namespacesynopsis
-  | db.macrosynopsis
-  | db.typedefsynopsis
-  | db.enumsynopsis
 div {
   db.synopsis.role.attribute = attribute role { text }
   db.synopsis.label.attribute = db.label.attribute
@@ -9903,19 +10222,22 @@ div {
     
     ## Information supplementing synopsis
     element synopsisinfo {
-      db.synopsisinfo.attlist,
-      (db.verbatim.contentmodel
-       | (db.programming.inlines?, db.all.blocks*))
+      db.synopsisinfo.attlist, db.verbatim.contentmodel
     }
 }
 div {
+  db.funcsynopsis.info = db._info.title.forbidden
   db.funcsynopsis.role.attribute = attribute role { text }
+  db.funcsynopsis.packageref.attribute =
+    
+    ## Identifies the package to which this synopsis (logically) belongs
+    attribute packageref { text }
   db.funcsynopsis.attlist =
     db.funcsynopsis.role.attribute?
     & db.common.attributes
     & db.common.linking.attributes
     & db.language.attribute?
-  db.funcsynopsis.info = db._info.title.forbidden
+    & db.funcsynopsis.packageref.attribute?
   db.funcsynopsis =
     
     ## The syntax summary for a function definition
@@ -9993,7 +10315,7 @@ div {
     ## A function (subroutine) name and its return type
     element funcdef {
       db.funcdef.attlist,
-      (db._text | db.type | db.templateid | db.void | db.function)*
+      (db._text | db.type | db.templatename | db.void | db.function)*
     }
 }
 div {
@@ -10072,7 +10394,7 @@ div {
        | db.initializer
        | db.modifier
        | db.type
-       | db.templateid
+       | db.templatename
        | db.parameter
        | db.funcparams)*
     }
@@ -10089,6 +10411,7 @@ div {
     element funcparams { db.funcparams.attlist, db._text }
 }
 div {
+  db.classsynopsis.info = db._info.title.forbidden
   db.classsynopsis.role.attribute = attribute role { text }
   db.classsynopsis.class.enumeration =
     
@@ -10101,12 +10424,17 @@ div {
     
     ## Specifies the nature of the synopsis
     attribute class { db.classsynopsis.class.enumeration }
+  db.classsynopsis.packageref.attribute =
+    
+    ## Identifies the package to which this synopsis (logically) belongs
+    attribute packageref { text }
   db.classsynopsis.attlist =
     db.classsynopsis.role.attribute?
     & db.common.attributes
     & db.common.linking.attributes
     & db.language.attribute?
     & db.classsynopsis.class.attribute?
+    & db.classsynopsis.packageref.attribute?
   db.classsynopsis =
     
     ## The syntax summary for a class definition
@@ -10124,16 +10452,17 @@ div {
     ]
     element classsynopsis {
       db.classsynopsis.attlist,
-      db.template*,
-      (db.oo.inlines | db.classname)+,
-      db.template*,
-      (db.classsynopsisinfo
-       | db.synopsisinfo
+      db.classsynopsis.info,
+      db.classsynopsisinfo*,
+      db.templatename*,
+      db.oo.inlines+,
+      (db.template
+       | db.ooexception
        | db.methodsynopsis
        | db.constructorsynopsis
        | db.destructorsynopsis
-       | db.fieldsynopsis)*,
-      db.recursive.blocks.or.sections?
+       | db.fieldsynopsis
+       | db.classsynopsisinfo)*
     }
 }
 div {
@@ -10172,7 +10501,10 @@ div {
     
     ## A class in an object-oriented programming language
     element ooclass {
-      db.ooclass.attlist, (db.package | db.modifier)*, db.classname
+      db.ooclass.attlist,
+      (db.package | db.modifier)*,
+      db.classname,
+      db.modifier*
     }
 }
 div {
@@ -10187,7 +10519,8 @@ div {
     element oointerface {
       db.oointerface.attlist,
       (db.package | db.modifier)*,
-      db.interfacename
+      db.interfacename,
+      db.modifier*
     }
 }
 div {
@@ -10202,7 +10535,8 @@ div {
     element ooexception {
       db.ooexception.attlist,
       (db.package | db.modifier)*,
-      db.exceptionname
+      db.exceptionname,
+      db.modifier*
     }
 }
 db.modifier.xml.space.attribute =
@@ -10260,12 +10594,18 @@ div {
     element exceptionname { db.exceptionname.attlist, db._text }
 }
 div {
+  db.fieldsynopsis.info = db._info.title.forbidden
   db.fieldsynopsis.role.attribute = attribute role { text }
+  db.fieldsynopsis.packageref.attribute =
+    
+    ## Identifies the package to which this synopsis (logically) belongs
+    attribute packageref { text }
   db.fieldsynopsis.attlist =
     db.fieldsynopsis.role.attribute?
     & db.common.attributes
     & db.common.linking.attributes
     & db.language.attribute?
+    & db.fieldsynopsis.packageref.attribute?
   db.fieldsynopsis =
     
     ## The name of a field in a class definition
@@ -10283,10 +10623,14 @@ div {
     ]
     element fieldsynopsis {
       db.fieldsynopsis.attlist,
+      db.fieldsynopsis.info,
+      db.synopsisinfo*,
       db.modifier*,
-      (db.type | db.templateid)*,
+      (db.type | db.templatename)*,
       db.varname,
-      db.initializer?
+      db.modifier*,
+      db.initializer?,
+      db.synopsisinfo*
     }
 }
 div {
@@ -10304,12 +10648,18 @@ div {
     }
 }
 div {
+  db.constructorsynopsis.info = db._info.title.forbidden
   db.constructorsynopsis.role.attribute = attribute role { text }
+  db.constructorsynopsis.packageref.attribute =
+    
+    ## Identifies the package to which this synopsis (logically) belongs
+    attribute packageref { text }
   db.constructorsynopsis.attlist =
     db.constructorsynopsis.role.attribute?
     & db.common.attributes
     & db.common.linking.attributes
     & db.language.attribute?
+    & db.constructorsynopsis.packageref.attribute?
   db.constructorsynopsis =
     
     ## A syntax summary for a constructor
@@ -10327,19 +10677,29 @@ div {
     ]
     element constructorsynopsis {
       db.constructorsynopsis.attlist,
+      db.constructorsynopsis.info,
+      db.synopsisinfo*,
       db.modifier*,
       db.methodname?,
       ((db.methodparam | db.group.methodparam)+ | db.void?),
-      db.exceptionname*
+      db.modifier*,
+      db.exceptionname*,
+      db.synopsisinfo*
     }
 }
 div {
+  db.destructorsynopsis.info = db._info.title.forbidden
   db.destructorsynopsis.role.attribute = attribute role { text }
+  db.destructorsynopsis.packageref.attribute =
+    
+    ## Identifies the package to which this synopsis (logically) belongs
+    attribute packageref { text }
   db.destructorsynopsis.attlist =
     db.destructorsynopsis.role.attribute?
     & db.common.attributes
     & db.common.linking.attributes
     & db.language.attribute?
+    & db.destructorsynopsis.packageref.attribute?
   db.destructorsynopsis =
     
     ## A syntax summary for a destructor
@@ -10357,19 +10717,29 @@ div {
     ]
     element destructorsynopsis {
       db.destructorsynopsis.attlist,
+      db.destructorsynopsis.info,
+      db.synopsisinfo*,
       db.modifier*,
       db.methodname?,
       ((db.methodparam | db.group.methodparam)+ | db.void?),
-      db.exceptionname*
+      db.modifier*,
+      db.exceptionname*,
+      db.synopsisinfo*
     }
 }
 div {
+  db.methodsynopsis.info = db._info.title.forbidden
   db.methodsynopsis.role.attribute = attribute role { text }
+  db.methodsynopsis.packageref.attribute =
+    
+    ## Identifies the package to which this synopsis (logically) belongs
+    attribute packageref { text }
   db.methodsynopsis.attlist =
     db.methodsynopsis.role.attribute?
     & db.common.attributes
     & db.common.linking.attributes
     & db.language.attribute?
+    & db.methodsynopsis.packageref.attribute?
   db.methodsynopsis =
     
     ## A syntax summary for a method
@@ -10387,17 +10757,15 @@ div {
     ]
     element methodsynopsis {
       db.methodsynopsis.attlist,
-      db.template*,
-      db.modifier*,
-      (db.type+ | db.templateid+ | db.void)?,
-      db.methodname,
-      db.template*,
-      ((db.methodparam | db.group.methodparam)+ | db.void),
-      db.exceptionname*,
-      db.modifier*,
-      db.template*,
+      db.methodsynopsis.info,
       db.synopsisinfo*,
-      db.recursive.blocks.or.sections?
+      (db.templatename | db.modifier)*,
+      (db.type | db.void)?,
+      db.methodname,
+      db.templatename*,
+      ((db.methodparam | db.group.methodparam)+ | db.void),
+      (db.exceptionname | db.modifier | db.templatename)*,
+      db.synopsisinfo*
     }
 }
 div {
@@ -10426,11 +10794,9 @@ div {
     ## Parameters to a method
     element methodparam {
       db.methodparam.attlist,
-      db.modifier*,
-      (db.type | db.templateid)*,
-      ((db.modifier*, db.parameter, db.initializer?) | db.funcparams),
-      db.modifier*,
-      db.recursive.blocks.or.sections?
+      (db.modifier | db.type | db.templatename)*,
+      ((db.parameter, db.initializer?) | db.funcparams),
+      db.modifier*
     }
 }
 div {
@@ -10504,8 +10870,7 @@ div {
     
     ## The classification of a value
     element type {
-      db.type.attlist,
-      (db._text | db.type | db.templateid | db.programming.inlines)*
+      db.type.attlist, (db._text | db.programming.inlines)*
     }
 }
 div {
@@ -10520,15 +10885,15 @@ div {
     element classname { db.classname.attlist, db._text }
 }
 div {
-  db.templateid.role.attribute = attribute role { text }
-  db.templateid.attlist =
-    db.templateid.role.attribute?
+  db.templatename.role.attribute = attribute role { text }
+  db.templatename.attlist =
+    db.templatename.role.attribute?
     & db.common.attributes
     & db.common.linking.attributes
-  db.templateid =
+  db.templatename =
     
     ## The identifier for a template, in the generic programming sense
-    element templateid { db.templateid.attlist, db._text }
+    element templatename { db.templatename.attlist, db._text }
 }
 div {
   db.template.role.attribute = attribute role { text }
@@ -10542,7 +10907,7 @@ div {
     element template {
       db.template.attlist,
       (((db.modifier | db.type | db._text)*,
-        db.templateid,
+        db.templatename,
         (db.modifier | db.type | db._text)*)
        | db.specializedtemplate)
     }
@@ -10562,44 +10927,26 @@ div {
     }
 }
 div {
-  db.namespace.role.attribute = attribute role { text }
-  db.namespace.attlist =
-    db.namespace.role.attribute?
-    & db.common.attributes
-    & db.common.linking.attributes
-  db.namespace =
+  db.packagesynopsis.info = db._info.title.forbidden
+  db.packagesynopsis.role.attribute = attribute role { text }
+  db.packagesynopsis.packageref.attribute =
     
-    ## The definition of a name space, which may be more than a name
-    element namespace {
-      db.namespace.attlist, db.modifier*, db.namespacename, db.modifier*
-    }
-}
-div {
-  db.namespacename.role.attribute = attribute role { text }
-  db.namespacename.attlist =
-    db.namespacename.role.attribute?
-    & db.common.attributes
-    & db.common.linking.attributes
-  db.namespacename =
-    
-    ## The name of a name space
-    element namespacename { db.namespacename.attlist, db._text }
-}
-div {
-  db.namespacesynopsis.role.attribute = attribute role { text }
-  db.namespacesynopsis.attlist =
-    db.namespacesynopsis.role.attribute?
+    ## Identifies the package to which this synopsis (logically) belongs
+    attribute packageref { text }
+  db.packagesynopsis.attlist =
+    db.packagesynopsis.role.attribute?
     & db.common.attributes
     & db.common.linking.attributes
     & db.language.attribute?
-  db.namespacesynopsis =
+    & db.packagesynopsis.packageref.attribute?
+  db.packagesynopsis =
     
-    ## The syntax summary for a name space definition
+    ## The syntax summary for a package definition
     [
       s:pattern [
         s:title [ "Root must have version" ]
         s:rule [
-          context = "/db:namespacesynopsis"
+          context = "/db:packagesynopsis"
           s:assert [
             test = "@version"
             "If this element is the root element, it must have a version attribute."
@@ -10607,19 +10954,14 @@ div {
         ]
       ]
     ]
-    element namespacesynopsis {
-      db.namespacesynopsis.attlist,
-      (db.namespace | db.namespacename),
-      db.recursive.blocks.or.sections?,
-      (db.synopsisinfo
-       | db.classsynopsis
-       | db.funcsynopsis
-       | db.fieldsynopsis
-       | db.typedefsynopsis
-       | db.macrosynopsis
-       | db.enumsynopsis
-       | db.namespacesynopsis)*,
-      db.recursive.blocks.or.sections?
+    element packagesynopsis {
+      db.packagesynopsis.attlist,
+      db.packagesynopsis.info,
+      db.synopsisinfo*,
+      db.modifier*,
+      db.package,
+      db.modifier*,
+      (db.synopsis.blocks | db.synopsisinfo)*
     }
 }
 div {
@@ -10634,12 +10976,18 @@ div {
     element macroname { db.macroname.attlist, db._text }
 }
 div {
+  db.macrosynopsis.info = db._info.title.forbidden
   db.macrosynopsis.role.attribute = attribute role { text }
+  db.macrosynopsis.packageref.attribute =
+    
+    ## Identifies the package to which this synopsis (logically) belongs
+    attribute packageref { text }
   db.macrosynopsis.attlist =
     db.macrosynopsis.role.attribute?
     & db.common.attributes
     & db.common.linking.attributes
     & db.language.attribute?
+    & db.macrosynopsis.packageref.attribute?
   db.macrosynopsis =
     
     ## The syntax summary for a macro definition (code-generating function)
@@ -10657,11 +11005,13 @@ div {
     ]
     element macrosynopsis {
       db.macrosynopsis.attlist,
+      db.macrosynopsis.info,
+      db.synopsisinfo*,
+      (db.package | db.modifier)*,
       db.macroname,
-      db.synopsisinfo*,
+      (db.package | db.modifier)*,
       db.macroprototype+,
-      db.synopsisinfo*,
-      db.recursive.blocks.or.sections?
+      db.synopsisinfo*
     }
 }
 div {
@@ -10693,7 +11043,7 @@ div {
     
     ## A macro name and its return type
     element macrodef {
-      db.macrodef.attlist, (db.type | db.templateid)*, db.macroname
+      db.macrodef.attlist, (db.type | db.templatename)*, db.macroname
     }
 }
 div {
@@ -10716,11 +11066,10 @@ div {
   db.union =
     
     ## The definition of a union of types, which may be more than a name
-    element union {
-      db.union.attlist, db.unionname?, db.programming.inlines*
-    }
+    element union { db.union.attlist, db.type+ }
 }
 div {
+  db.unionsynopsis.info = db._info.title.forbidden
   db.unionsynopsis.role.attribute = attribute role { text }
   # N.B. the enumeration is explicitly identical to the enumeration
   # on enumsynopsis by default.
@@ -10728,12 +11077,17 @@ div {
     
     ## Indicates how the value of a union is specified.
     attribute ordered { db.enumsynopsis.ordered.enumeration }
+  db.unionsynopsis.packageref.attribute =
+    
+    ## Identifies the package to which this synopsis (logically) belongs
+    attribute packageref { text }
   db.unionsynopsis.attlist =
     db.unionsynopsis.role.attribute?
     & db.common.attributes
     & db.common.linking.attributes
     & db.language.attribute?
     & db.unionsynopsis.ordered.attribute?
+    & db.unionsynopsis.packageref.attribute?
   db.unionsynopsis =
     
     ## The syntax summary for a union-of-types definition
@@ -10751,10 +11105,13 @@ div {
     ]
     element unionsynopsis {
       db.unionsynopsis.attlist,
-      db.unionname?,
-      db.union?,
+      db.unionsynopsis.info,
       db.synopsisinfo*,
-      db.recursive.blocks.or.sections?
+      (db.package | db.modifier)*,
+      db.unionname?,
+      db.union,
+      (db.package | db.modifier)*,
+      db.synopsisinfo*
     }
 }
 div {
@@ -10804,17 +11161,23 @@ div {
     element enumidentifier { db.enumidentifier.attlist, db._text }
 }
 div {
+  db.enumitem.role.attribute = attribute role { text }
+  db.enumitem.attlist =
+    db.enumitem.role.attribute?
+    & db.common.attributes
+    & db.common.linking.attributes
   db.enumitem =
     
     ## A value an enumerated type can take and its description
     element enumitem {
-      db.enumvalue.attlist,
+      db.enumitem.attlist,
       db.enumidentifier,
-      db.enumvalue?,
+      db.enumvalue*,
       db.enumitemdescription?
     }
 }
 div {
+  db.enumsynopsis.info = db._info.title.forbidden
   db.enumsynopsis.role.attribute = attribute role { text }
   db.enumsynopsis.ordered.enumeration =
     
@@ -10827,12 +11190,17 @@ div {
     
     ## Indicates how the value of an enumeration is specified.
     attribute ordered { db.enumsynopsis.ordered.enumeration }
+  db.enumsynopsis.packageref.attribute =
+    
+    ## Identifies the package to which this synopsis (logically) belongs
+    attribute packageref { text }
   db.enumsynopsis.attlist =
     db.enumsynopsis.role.attribute?
     & db.common.attributes
     & db.common.linking.attributes
     & db.language.attribute?
     & db.enumsynopsis.ordered.attribute?
+    & db.enumsynopsis.packageref.attribute?
   db.enumsynopsis =
     
     ## The syntax summary for an enumerated-type definition
@@ -10850,10 +11218,12 @@ div {
     ]
     element enumsynopsis {
       db.enumsynopsis.attlist,
-      db.enumname?,
+      db.enumsynopsis.info,
       db.synopsisinfo*,
+      (db.package | db.modifier)*,
+      (db.enumname, db.modifier*)?,
       db.enumitem+,
-      db.recursive.blocks.or.sections?
+      db.synopsisinfo*
     }
 }
 div {
@@ -10868,12 +11238,18 @@ div {
     element typedefname { db.typedefname.attlist, db._text }
 }
 div {
+  db.typedefsynopsis.info = db._info.title.forbidden
   db.typedefsynopsis.role.attribute = attribute role { text }
+  db.typedefsynopsis.packageref.attribute =
+    
+    ## Identifies the package to which this synopsis (logically) belongs
+    attribute packageref { text }
   db.typedefsynopsis.attlist =
     db.typedefsynopsis.role.attribute?
     & db.common.attributes
     & db.common.linking.attributes
     & db.language.attribute?
+    & db.typedefsynopsis.packageref.attribute?
   db.typedefsynopsis =
     
     ## The syntax summary for a type-alias definition
@@ -10891,9 +11267,12 @@ div {
     ]
     element typedefsynopsis {
       db.typedefsynopsis.attlist,
+      db.typedefsynopsis.info,
+      db.synopsisinfo*,
+      (db.package | db.modifier)*,
       db.typedefname,
-      db.programming.inlines*,
-      db.recursive.blocks.or.sections?
+      (db.package | db.modifier)*,
+      db.synopsisinfo*
     }
 }
 div {
@@ -11648,10 +12027,16 @@ div {
     }
 }
 db._any =
-  element * - (db:* | html:* | its:*) {
+  element * - (db:* | its:*) {
     (attribute * { text }
      | text
      | db._any)*
+  }
+db._any_other.attribute =
+  
+  ## Any attribute in an other explicit namespace.
+  attribute * - (db:* | xml:* | xlink:* | trans:* | its:* | local:*) {
+    text
   }
 # Include base ITS schema
 
