@@ -49,6 +49,7 @@
   (ivy-mode))
 
 (use-package gptel
+  :disabled
   :defer t
   :config
   (setq gptel-backend (gptel-make-openai "GPT-OSS"
