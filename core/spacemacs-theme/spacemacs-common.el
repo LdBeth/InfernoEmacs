@@ -1,13 +1,14 @@
 ;;; spacemacs-common.el --- Color theme with a dark and light versions.  -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2015-2018 Nasser Alshammari
+;; Copyright (C) 2026 LdBeth
 
 ;; Author: Nasser Alshammari
 ;; URL: <https://github.com/nashamri/spacemacs-theme>
 ;;
 ;; Version: 0.1
 ;; Keywords: color, theme
-;; Package-Requires: ((emacs "24"))
+;; Package-Requires: ((emacs "27.1"))
 
 ;; Initially created with the help of emacs-theme-generator, <https://github.com/mswift42/theme-creator>.
 
@@ -704,7 +705,7 @@ to 'auto, tags may not be properly aligned. "
      '(persp-selected-face ((,class (:inherit bold :foreground ,func))))
 
 ;;;;; popup
-     '(popup-enu-selection-face ((,class (:background ,ttip-sl :foreground ,base))))
+     '(popup-menu-selection-face ((,class (:background ,ttip-sl :foreground ,base))))
      '(popup-face ((,class (:background ,ttip-bg :foreground ,ttip))))
      '(popup-isearch-match ((,class (:inherit match))))
      '(popup-menu-face ((,class (:background ,ttip-bg :foreground ,base))))
