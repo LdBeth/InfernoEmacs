@@ -229,7 +229,7 @@
     (append j-font-lock-len-3-verbs j-font-lock-len-2-verbs j-font-lock-len-1-verbs))
 
   (defconst j-font-lock-len-3-adverbs
-    '("/.."))
+    '("/.." "&::" "$::"))
   (defconst j-font-lock-len-2-adverbs
     '("]:" "M." "f." "b." "/." "\\."))
   (defconst j-font-lock-len-1-adverbs

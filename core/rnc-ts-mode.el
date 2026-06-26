@@ -29,6 +29,13 @@
 (eval-when-compile
   (require 'rx))
 
+(treesit-declare-unavailable-functions)
+
+(add-to-list
+ 'treesit-language-source-alist
+ '(rnc "https://github.com/LdBeth/tree-sitter-rnc")
+ t)
+
 ;;; Code:
 
 ;;;###autoload
@@ -129,12 +136,11 @@
       first-sibling 0)
      ((node-is "documentation") parent-bol 0)
      ((parent-is ,(rx (seq (one-or-more alpha) "_pattern"))) first-sibling 0)
-     ((parent-is ,(rx (seq (one-or-more alpha) "_block")))
-      grand-parent rnc-indent-level)
-     ((parent-is "param") great-grand-parent ,rnc-indent-level)
-     ((parent-is "primary") great-grand-parent ,rnc-indent-level)
-     ((field-is "body") parent-bol ,rnc-indent-level)
-     ((field-is "except") parent-bol ,rnc-indent-level)
+     ((parent-is ,(rx (seq (one-or-more alpha) "_block"))) grand-parent rnc-indent-level)
+     ((parent-is "param") great-grand-parent rnc-indent-level)
+     ((parent-is "primary") great-grand-parent rnc-indent-level)
+     ((field-is "body") parent-bol rnc-indent-level)
+     ((field-is "except") parent-bol rnc-indent-level)
      (no-node parent-bol rnc-indent-level)
      )))
 
@@ -151,7 +157,8 @@ Return nil if there is no name or if NODE is not a defun node."
 (define-derived-mode rnc-ts-mode prog-mode "RNC"
   "Major mode to edit Relax-NG Compact files."
   :syntax-table rnc-mode-syntax-table
-  (when (treesit-ready-p 'rnc)
+  (when (and (treesit-ensure-installed 'rnc)
+             (treesit-ready-p 'rnc))
     (setq-local comment-start "#")
     (treesit-parser-create 'rnc)
     (setq-local treesit-font-lock-settings rnc--treesit-font-lock-settings)
