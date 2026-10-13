@@ -1,9 +1,10 @@
 ;; -*- lexical-binding:nil -*-
-(let ((paths
-       (eval-when-compile
-         (with-temp-buffer
-           (call-process-shell-command "cat /etc/paths /etc/paths.d/*" nil t)
-           (split-string (buffer-string))))))
+(let* ((paths
+        (eval-when-compile
+          (with-temp-buffer
+            (call-process-shell-command "cat /etc/paths /etc/paths.d/*" nil t)
+            (split-string (buffer-string)))))
+       (paths (cons "/Users/ldbeth/.local/bin" paths)))
   (unless (getenv "EDITOR")
     (setenv "PATH" (mapconcat #'identity paths ":"))
     (setq exec-path (append paths (list exec-directory)))))

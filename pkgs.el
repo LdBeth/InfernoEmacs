@@ -128,9 +128,13 @@
 ;; Spell
 (use-package flyspell
   :defer t
+  :init
+  (setq ispell-program-name "/usr/local/bin/nsspell")
   :hook (text-mode . flyspell-mode)
   :bind (:map flyspell-mode-map
               ("C-;" . flyspell-correct-wrapper)))
+
+(use-package nsspell)
 
 ;; IM
 (use-package rime
@@ -219,7 +223,7 @@
   :config
   (defclass eglot-deno (eglot-lsp-server) ()
     :documentation "A custom class for deno lsp.")
-  (cl-defmethod eglot-initialization-options ((server eglot-deno))
+  (cl-defmethod eglot-initialization-options ((_server eglot-deno))
     "Passes through required deno initialization options"
     '(:enable t :unstable t))
   (add-to-list 'eglot-server-programs
