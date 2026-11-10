@@ -10,7 +10,6 @@
   <namespace ns="http://docbook.org/ns/docbook" typeId="DocBook"/>
   <namespace ns="http://www.w3.org/1998/Math/MathML" typeId="MathML"/>
   <namespace ns="http://www.w3.org/2005/Atom" typeId="Atom"/>
-  <namespace ns="https://ldbeth.sdf.org/lsml" typeId="LsML"/>
   <namespace ns="https://ldbeth.sdf.org/shuffle" typeId="JLit"/>
   <namespace ns="https://ldbeth.sdf.org/news" typeId="TNews"/>
   <namespace ns="urn:speedata.de:2009/publisher/en" typeId="Layout"/>
@@ -30,7 +29,6 @@
   <documentElement prefix="" localName="refentry" typeId="DocBook"/>
   <documentElement prefix="" localName="section" typeId="DocBook"/>
 
-  <documentElement prefix="" localName="lsml" typeId="LsML"/>
   <documentElement prefix="" localName="TeXML" typeId="TeX"/>
 
   <documentElement prefix="" localName="Layout" typeId="Layout"/>
@@ -41,7 +39,6 @@
   <typeId id="MathML" uri="mathml3.rnc"/>
   <typeId id="RSS" uri="rss.rnc"/>
   <typeId id="Atom" uri="atom.rnc"/>
-  <typeId id="LsML" uri="lsml.rnc"/>
   <typeId id="TeX" uri="texml.rnc"/>
   <typeId id="TNews" uri="news.rnc"/>
   <typeId id="Layout" uri="layoutschema.rnc"/>
